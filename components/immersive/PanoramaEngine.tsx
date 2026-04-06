@@ -269,7 +269,7 @@ export default function PanoramaEngine({
   useEffect(() => {
     if (!viewerRef.current || !loaded) return;
     const timer = setTimeout(() => {
-      try { viewerRef.current?.autoSize(); } catch {}
+      try { (viewerRef.current as unknown as { autoSize: () => void })?.autoSize(); } catch {}
     }, 100);
     return () => clearTimeout(timer);
   }, [loaded]);

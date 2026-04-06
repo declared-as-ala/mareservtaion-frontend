@@ -81,7 +81,7 @@ export default function AdminEventEditPage() {
 
   useEffect(() => {
     // eslint-disable-next-line react-hooks/set-state-in-effect
-    if (event && typeof event === 'object') setForm(toForm(event as Record<string, unknown>));
+    if (event && typeof event === 'object') setForm(toForm(event as unknown as Record<string, unknown>));
   }, [event]);
 
   const updateMutation = useMutation({

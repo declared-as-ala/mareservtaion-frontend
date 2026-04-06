@@ -23,7 +23,7 @@ export async function createScene(body: {
     ? (raw as { data: Scene }).data
     : raw;
   if (!data) throw new Error('Erreur lors de la création.');
-  return data;
+  return data as Scene;
 }
 
 export async function updateScene(
@@ -36,7 +36,7 @@ export async function updateScene(
     ? (raw as { data: Scene }).data
     : raw;
   if (!data) throw new Error('Erreur.');
-  return data;
+  return data as Scene;
 }
 
 export async function deleteScene(id: string): Promise<void> {

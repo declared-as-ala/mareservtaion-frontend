@@ -207,7 +207,7 @@ export default function AdminVenueDetailPage() {
   const effectiveSceneId = activeSceneId ?? (scenes[0]?._id ?? null);
 
   useEffect(() => {
-    if (venue && typeof venue === 'object') setForm(toForm(venue as Record<string, unknown>));
+    if (venue && typeof venue === 'object') setForm(toForm(venue as unknown as Record<string, unknown>));
   }, [venue]);
 
   const updateMutation = useMutation({
@@ -549,7 +549,7 @@ export default function AdminVenueDetailPage() {
             )}
           </div>
           <Button variant="outline" size="sm" asChild className="rounded-xl">
-            <Link href={`/lieu/${(venue as Record<string, unknown>).slug || (venue as Record<string, unknown>)._id}`} target="_blank">
+            <Link href={`/lieu/${venue.slug || venue._id}`} target="_blank">
               <Eye className="size-3.5 mr-1.5" /> Aperçu
             </Link>
           </Button>

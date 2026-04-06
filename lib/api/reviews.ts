@@ -36,7 +36,7 @@ export async function createReview(body: {
     ? (raw as { data: Review }).data
     : raw;
   if (!data) throw new Error('Erreur lors de la création de l\'avis.');
-  return data;
+  return data as Review;
 }
 
 export async function deleteReview(id: string): Promise<void> {
