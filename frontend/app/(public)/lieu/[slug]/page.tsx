@@ -264,6 +264,26 @@ export default function VenueDetailPage() {
 
           {/* ── Aperçu ── */}
           <TabsContent value="apercu" className="space-y-8 mt-4">
+            {/* 360° Preview */}
+            <div className="space-y-3">
+              <h2 className="font-semibold flex items-center gap-2">
+                <Eye className="size-4 text-amber-400" />
+                Vue 360°
+              </h2>
+              <div className="relative rounded-xl overflow-hidden border border-white/10 aspect-[2/1] bg-black/40">
+                <img
+                  src={venue.immersiveFile || '/default-360.jpg'}
+                  alt={`Vue 360° - ${venue.name}`}
+                  className="w-full h-full object-cover"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent flex items-end justify-center pb-6">
+                  <span className="text-sm font-medium text-white/90">
+                    Cliquez sur "Expérience immersive" pour explorer en 360°
+                  </span>
+                </div>
+              </div>
+            </div>
+
             {venue.description && (
               <div>
                 <h2 className="font-semibold mb-2">Description</h2>
