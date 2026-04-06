@@ -302,8 +302,8 @@ export default function VenueDetailPage() {
             <div className="space-y-4">
               {(() => {
                 const effImmersiveType = (venue.immersiveType && venue.immersiveType !== 'none') ? venue.immersiveType : 'view-360';
-                const effImmersiveSourceType = (effImmersiveType === 'view-360' && !venue.immersiveUrl && !venue.immersiveFile) ? 'upload' : (venue.immersiveSourceType || 'upload');
-                const effImmersiveFile = (!venue.immersiveFile && effImmersiveSourceType === 'upload') ? '/default-360.jpg' : venue.immersiveFile;
+                const effImmersiveSourceType = venue.immersiveSourceType === 'url' && venue.immersiveUrl ? 'url' : 'upload';
+                const effImmersiveFile = venue.immersiveFile || '/default-360.jpg';
                 const hasNewImmersiveLocal = true;
 
                 const tableReservationModal = selectedTable ? (
