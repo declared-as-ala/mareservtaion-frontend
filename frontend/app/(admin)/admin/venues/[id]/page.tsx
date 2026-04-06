@@ -500,7 +500,7 @@ export default function AdminVenueDetailPage() {
 
   const effImmersiveFile = form?.immersiveFile || '/default-360.jpg';
   const hasPanorama = effImmersiveFile &&
-    (form?.immersiveSourceType === 'upload' || !form?.immersiveSourceType || form?.immersiveSourceType === '') &&
+    (form?.immersiveSourceType === 'upload' || !form?.immersiveSourceType) &&
     !effImmersiveFile.match(/\.(mp4|webm|ogg)$/i);
 
   // ── Early returns ──
