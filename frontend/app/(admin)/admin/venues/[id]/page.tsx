@@ -522,18 +522,30 @@ export default function AdminVenueDetailPage() {
   return (
     <div className="space-y-6 pb-10">
       {/* ── Premium Header ───────────────────────────────────── */}
-      <div className="flex items-center justify-between">
-        <div className="flex items-center gap-4">
-          <Button variant="ghost" size="icon" asChild className="size-9 rounded-xl border border-border/50 hover:border-border">
+      <div className="rounded-2xl border border-border/40 bg-card p-4 flex items-center justify-between gap-4">
+        <div className="flex items-center gap-3">
+          <Button variant="ghost" size="icon" asChild className="size-9 rounded-xl border border-border/50 hover:border-border shrink-0">
             <Link href="/admin/venues"><ArrowLeft className="size-4" /></Link>
           </Button>
+
+          {/* Mini cover thumbnail */}
+          <div className={cn(
+            'relative size-12 rounded-xl overflow-hidden border border-border/40 bg-muted shrink-0',
+            !form.coverImage && 'flex items-center justify-center'
+          )}>
+            {form.coverImage
+              ? <Image src={form.coverImage} alt="" fill className="object-cover" sizes="48px" />
+              : <Building2 className="size-5 text-muted-foreground/40" />
+            }
+          </div>
+
           <div>
-            <div className="flex items-center gap-2 text-xs text-muted-foreground mb-0.5">
+            <div className="flex items-center gap-1.5 text-xs text-muted-foreground mb-0.5">
               <Link href="/admin/venues" className="hover:text-foreground transition-colors">Lieux</Link>
               <span>/</span>
-              <span className="text-foreground font-medium">{form.name || 'Édition'}</span>
+              <span className="text-foreground font-medium truncate max-w-[200px]">{form.name || 'Édition'}</span>
             </div>
-            <h1 className="text-xl font-bold tracking-tight">{form.name || 'Nouveau lieu'}</h1>
+            <h1 className="text-xl font-bold tracking-tight leading-none">{form.name || 'Nouveau lieu'}</h1>
           </div>
         </div>
         <div className="flex items-center gap-3">

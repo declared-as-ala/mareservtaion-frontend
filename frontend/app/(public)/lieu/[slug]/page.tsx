@@ -33,6 +33,8 @@ import {
   Phone,
   MapPin,
   Clock,
+  MessageCircle,
+  Info,
 } from 'lucide-react';
 import { toast } from 'sonner';
 import type { TablePlacement } from '@/lib/api/types';
@@ -244,22 +246,75 @@ export default function VenueDetailPage() {
       </div>
 
       <div className="mx-auto max-w-5xl px-4 py-8">
+
+        {/* ── Quick info bar ── */}
+        <div className="mb-6 flex flex-wrap gap-2.5">
+          {venue.rating > 0 && (
+            <div className="flex items-center gap-2 rounded-2xl bg-amber-500/10 border border-amber-500/25 px-4 py-2.5">
+              <Star className="size-4 fill-amber-400 text-amber-400" />
+              <span className="font-bold text-sm text-amber-400">{venue.rating}</span>
+              <span className="text-xs text-muted-foreground">/ 5</span>
+            </div>
+          )}
+          {venue.city && (
+            <div className="flex items-center gap-2 rounded-2xl bg-muted/50 border border-border/40 px-4 py-2.5">
+              <MapPin className="size-3.5 text-muted-foreground" />
+              <span className="text-sm font-medium">{venue.city}</span>
+            </div>
+          )}
+          {venue.startingPrice != null && venue.startingPrice > 0 && (
+            <div className="flex items-center gap-2 rounded-2xl bg-muted/50 border border-border/40 px-4 py-2.5">
+              <span className="text-xs text-muted-foreground">À partir de</span>
+              <span className="text-sm font-bold text-amber-400">{venue.startingPrice} TND</span>
+            </div>
+          )}
+          {venue.phone && (
+            <a
+              href={`tel:${venue.phone}`}
+              className="flex items-center gap-2 rounded-2xl bg-muted/50 border border-border/40 px-4 py-2.5 hover:border-primary/40 transition-colors group"
+            >
+              <Phone className="size-3.5 text-muted-foreground group-hover:text-primary transition-colors" />
+              <span className="text-sm font-medium">{venue.phone}</span>
+            </a>
+          )}
+        </div>
+
         <Tabs defaultValue={tabsDefaultValue} className="space-y-4">
-          <TabsList className="w-full justify-start overflow-x-auto">
-            <TabsTrigger value="apercu">Aperçu</TabsTrigger>
+          <TabsList className="w-full justify-start overflow-x-auto bg-card/60 backdrop-blur border border-border/50 rounded-2xl p-1.5 gap-0.5 h-auto">
+            <TabsTrigger
+              value="apercu"
+              className="rounded-xl gap-1.5 px-4 py-2 text-sm data-[state=active]:bg-background data-[state=active]:shadow-sm"
+            >
+              <Eye className="size-3.5" /> Aperçu
+            </TabsTrigger>
             {hasNewImmersive && (
-              <TabsTrigger value="visite">Expérience immersive</TabsTrigger>
+              <TabsTrigger
+                value="visite"
+                className="rounded-xl gap-1.5 px-4 py-2 text-sm data-[state=active]:bg-amber-500/20 data-[state=active]:text-amber-400 data-[state=active]:shadow-sm"
+              >
+                <Video className="size-3.5" /> Expérience immersive
+              </TabsTrigger>
             )}
             {hasTablePlacements && (
-              <TabsTrigger value="tables" className="gap-1.5">
-                Tables
+              <TabsTrigger value="tables" className="rounded-xl gap-1.5 px-4 py-2 text-sm data-[state=active]:bg-background data-[state=active]:shadow-sm">
+                <Users className="size-3.5" /> Tables
                 <span className="inline-flex items-center justify-center rounded-full bg-amber-500/20 text-amber-400 text-[10px] font-bold px-1.5 min-w-[18px] h-[18px]">
                   {allPlacements.length}
                 </span>
               </TabsTrigger>
             )}
-            <TabsTrigger value="avis">Avis</TabsTrigger>
-            <TabsTrigger value="infos">Infos pratiques</TabsTrigger>
+            <TabsTrigger
+              value="avis"
+              className="rounded-xl gap-1.5 px-4 py-2 text-sm data-[state=active]:bg-background data-[state=active]:shadow-sm"
+            >
+              <MessageCircle className="size-3.5" /> Avis
+            </TabsTrigger>
+            <TabsTrigger
+              value="infos"
+              className="rounded-xl gap-1.5 px-4 py-2 text-sm data-[state=active]:bg-background data-[state=active]:shadow-sm"
+            >
+              <Info className="size-3.5" /> Infos
+            </TabsTrigger>
           </TabsList>
 
           {/* ── Aperçu ── */}
@@ -752,40 +807,63 @@ export default function VenueDetailPage() {
 
           {/* ── Infos pratiques ── */}
           <TabsContent value="infos" className="mt-4 space-y-6">
-            <dl className="space-y-3 text-sm">
+            <div className="grid sm:grid-cols-2 gap-3">
               {venue.address && (
-                <div>
-                  <dt className="font-medium flex items-center gap-1.5 mb-0.5">
-                    <MapPin className="size-3.5" /> Adresse
-                  </dt>
-                  <dd className="text-muted-foreground pl-5">
-                    {venue.address}, {venue.city}
-                  </dd>
+                <div className="flex items-start gap-3 rounded-2xl border border-border/40 bg-muted/20 p-4">
+                  <div className="size-10 rounded-xl bg-primary/10 flex items-center justify-center shrink-0">
+                    <MapPin className="size-4 text-primary" />
+                  </div>
+                  <div>
+                    <p className="text-[10px] font-semibold uppercase tracking-widest text-muted-foreground mb-1">Adresse</p>
+                    <p className="text-sm font-medium leading-snug">{venue.address}</p>
+                    {venue.city && <p className="text-xs text-muted-foreground mt-0.5">{venue.city}</p>}
+                  </div>
                 </div>
               )}
               {venue.phone && (
-                <div>
-                  <dt className="font-medium flex items-center gap-1.5 mb-0.5">
-                    <Phone className="size-3.5" /> Téléphone
-                  </dt>
-                  <dd className="pl-5">
-                    <a href={`tel:${venue.phone}`} className="text-primary hover:underline">
-                      {venue.phone}
-                    </a>
-                  </dd>
-                </div>
+                <a
+                  href={`tel:${venue.phone}`}
+                  className="flex items-start gap-3 rounded-2xl border border-border/40 bg-muted/20 p-4 hover:border-primary/40 hover:bg-primary/5 transition-colors group"
+                >
+                  <div className="size-10 rounded-xl bg-primary/10 flex items-center justify-center shrink-0 group-hover:bg-primary/20 transition-colors">
+                    <Phone className="size-4 text-primary" />
+                  </div>
+                  <div>
+                    <p className="text-[10px] font-semibold uppercase tracking-widest text-muted-foreground mb-1">Téléphone</p>
+                    <p className="text-sm font-medium">{venue.phone}</p>
+                    <p className="text-xs text-primary mt-0.5 opacity-0 group-hover:opacity-100 transition-opacity">Appeler →</p>
+                  </div>
+                </a>
               )}
               {venue.startingPrice != null && (
-                <div>
-                  <dt className="font-medium flex items-center gap-1.5 mb-0.5">
-                    <Clock className="size-3.5" /> Tarif
-                  </dt>
-                  <dd className="text-muted-foreground pl-5">
-                    À partir de <span className="font-medium text-foreground">{venue.startingPrice} TND</span>
-                  </dd>
+                <div className="flex items-start gap-3 rounded-2xl border border-amber-500/20 bg-amber-500/5 p-4">
+                  <div className="size-10 rounded-xl bg-amber-500/15 flex items-center justify-center shrink-0">
+                    <Clock className="size-4 text-amber-500" />
+                  </div>
+                  <div>
+                    <p className="text-[10px] font-semibold uppercase tracking-widest text-muted-foreground mb-1">Tarif</p>
+                    <p className="text-sm">
+                      À partir de{' '}
+                      <span className="font-bold text-amber-400">{venue.startingPrice} TND</span>
+                    </p>
+                  </div>
                 </div>
               )}
-            </dl>
+              {venue.rating > 0 && (
+                <div className="flex items-start gap-3 rounded-2xl border border-amber-500/20 bg-amber-500/5 p-4">
+                  <div className="size-10 rounded-xl bg-amber-500/15 flex items-center justify-center shrink-0">
+                    <Star className="size-4 fill-amber-400 text-amber-400" />
+                  </div>
+                  <div>
+                    <p className="text-[10px] font-semibold uppercase tracking-widest text-muted-foreground mb-1">Note moyenne</p>
+                    <p className="text-sm font-bold text-amber-400">
+                      {venue.rating}{' '}
+                      <span className="text-muted-foreground font-normal text-xs">/ 5</span>
+                    </p>
+                  </div>
+                </div>
+              )}
+            </div>
 
             {venue.address && venue.city && (
               <VenueMap address={venue.address} city={venue.city} />
