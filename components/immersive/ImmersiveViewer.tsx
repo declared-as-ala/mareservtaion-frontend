@@ -34,18 +34,12 @@ export default function ImmersiveViewer({
   onMarkerClick,
   onMarkerMoved,
 }: ImmersiveViewerProps) {
-  if (!url) {
-    return (
-      <div className="flex items-center justify-center w-full h-full min-h-[400px] bg-zinc-900 text-zinc-500 text-sm">
-        Aucun média 360° configuré
-      </div>
-    );
-  }
+  const DEFAULT_360 = '/default-360.jpg';
 
-  if (sourceType === 'upload') {
+  if (sourceType === 'upload' || !url) {
     return (
       <PanoramaEngine
-        imageUrl={url}
+        imageUrl={url || DEFAULT_360}
         markers={markers}
         selectedMarkerId={selectedMarkerId}
         mode={mode}
