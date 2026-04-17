@@ -128,9 +128,9 @@ export default function EventDetailPage() {
         badges={
           <>
             <TypeBadge type={event.type} />
-            {event.isSponsored && (
-              <span className="rounded-full bg-amber-500/90 px-2 py-0.5 text-xs font-medium text-white">
-                Sponsorisé
+            {event.isVedette && (
+              <span className="rounded-full bg-amber-500/90 px-2 py-0.5 text-xs font-bold text-black">
+                ⭐ Vedette
               </span>
             )}
           </>

@@ -4,7 +4,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { useQuery } from '@tanstack/react-query';
 import { fetchVenues } from '@/lib/api/venues';
-import { MapPin, Star, ArrowRight } from 'lucide-react';
+import { MapPin, ArrowRight } from 'lucide-react';
 import type { VenueType } from '@/lib/api/types';
 
 interface SimilarVenuesProps {
@@ -60,23 +60,10 @@ export function SimilarVenues({ venueId, type, city }: SimilarVenuesProps) {
                 <p className="font-medium text-sm line-clamp-1 group-hover:text-primary transition-colors">
                   {venue.name}
                 </p>
-                <div className="flex items-center justify-between mt-1.5">
-                  <span className="text-xs text-muted-foreground flex items-center gap-1">
-                    <MapPin className="size-3 shrink-0" />
-                    {venue.city}
-                  </span>
-                  {venue.rating > 0 && (
-                    <span className="text-xs flex items-center gap-0.5 text-amber-500">
-                      <Star className="size-3 fill-amber-400 text-amber-400" />
-                      {venue.rating}
-                    </span>
-                  )}
-                </div>
-                {venue.startingPrice != null && (
-                  <p className="text-xs text-muted-foreground mt-1">
-                    À partir de <span className="text-amber-500 font-medium">{venue.startingPrice} TND</span>
-                  </p>
-                )}
+                <span className="mt-1.5 text-xs text-muted-foreground flex items-center gap-1">
+                  <MapPin className="size-3 shrink-0" />
+                  {venue.city}
+                </span>
               </div>
             </Link>
           );

@@ -2,7 +2,8 @@
 
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
-import { api, setAccessToken, clearAccessToken } from '@/lib/api/client';
+
+const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
 
 export type User = {
   id: string;
@@ -14,10 +15,14 @@ export type User = {
 
 type AuthState = {
   user: User | null;
-  accessToken: string | null;
-  setAuth: (user: User, token: string) => void;
-  logout: () => void;
-  clear: () => void;
+  /** True while the app is bootstrapping or validating the session. */
+  isResolving: boolean;
+  /** True when the store has finished its initial hydration from localStorage. */
+  hasHydrated: boolean;
+  setAuth: (user: User) => void;
+  logout: () => Promise<void>;
+  clearAll: () => void;
+  /** Validate the current session by calling /me. Returns user or null. */
   fetchMe: () => Promise<User | null>;
 };
 
@@ -30,83 +35,130 @@ type MeResponse = {
   createdAt?: string;
 };
 
+/**
+ * Build headers with credentials:include for cookie-based auth.
+ * The backend uses httpOnly cookies, so we don't need to manually
+ * attach an Authorization header.
+ */
+function authHeaders(): Record<string, string> {
+  return { 'Content-Type': 'application/json' };
+}
+
+/** Map a backend user object to our User type. */
+function mapUser(d: MeResponse): User {
+  return {
+    id: d.id ?? d._id ?? '',
+    fullName: d.fullName,
+    email: d.email,
+    role: d.role,
+    createdAt: d.createdAt,
+  };
+}
+
 export const useAuthStore = create<AuthState>()(
   persist(
-    (set) => ({
+    (set, _get) => ({
       user: null,
-      accessToken: null,
+      isResolving: false,
+      hasHydrated: false,
 
-      setAuth: (user, token) => {
-        setAccessToken(token);
-        set({ user, accessToken: token });
+      setAuth: (user) => {
+        set({ user, isResolving: false });
       },
 
-      logout: () => {
-        clearAccessToken();
-        set({ user: null, accessToken: null });
+      clearAll: () => {
+        set({ user: null, isResolving: false });
       },
 
-      clear: () => {
-        clearAccessToken();
-        set({ user: null, accessToken: null });
+      logout: async () => {
+        try {
+          // Call backend to invalidate refresh token and clear httpOnly cookies.
+          await fetch(`${API_BASE}/api/v1/auth/logout`, {
+            method: 'POST',
+            headers: authHeaders(),
+            credentials: 'include',
+          });
+        } catch {
+          // Even if the backend call fails, clear local state.
+        } finally {
+          set({ user: null, isResolving: false });
+
+          if (typeof window !== 'undefined') {
+            window.location.href = '/login';
+          }
+        }
       },
 
       fetchMe: async () => {
+        set({ isResolving: true });
         try {
-          const res = await api.get<MeResponse>('/auth/me');
-          const d = (res as { data?: MeResponse }).data ?? (res as unknown as MeResponse);
-          if (d && (d.id || d._id)) {
-            const user: User = {
-              id: d.id ?? d._id ?? '',
-              fullName: d.fullName,
-              email: d.email,
-              role: d.role,
-              createdAt: d.createdAt,
-            };
-            set({ user });
-            return user;
-          }
-        } catch {
-          // If access token expired, try silent refresh once using the httpOnly cookie.
-          try {
-            const refreshRes = await api.post<unknown>('/auth/refresh', {});
-            const raw = refreshRes as {
-              accessToken?: string;
-              token?: string;
-              data?: { accessToken?: string; token?: string };
-            };
-            const token = raw.accessToken ?? raw.token ?? raw.data?.accessToken ?? raw.data?.token;
-            if (typeof token === 'string' && token) {
-              setAccessToken(token);
-              // Retry fetching the user profile.
-              const res2 = await api.get<MeResponse>('/auth/me');
-              const d2 = (res2 as { data?: MeResponse }).data ?? (res2 as unknown as MeResponse);
-              if (d2 && (d2.id || d2._id)) {
-                const user: User = {
-                  id: d2.id ?? d2._id ?? '',
-                  fullName: d2.fullName,
-                  email: d2.email,
-                  role: d2.role,
-                  createdAt: d2.createdAt,
-                };
-                set({ user, accessToken: token });
-                return user;
-              }
-            }
-          } catch {
-            // ignore and fallthrough to clearing auth state
+          const res = await fetch(`${API_BASE}/api/v1/auth/me`, {
+            method: 'GET',
+            headers: authHeaders(),
+            credentials: 'include',
+          });
+
+          if (!res.ok) {
+            throw new Error(`HTTP ${res.status}`);
           }
 
-          set({ user: null, accessToken: null });
-          clearAccessToken();
+          const d = (await res.json()) as MeResponse;
+          if (d && (d.id || d._id)) {
+            const user = mapUser(d);
+            set({ user, isResolving: false });
+            return user;
+          }
+          throw new Error('Invalid response');
+        } catch {
+          // Session is invalid — try a silent refresh once.
+          try {
+            const refreshRes = await fetch(`${API_BASE}/api/v1/auth/refresh`, {
+              method: 'POST',
+              credentials: 'include',
+            });
+
+            if (!refreshRes.ok) {
+              throw new Error(`Refresh failed: ${refreshRes.status}`);
+            }
+
+            // Refresh succeeded — httpOnly cookies have been updated.
+            // Retry /me with the new session.
+            const res2 = await fetch(`${API_BASE}/api/v1/auth/me`, {
+              method: 'GET',
+              headers: authHeaders(),
+              credentials: 'include',
+            });
+
+            if (!res2.ok) {
+              throw new Error(`HTTP ${res2.status}`);
+            }
+
+            const d2 = (await res2.json()) as MeResponse;
+            if (d2 && (d2.id || d2._id)) {
+              const user = mapUser(d2);
+              set({ user, isResolving: false });
+              return user;
+            }
+            throw new Error('Invalid response');
+          } catch {
+            // All refresh attempts failed — session is gone.
+            set({ user: null, isResolving: false });
+            return null;
+          }
         }
-        return null;
       },
     }),
     {
       name: 'ma-reservation-auth',
-      partialize: (state) => ({ user: state.user, accessToken: state.accessToken }),
+      // Only persist the user object, NOT tokens.
+      // The session is validated via httpOnly cookies on every bootstrap.
+      partialize: (state) => ({ user: state.user }),
+      // Notify when hydration is complete.
+      onRehydrateStorage: () => (state) => {
+        if (state) {
+          state.hasHydrated = true;
+        }
+      },
     }
   )
 );
-

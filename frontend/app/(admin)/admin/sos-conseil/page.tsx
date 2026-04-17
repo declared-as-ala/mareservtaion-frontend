@@ -2,8 +2,26 @@
 
 import { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { Sparkles, Eye, Trash2, RefreshCcw, ChevronLeft, ChevronRight, X } from 'lucide-react';
+import { Sparkles, Eye, Trash2, RefreshCcw, ChevronLeft, ChevronRight, X, CalendarDays, Users, MapPin, Phone, Mail } from 'lucide-react';
 import { listSOSConseil, updateSOSConseilStatus, deleteSOSConseil, type SOSConseilRecord } from '@/lib/api/sos-conseil';
+import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
+import { Skeleton } from '@/components/ui/skeleton';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+} from '@/components/ui/dialog';
 import { toast } from 'sonner';
 
 const STATUS_LABEL: Record<string, string> = {
@@ -13,12 +31,24 @@ const STATUS_LABEL: Record<string, string> = {
   closed: 'Clôturé',
 };
 
-const STATUS_STYLE: Record<string, string> = {
-  new: 'text-blue-400 bg-blue-400/10 border-blue-400/20',
-  in_review: 'text-amber-400 bg-amber-400/10 border-amber-400/20',
-  contacted: 'text-emerald-400 bg-emerald-400/10 border-emerald-400/20',
-  closed: 'text-zinc-400 bg-zinc-800 border-zinc-700',
-};
+function StatusBadge({ status }: { status: string }) {
+  const styles: Record<string, string> = {
+    new: 'bg-blue-500/10 text-blue-400 border-blue-500/20',
+    in_review: 'bg-amber-500/10 text-amber-400 border-amber-500/20',
+    contacted: 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20',
+    closed: 'bg-zinc-800 text-zinc-400 border-zinc-700',
+  };
+  
+  const style = styles[status] ?? 'bg-zinc-800 text-zinc-400 border-zinc-700';
+  const label = STATUS_LABEL[status] ?? status;
+  
+  return (
+    <Badge variant="outline" className={`inline-flex items-center gap-1.5 px-2 py-1 text-xs font-medium border ${style}`}>
+      <div className={`size-1.5 rounded-full ${status === 'new' ? 'bg-blue-400' : status === 'in_review' ? 'bg-amber-400' : status === 'contacted' ? 'bg-emerald-400' : 'bg-zinc-500'}`} />
+      {label}
+    </Badge>
+  );
+}
 
 function DetailModal({ req, onClose }: { req: SOSConseilRecord; onClose: () => void }) {
   const queryClient = useQueryClient();
@@ -34,77 +64,137 @@ function DetailModal({ req, onClose }: { req: SOSConseilRecord; onClose: () => v
     onError: () => toast.error('Erreur lors de la mise à jour'),
   });
 
-  const fields: [string, string][] = [
-    ['Nom complet', current.fullName],
-    ['Téléphone', current.phone],
-    ['Email', current.email || '—'],
-    ['Occasion', current.occasionType.replace('_', ' ')],
-    ['Participants', String(current.participantsCount)],
-    ["Tranche d'âge", current.averageAgeRange],
-    ['Région', current.preferredRegion],
-    ['Catégorie', current.preferredCategory.replace('_', ' ')],
-    ['Budget', current.budgetRange.replace('_', ' ')],
-    ['Date souhaitée', current.preferredDate ? new Date(current.preferredDate).toLocaleDateString('fr-FR') : '—'],
-    ['Heure souhaitée', current.preferredTime || '—'],
-  ];
-
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm">
-      <div className="w-full max-w-lg rounded-2xl border border-zinc-800 bg-zinc-900 p-6 shadow-2xl overflow-y-auto max-h-[90vh]">
-        <div className="flex items-start justify-between mb-6">
-          <div>
-            <div className="flex items-center gap-2 mb-1">
-              <Sparkles className="w-5 h-5 text-amber-400" />
-              <h2 className="text-base font-semibold text-white">Demande SOS Conseil</h2>
+    <Dialog open={true} onOpenChange={() => onClose()}>
+      <DialogContent className="max-w-2xl border-zinc-800 bg-zinc-900 max-h-[90vh] overflow-y-auto">
+        <DialogHeader>
+          <div className="flex items-start justify-between">
+            <div>
+              <DialogTitle className="flex items-center gap-2 text-white">
+                <Sparkles className="size-5 text-amber-400" />
+                Demande SOS Conseil
+              </DialogTitle>
+              <DialogDescription className="text-zinc-400 mt-1">
+                {new Date(current.createdAt).toLocaleString('fr-FR')}
+              </DialogDescription>
             </div>
-            <p className="text-xs text-zinc-500">{new Date(current.createdAt).toLocaleString('fr-FR')}</p>
           </div>
-          <button type="button" onClick={onClose} className="p-1.5 rounded-lg hover:bg-zinc-800 text-zinc-500 hover:text-zinc-300">
-            <X className="w-4 h-4" />
-          </button>
+        </DialogHeader>
+        
+        <div className="space-y-6 pt-2">
+          {/* Contact Info */}
+          <div className="grid sm:grid-cols-2 gap-4">
+            <div className="flex items-center gap-3 p-3 rounded-lg bg-zinc-800/50 border border-zinc-700/50">
+              <div className="size-9 rounded-full bg-blue-500/10 flex items-center justify-center">
+                <Users className="size-4 text-blue-400" />
+              </div>
+              <div>
+                <p className="text-xs text-zinc-500">Nom complet</p>
+                <p className="text-sm font-medium text-zinc-100">{current.fullName}</p>
+              </div>
+            </div>
+            <div className="flex items-center gap-3 p-3 rounded-lg bg-zinc-800/50 border border-zinc-700/50">
+              <div className="size-9 rounded-full bg-emerald-500/10 flex items-center justify-center">
+                <Phone className="size-4 text-emerald-400" />
+              </div>
+              <div>
+                <p className="text-xs text-zinc-500">Téléphone</p>
+                <p className="text-sm font-medium text-zinc-100">{current.phone}</p>
+              </div>
+            </div>
+            <div className="flex items-center gap-3 p-3 rounded-lg bg-zinc-800/50 border border-zinc-700/50">
+              <div className="size-9 rounded-full bg-purple-500/10 flex items-center justify-center">
+                <Mail className="size-4 text-purple-400" />
+              </div>
+              <div>
+                <p className="text-xs text-zinc-500">Email</p>
+                <p className="text-sm font-medium text-zinc-100">{current.email || '—'}</p>
+              </div>
+            </div>
+            <div className="flex items-center gap-3 p-3 rounded-lg bg-zinc-800/50 border border-zinc-700/50">
+              <div className="size-9 rounded-full bg-amber-500/10 flex items-center justify-center">
+                <CalendarDays className="size-4 text-amber-400" />
+              </div>
+              <div>
+                <p className="text-xs text-zinc-500">Date souhaitée</p>
+                <p className="text-sm font-medium text-zinc-100">
+                  {current.preferredDate ? new Date(current.preferredDate).toLocaleDateString('fr-FR') : '—'}
+                </p>
+              </div>
+            </div>
+          </div>
+
+          {/* Event Details */}
+          <div className="grid sm:grid-cols-2 gap-4">
+            <div className="space-y-2">
+              <p className="text-xs text-zinc-500">Occasion</p>
+              <p className="text-sm font-medium text-zinc-100 capitalize">{current.occasionType.replace('_', ' ')}</p>
+            </div>
+            <div className="space-y-2">
+              <p className="text-xs text-zinc-500">Participants</p>
+              <p className="text-sm font-medium text-zinc-100">{current.participantsCount} personnes</p>
+            </div>
+            <div className="space-y-2">
+              <p className="text-xs text-zinc-500">Tranche d'âge</p>
+              <p className="text-sm font-medium text-zinc-100">{current.averageAgeRange}</p>
+            </div>
+            <div className="space-y-2">
+              <p className="text-xs text-zinc-500">Région</p>
+              <p className="text-sm font-medium text-zinc-100 flex items-center gap-1.5">
+                <MapPin className="size-3.5" />
+                {current.preferredRegion}
+              </p>
+            </div>
+            <div className="space-y-2">
+              <p className="text-xs text-zinc-500">Catégorie</p>
+              <p className="text-sm font-medium text-zinc-100 capitalize">{current.preferredCategory.replace('_', ' ')}</p>
+            </div>
+            <div className="space-y-2">
+              <p className="text-xs text-zinc-500">Budget</p>
+              <p className="text-sm font-medium text-zinc-100">{current.budgetRange.replace('_', ' ')}</p>
+            </div>
+            {current.preferredTime && (
+              <div className="space-y-2">
+                <p className="text-xs text-zinc-500">Heure souhaitée</p>
+                <p className="text-sm font-medium text-zinc-100">{current.preferredTime}</p>
+              </div>
+            )}
+          </div>
+
+          {/* Details */}
+          {current.details && (
+            <div className="space-y-2">
+              <p className="text-xs text-zinc-500">Détails</p>
+              <div className="bg-zinc-800/50 rounded-lg p-4 text-sm text-zinc-300 leading-relaxed whitespace-pre-wrap border border-zinc-700/50">
+                {current.details}
+              </div>
+            </div>
+          )}
+
+          {/* Status */}
+          <div className="space-y-3 pt-4 border-t border-zinc-800">
+            <p className="text-xs text-zinc-500">Changer le statut</p>
+            <div className="flex flex-wrap gap-2">
+              {(['new', 'in_review', 'contacted', 'closed'] as const).map((s) => (
+                <button
+                  key={s}
+                  type="button"
+                  disabled={isPending || current.status === s}
+                  onClick={() => changeStatus(s)}
+                  className={`px-3 py-2 rounded-lg text-xs font-medium transition-all duration-200 border ${
+                    current.status === s
+                      ? 'bg-amber-500 text-black border-amber-500 cursor-default'
+                      : 'bg-zinc-800/50 border-zinc-700 text-zinc-300 hover:border-amber-500/40 hover:text-amber-400'
+                  }`}
+                >
+                  {STATUS_LABEL[s]}
+                </button>
+              ))}
+            </div>
+          </div>
         </div>
-
-        <dl className="space-y-0 divide-y divide-zinc-800/60 text-sm">
-          {fields.map(([label, value]) => (
-            <div key={label} className="grid grid-cols-2 gap-2 py-2.5">
-              <dt className="text-zinc-500">{label}</dt>
-              <dd className="font-medium text-zinc-200 capitalize">{value}</dd>
-            </div>
-          ))}
-        </dl>
-
-        {current.details && (
-          <div className="mt-4">
-            <p className="text-xs text-zinc-500 mb-1.5">Détails</p>
-            <div className="bg-zinc-800/50 rounded-lg p-3 text-sm text-zinc-300 leading-relaxed whitespace-pre-wrap">
-              {current.details}
-            </div>
-          </div>
-        )}
-
-        <div className="mt-6 pt-4 border-t border-zinc-800">
-          <p className="text-xs text-zinc-500 mb-2">Changer le statut</p>
-          <div className="flex flex-wrap gap-2">
-            {(['new', 'in_review', 'contacted', 'closed'] as const).map((s) => (
-              <button
-                key={s}
-                type="button"
-                disabled={isPending || current.status === s}
-                onClick={() => changeStatus(s)}
-                className={[
-                  'px-3 py-1.5 rounded-lg text-xs font-medium transition-colors',
-                  current.status === s
-                    ? 'bg-amber-400 text-black cursor-default'
-                    : 'bg-zinc-800 border border-zinc-700 text-zinc-300 hover:border-amber-400/40 hover:text-amber-400',
-                ].join(' ')}
-              >
-                {STATUS_LABEL[s]}
-              </button>
-            ))}
-          </div>
-        </div>
-      </div>
-    </div>
+      </DialogContent>
+    </Dialog>
   );
 }
 
@@ -116,7 +206,7 @@ export default function AdminSOSConseilPage() {
 
   const { data, isLoading, refetch } = useQuery({
     queryKey: ['admin', 'sos-conseil', page, status],
-    queryFn: () => listSOSConseil({ page, status: status || undefined }),
+    queryFn: () => listSOSConseil({ page, status: (status === 'all' ? '' : status) || undefined }),
   });
 
   const { mutate: remove } = useMutation({
@@ -138,140 +228,168 @@ export default function AdminSOSConseilPage() {
         {/* Header */}
         <div className="flex items-center justify-between flex-wrap gap-3">
           <div>
-            <h1 className="text-xl font-bold text-white flex items-center gap-2">
-              <Sparkles className="w-5 h-5 text-amber-400" />
+            <h1 className="text-2xl font-bold text-white flex items-center gap-2">
+              <Sparkles className="size-6 text-amber-400" />
               SOS Conseil
             </h1>
-            <p className="text-sm text-zinc-400 mt-0.5">Demandes de conseil personnalisé</p>
+            <p className="text-sm text-zinc-400 mt-1">Demandes de conseil personnalisé</p>
           </div>
           {data && (
-            <span className="text-sm text-zinc-400">
+            <Badge variant="outline" className="bg-zinc-800/50 text-zinc-300 border-zinc-700">
               {data.total} demande{data.total !== 1 ? 's' : ''}
-            </span>
+            </Badge>
           )}
         </div>
 
         {/* Filters */}
-        <div className="flex items-center gap-3 flex-wrap">
-          <select
-            value={status}
-            onChange={(e) => { setStatus(e.target.value); setPage(1); }}
-            className="px-4 py-2 rounded-lg bg-zinc-800 border border-zinc-700 text-zinc-200 text-sm outline-none focus:border-amber-400/50"
-          >
-            <option value="">Tous les statuts</option>
-            <option value="new">Nouveau</option>
-            <option value="in_review">En revue</option>
-            <option value="contacted">Contacté</option>
-            <option value="closed">Clôturé</option>
-          </select>
-          <button
-            type="button"
-            onClick={() => refetch()}
-            className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-zinc-800 border border-zinc-700 hover:border-zinc-600 text-zinc-300 text-sm transition-colors"
-          >
-            <RefreshCcw className="w-4 h-4" />
-            Actualiser
-          </button>
-        </div>
+        <Card className="border-zinc-800 bg-zinc-900/50">
+          <CardContent className="pt-5 pb-4">
+            <div className="flex items-center gap-3 flex-wrap">
+              <Select value={status} onValueChange={(v) => { setStatus(v); setPage(1); }}>
+                <SelectTrigger className="w-[180px] h-9 border-zinc-700 bg-zinc-800/50 text-zinc-100 focus:border-amber-500 focus:ring-amber-500/20">
+                  <SelectValue placeholder="Tous les statuts" />
+                </SelectTrigger>
+                <SelectContent className="bg-zinc-900 border-zinc-800">
+                  <SelectItem value="all">Tous les statuts</SelectItem>
+                  <SelectItem value="new">Nouveau</SelectItem>
+                  <SelectItem value="in_review">En revue</SelectItem>
+                  <SelectItem value="contacted">Contacté</SelectItem>
+                  <SelectItem value="closed">Clôturé</SelectItem>
+                </SelectContent>
+              </Select>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => refetch()}
+                className="h-9 border-zinc-700 bg-zinc-800/50 text-zinc-200 hover:bg-zinc-800 gap-2"
+              >
+                <RefreshCcw className="size-4" />
+                Actualiser
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
 
         {/* Table */}
-        <div className="rounded-xl border border-zinc-800 bg-zinc-900 overflow-x-auto">
-          {isLoading ? (
-            <div className="p-8 space-y-3">
-              {[1, 2, 3, 4].map((i) => (
-                <div key={i} className="h-12 bg-zinc-800/50 rounded-lg animate-pulse" />
-              ))}
-            </div>
-          ) : requests.length === 0 ? (
-            <div className="p-16 text-center">
-              <Sparkles className="w-12 h-12 mx-auto mb-4 text-zinc-600 opacity-50" />
-              <p className="text-zinc-500">Aucune demande SOS Conseil pour le moment</p>
-            </div>
-          ) : (
-            <>
-              <table className="w-full text-sm">
-                <thead className="bg-zinc-950/50">
-                  <tr>
-                    {['Nom', 'Téléphone', 'Occasion', 'Participants', 'Catégorie', 'Région', 'Statut', 'Date', ''].map((h) => (
-                      <th key={h} className="px-4 py-3 text-left text-xs font-semibold text-zinc-500 uppercase tracking-wider whitespace-nowrap">
-                        {h}
-                      </th>
-                    ))}
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-zinc-800/60">
-                  {requests.map((req) => (
-                    <tr key={req._id} className="hover:bg-zinc-800/30 transition-colors">
-                      <td className="px-4 py-3 font-medium text-zinc-200">{req.fullName}</td>
-                      <td className="px-4 py-3 text-zinc-400">{req.phone}</td>
-                      <td className="px-4 py-3 text-zinc-300 capitalize">{req.occasionType.replace('_', ' ')}</td>
-                      <td className="px-4 py-3 text-zinc-300">{req.participantsCount}</td>
-                      <td className="px-4 py-3 text-zinc-300 capitalize">{req.preferredCategory.replace('_', ' ')}</td>
-                      <td className="px-4 py-3 text-zinc-300">{req.preferredRegion}</td>
-                      <td className="px-4 py-3">
-                        <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium border ${STATUS_STYLE[req.status] ?? ''}`}>
-                          {STATUS_LABEL[req.status] ?? req.status}
-                        </span>
-                      </td>
-                      <td className="px-4 py-3 text-zinc-500 whitespace-nowrap">
-                        {new Date(req.createdAt).toLocaleDateString('fr-FR')}
-                      </td>
-                      <td className="px-4 py-3">
-                        <div className="flex items-center gap-1">
-                          <button
-                            type="button"
-                            onClick={() => setSelected(req)}
-                            className="p-1.5 rounded-lg hover:bg-amber-400/10 text-zinc-500 hover:text-amber-400 transition-colors"
-                            title="Voir les détails"
-                          >
-                            <Eye className="w-4 h-4" />
-                          </button>
-                          <button
-                            type="button"
-                            onClick={() => {
-                              if (confirm(`Supprimer la demande de ${req.fullName} ?`)) remove(req._id);
-                            }}
-                            className="p-1.5 rounded-lg hover:bg-red-400/10 text-zinc-500 hover:text-red-400 transition-colors"
-                            title="Supprimer"
-                          >
-                            <Trash2 className="w-4 h-4" />
-                          </button>
-                        </div>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-
-              {/* Pagination */}
-              {data && data.pages > 1 && (
-                <div className="flex items-center justify-between px-4 py-3 border-t border-zinc-800">
-                  <span className="text-sm text-zinc-500">
-                    Page {data.page} / {data.pages}
-                  </span>
-                  <div className="flex gap-2">
-                    <button
-                      type="button"
-                      onClick={() => setPage((p) => Math.max(1, p - 1))}
-                      disabled={data.page <= 1}
-                      className="p-2 rounded-lg border border-zinc-700 disabled:opacity-40 hover:border-zinc-600 transition-colors"
-                    >
-                      <ChevronLeft className="w-4 h-4" />
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => setPage((p) => p + 1)}
-                      disabled={data.page >= data.pages}
-                      className="p-2 rounded-lg border border-zinc-700 disabled:opacity-40 hover:border-zinc-600 transition-colors"
-                    >
-                      <ChevronRight className="w-4 h-4" />
-                    </button>
-                  </div>
+        <Card className="border-zinc-800 bg-zinc-900/50">
+          <CardContent className="p-0">
+            {isLoading ? (
+              <div className="p-5 space-y-3">
+                {[1, 2, 3, 4].map((i) => (
+                  <Skeleton key={i} className="h-12 w-full bg-zinc-800" />
+                ))}
+              </div>
+            ) : requests.length === 0 ? (
+              <div className="flex flex-col items-center justify-center py-16 text-zinc-500">
+                <div className="size-16 rounded-full bg-zinc-800/50 flex items-center justify-center mb-4">
+                  <Sparkles className="size-8" />
                 </div>
-              )}
-            </>
-          )}
-        </div>
+                <p className="text-sm font-medium text-zinc-400">Aucune demande SOS Conseil</p>
+                <p className="text-xs mt-1 text-zinc-500">Les demandes apparaîtront ici</p>
+              </div>
+            ) : (
+              <div className="overflow-x-auto">
+                <table className="w-full text-sm">
+                  <thead className="bg-zinc-900/80 border-b border-zinc-800">
+                    <tr>
+                      {['Nom', 'Téléphone', 'Occasion', 'Participants', 'Catégorie', 'Région', 'Statut', 'Date', ''].map((h) => (
+                        <th key={h} className="px-4 py-3 text-left text-xs font-semibold text-zinc-500 uppercase tracking-wider whitespace-nowrap">
+                          {h}
+                        </th>
+                      ))}
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-zinc-800">
+                    {requests.map((req) => (
+                      <tr key={req._id} className="hover:bg-zinc-800/40 transition-colors duration-150">
+                        <td className="px-4 py-3 font-medium text-zinc-100">{req.fullName}</td>
+                        <td className="px-4 py-3 text-zinc-400">
+                          <span className="flex items-center gap-1.5">
+                            <Phone className="size-3.5 text-zinc-500" />
+                            {req.phone}
+                          </span>
+                        </td>
+                        <td className="px-4 py-3 text-zinc-300 capitalize">{req.occasionType.replace('_', ' ')}</td>
+                        <td className="px-4 py-3 text-zinc-300">
+                          <span className="flex items-center gap-1.5">
+                            <Users className="size-3.5 text-zinc-500" />
+                            {req.participantsCount}
+                          </span>
+                        </td>
+                        <td className="px-4 py-3 text-zinc-300 capitalize">{req.preferredCategory.replace('_', ' ')}</td>
+                        <td className="px-4 py-3 text-zinc-300">
+                          <span className="flex items-center gap-1.5">
+                            <MapPin className="size-3.5 text-zinc-500" />
+                            {req.preferredRegion}
+                          </span>
+                        </td>
+                        <td className="px-4 py-3">
+                          <StatusBadge status={req.status} />
+                        </td>
+                        <td className="px-4 py-3 text-zinc-500 whitespace-nowrap">
+                          {new Date(req.createdAt).toLocaleDateString('fr-FR')}
+                        </td>
+                        <td className="px-4 py-3">
+                          <div className="flex items-center gap-1">
+                            <button
+                              type="button"
+                              onClick={() => setSelected(req)}
+                              className="p-1.5 rounded-lg hover:bg-amber-500/10 text-zinc-400 hover:text-amber-400 transition-all duration-200"
+                              title="Voir les détails"
+                              aria-label="Voir les détails"
+                            >
+                              <Eye className="size-4" />
+                            </button>
+                            <button
+                              type="button"
+                              onClick={() => {
+                                if (confirm(`Supprimer la demande de ${req.fullName} ?`)) remove(req._id);
+                              }}
+                              className="p-1.5 rounded-lg hover:bg-red-500/10 text-zinc-400 hover:text-red-400 transition-all duration-200"
+                              title="Supprimer"
+                              aria-label="Supprimer"
+                            >
+                              <Trash2 className="size-4" />
+                            </button>
+                          </div>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+
+                {/* Pagination */}
+                {data && data.pages > 1 && (
+                  <div className="flex items-center justify-between px-4 py-3 border-t border-zinc-800">
+                    <span className="text-sm text-zinc-500">
+                      Page {data.page} / {data.pages}
+                    </span>
+                    <div className="flex gap-2">
+                      <button
+                        type="button"
+                        onClick={() => setPage((p) => Math.max(1, p - 1))}
+                        disabled={data.page <= 1}
+                        className="p-2 rounded-lg border border-zinc-700 bg-zinc-800/50 text-zinc-400 disabled:opacity-40 hover:border-zinc-600 hover:text-zinc-200 transition-all duration-200"
+                        aria-label="Page précédente"
+                      >
+                        <ChevronLeft className="size-4" />
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => setPage((p) => p + 1)}
+                        disabled={data.page >= data.pages}
+                        className="p-2 rounded-lg border border-zinc-700 bg-zinc-800/50 text-zinc-400 disabled:opacity-40 hover:border-zinc-600 hover:text-zinc-200 transition-all duration-200"
+                        aria-label="Page suivante"
+                      >
+                        <ChevronRight className="size-4" />
+                      </button>
+                    </div>
+                  </div>
+                )}
+              </div>
+            )}
+          </CardContent>
+        </Card>
       </div>
     </>
   );

@@ -58,14 +58,13 @@ export interface Venue {
   phone?: string;
   coverImage?: string;
   gallery?: string[];
-  rating: number;
   startingPrice?: number;
   priceRangeMin?: number;
   priceRangeMax?: number;
   isPublished?: boolean;
   isFeatured?: boolean;
-  isSponsored?: boolean;
-  sponsoredOrder?: number;
+  isVedette?: boolean;
+  vedetteOrder?: number;
   bannerImage?: string;
   hasVirtualTour?: boolean;
   immersiveType?: 'none' | 'virtual-tour' | 'view-360';
@@ -96,7 +95,7 @@ export interface Event {
   endAt?: string;
   description: string;
   imageUrl?: string;
-  isSponsored?: boolean;
+  isVedette?: boolean;
 }
 
 export interface EventSession {
@@ -130,17 +129,6 @@ export interface Reservation {
   qrCodeImageUrl?: string;
   checkInStatus?: 'not_checked_in' | 'checked_in';
   checkedInAt?: string;
-}
-
-export interface Review {
-  _id: string;
-  userId: string | { _id: string; fullName: string };
-  venueId: string;
-  reservationId?: string;
-  rating: number;
-  comment: string;
-  isVerified: boolean;
-  createdAt: string;
 }
 
 export interface Scene {

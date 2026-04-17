@@ -45,7 +45,7 @@ function ExplorerContent() {
   const q = searchParams.get('q') ?? '';
   const categoryId = searchParams.get('categoryId') ?? '';
   const isFeaturedFilter = searchParams.get('isFeatured') === 'true';
-  const isSponsoredFilter = searchParams.get('isSponsored') === 'true';
+  const isVedetteFilter = searchParams.get('isVedette') === 'true';
 
   const updateParams = useCallback(
     (updates: Record<string, string>) => {
@@ -66,7 +66,7 @@ function ExplorerContent() {
   });
 
   const { data: rawVenues = [], isLoading, error, refetch } = useQuery({
-    queryKey: ['venues', type, city, q, categoryId, isFeaturedFilter, isSponsoredFilter],
+    queryKey: ['venues', type, city, q, categoryId, isFeaturedFilter, isVedetteFilter],
     queryFn: () =>
       fetchVenues({
         type: type || undefined,
@@ -74,13 +74,13 @@ function ExplorerContent() {
         q: q || undefined,
         categoryId: categoryId || undefined,
         isFeatured: isFeaturedFilter || undefined,
-        isSponsored: isSponsoredFilter || undefined,
+        isVedette: isVedetteFilter || undefined,
       }),
   });
 
   const venues = [...rawVenues].sort((a, b) => {
-    if (a.isSponsored && !b.isSponsored) return -1;
-    if (!a.isSponsored && b.isSponsored) return 1;
+    if (a.isVedette && !b.isVedette) return -1;
+    if (!a.isVedette && b.isVedette) return 1;
     if (a.isFeatured && !b.isFeatured) return -1;
     if (!a.isFeatured && b.isFeatured) return 1;
     return 0;

@@ -28,32 +28,29 @@ export function RoomCard({ room, venueSlugOrId, className }: RoomCardProps) {
     room.venueName ?? (typeof room.venueId === 'object' ? room.venueId?.name : undefined);
 
   return (
-    <Link href={href} className={cn('block transition-shadow hover:shadow-md', className)}>
-      <Card className="h-full overflow-hidden">
-        <div className="aspect-[16/10] w-full overflow-hidden bg-muted">
-          <div className="flex h-full items-center justify-center text-muted-foreground">
+    <Link href={href} className={cn('block transition-shadow hover:shadow-lg', className)}>
+      <Card className="h-full overflow-hidden bg-white border-gray-200 shadow-md">
+        <div className="aspect-[16/10] w-full overflow-hidden bg-gray-100">
+          <div className="flex h-full items-center justify-center text-gray-400">
             <Bed className="size-12" />
           </div>
         </div>
         <CardHeader className="pb-2">
-          <h3 className="font-semibold">
+          <h3 className="font-semibold text-[#111111]">
             Chambre {room.roomNumber ?? room._id}
             {room.roomType ? ` — ${room.roomType}` : ''}
           </h3>
-          {venueName && <p className="text-sm text-muted-foreground">{venueName}</p>}
+          {venueName && <p className="text-sm text-gray-600">{venueName}</p>}
         </CardHeader>
         <CardContent className="pb-2">
           <div className="flex flex-wrap gap-2">
             {room.capacity != null && (
               <Badge variant="secondary">Jusqu&apos;à {room.capacity} pers.</Badge>
             )}
-            {room.pricePerNight != null && (
-              <span className="text-sm font-medium">{room.pricePerNight} TND / nuit</span>
-            )}
           </div>
         </CardContent>
-        <CardFooter className="pt-0 text-sm text-primary">
-          Voir le lieu →
+        <CardFooter className="pt-0 text-sm text-[#D4AF37]">
+          Voir le lieu &rarr;
         </CardFooter>
       </Card>
     </Link>

@@ -211,8 +211,8 @@ export default function MatterportClientViewer({
       />
 
       {connecting && (
-        <div className="absolute top-3 left-1/2 -translate-x-1/2 z-20 bg-black/70 text-white text-xs font-medium px-3 py-1.5 rounded-full shadow-lg flex items-center gap-2">
-          <div className="size-3 border-2 border-white border-t-transparent rounded-full animate-spin" />
+        <div className="absolute top-3 left-1/2 -translate-x-1/2 z-20 bg-white/90 text-gray-700 text-xs font-medium px-3 py-1.5 rounded-full shadow-lg flex items-center gap-2">
+          <div className="size-3 border-2 border-gray-300 border-t-[#D4AF37] rounded-full animate-spin" />
           Chargement des tables...
         </div>
       )}
@@ -237,8 +237,8 @@ export default function MatterportClientViewer({
               )}
             </div>
             {/* Legend */}
-            <div className="bg-black/70 backdrop-blur-sm text-white text-[10px] px-3 py-2 rounded-lg shadow-lg space-y-1">
-              <div className="text-[9px] uppercase tracking-wider text-zinc-400 mb-1 font-medium">Tables · cliquez pour réserver</div>
+            <div className="bg-white/90 backdrop-blur-sm text-gray-700 text-[10px] px-3 py-2 rounded-lg shadow-lg space-y-1">
+              <div className="text-[9px] uppercase tracking-wider text-gray-500 mb-1 font-medium">Tables · cliquez pour réserver</div>
               <div className="flex items-center gap-1.5">
                 <div className="size-2.5 rounded-full bg-emerald-500" />
                 <span>✓ Disponible</span>

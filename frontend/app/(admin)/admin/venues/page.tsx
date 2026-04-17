@@ -6,39 +6,74 @@ import Image from 'next/image';
 import { useQuery } from '@tanstack/react-query';
 import { fetchAdminVenues } from '@/lib/api/admin';
 import { Button } from '@/components/ui/button';
-import { EmptyState } from '@/components/shared/EmptyState';
-import {
-  MapPin, Plus, Search, Building2, Star, Eye,
-  LayoutGrid, Filter,
-} from 'lucide-react';
+import { Card, CardContent } from '@/components/ui/card';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import { Skeleton } from '@/components/ui/skeleton';
+import { Badge } from '@/components/ui/badge';
+import { MapPin, Search, ExternalLink, Building2, Eye, Coffee, Bed, Film, CalendarDays, MoreHorizontal, Grid3X3, List } from 'lucide-react';
 import { VENUE_TYPE_LABELS } from '@/app/constants/venueTypes';
 import {
-  Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
 } from '@/components/ui/select';
 import { Input } from '@/components/ui/input';
-import { cn } from '@/lib/utils';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
 
-const TYPE_OPTIONS = [
-  { value: '', label: 'Tous les types' },
-  ...Object.entries(VENUE_TYPE_LABELS).map(([value, label]) => ({ value, label })),
-];
+type VenueRow = { _id: string; name: string; type: string; city: string; coverImage?: string };
 
-const TYPE_COLORS: Record<string, string> = {
-  CAFE:       'bg-amber-500/15 text-amber-400 border-amber-500/30',
-  RESTAURANT: 'bg-orange-500/15 text-orange-400 border-orange-500/30',
-  HOTEL:      'bg-blue-500/15 text-blue-400 border-blue-500/30',
-  CINEMA:     'bg-violet-500/15 text-violet-400 border-violet-500/30',
-  EVENT:      'bg-pink-500/15 text-pink-400 border-pink-500/30',
+// Type-specific icons and colors
+const TYPE_CONFIG: Record<string, { icon: React.ComponentType<{ className?: string }>; color: string; bgColor: string; borderColor: string }> = {
+  CAFE: { icon: Coffee, color: 'text-amber-400', bgColor: 'bg-amber-500/10', borderColor: 'border-amber-500/20' },
+  RESTAURANT: { icon: Building2, color: 'text-emerald-400', bgColor: 'bg-emerald-500/10', borderColor: 'border-emerald-500/20' },
+  HOTEL: { icon: Bed, color: 'text-blue-400', bgColor: 'bg-blue-500/10', borderColor: 'border-blue-500/20' },
+  CINEMA: { icon: Film, color: 'text-purple-400', bgColor: 'bg-purple-500/10', borderColor: 'border-purple-500/20' },
+  EVENT_SPACE: { icon: CalendarDays, color: 'text-rose-400', bgColor: 'bg-rose-500/10', borderColor: 'border-rose-500/20' },
 };
 
-type VenueRow = {
-  _id: string; name: string; type: string; city: string;
-  coverImage?: string; isPublished?: boolean; isFeatured?: boolean; isSponsored?: boolean;
-};
+function TypeBadge({ type }: { type: string }) {
+  const config = TYPE_CONFIG[type] ?? { icon: MapPin, color: 'text-zinc-400', bgColor: 'bg-zinc-800', borderColor: 'border-zinc-700' };
+  const Icon = config.icon;
+  const label = VENUE_TYPE_LABELS[type] ?? type;
+
+  return (
+    <Badge 
+      variant="outline" 
+      className={`inline-flex items-center gap-1.5 px-2.5 py-1 text-xs font-medium ${config.bgColor} ${config.color} ${config.borderColor}`}
+    >
+      <Icon className="size-3" />
+      {label}
+    </Badge>
+  );
+}
+
+function VenueImage({ coverImage, name }: { coverImage?: string; name: string }) {
+  if (coverImage) {
+    return (
+      <div className="relative h-14 w-14 rounded-xl overflow-hidden bg-zinc-800 border border-zinc-700/50 shadow-lg group">
+        <Image src={coverImage} alt={name} fill className="object-cover transition-transform duration-200 group-hover:scale-110" sizes="56px" />
+        <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors duration-200" />
+      </div>
+    );
+  }
+  return (
+    <div className="h-14 w-14 rounded-xl bg-gradient-to-br from-zinc-800 to-zinc-900 border border-zinc-700/50 flex items-center justify-center text-zinc-600 shadow-lg">
+      <MapPin className="size-6" />
+    </div>
+  );
+}
 
 export default function AdminVenuesPage() {
   const [typeFilter, setTypeFilter] = useState('');
   const [q, setQ] = useState('');
+  const [viewMode, setViewMode] = useState<'table' | 'grid'>('table');
 
   const { data: venuesData = [], isLoading } = useQuery({
     queryKey: ['admin', 'venues', typeFilter, q],
@@ -46,198 +81,274 @@ export default function AdminVenuesPage() {
   });
   const venues = venuesData as VenueRow[];
 
-  const publishedCount = venues.filter((v) => v.isPublished !== false).length;
-  const featuredCount  = venues.filter((v) => v.isFeatured).length;
+  // Count by type
+  const typeCounts = venues.reduce((acc, v) => {
+    acc[v.type] = (acc[v.type] ?? 0) + 1;
+    return acc;
+  }, {} as Record<string, number>);
 
   return (
     <div className="space-y-6">
-
-      {/* ── Header ── */}
-      <div className="flex items-center justify-between">
+      {/* Header */}
+      <div className="flex items-center justify-between gap-4 flex-wrap">
         <div>
-          <h1 className="text-2xl font-bold tracking-tight">Lieux</h1>
-          <p className="text-sm text-muted-foreground mt-0.5">Gérez vos établissements</p>
+          <h1 className="text-2xl font-bold text-white">Lieux</h1>
+          <p className="mt-1 text-sm text-zinc-400">
+            {venues.length} lieu{venues.length !== 1 ? 'x' : ''} au total
+          </p>
         </div>
-        <Button asChild className="gap-1.5 rounded-xl shadow-md shadow-primary/20">
-          <Link href="/admin/venues/new">
-            <Plus className="size-4" /> Nouveau lieu
-          </Link>
-        </Button>
+        <div className="flex items-center gap-2">
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={() => setViewMode(viewMode === 'table' ? 'grid' : 'table')}
+            className="text-zinc-400 hover:text-zinc-200 hover:bg-zinc-800"
+            aria-label="Changer le mode d'affichage"
+          >
+            {viewMode === 'table' ? <Grid3X3 className="size-4" /> : <List className="size-4" />}
+          </Button>
+        </div>
       </div>
 
-      {/* ── Stats bar ── */}
+      {/* Stats Pills */}
       {!isLoading && venues.length > 0 && (
-        <div className="grid grid-cols-3 gap-3">
-          <div className="rounded-2xl border border-border/40 bg-card p-4 flex items-center gap-3">
-            <div className="size-10 rounded-xl bg-primary/10 flex items-center justify-center shrink-0">
-              <LayoutGrid className="size-5 text-primary" />
-            </div>
-            <div>
-              <p className="text-2xl font-bold leading-none">{venues.length}</p>
-              <p className="text-xs text-muted-foreground mt-0.5">Total lieux</p>
-            </div>
-          </div>
-          <div className="rounded-2xl border border-emerald-500/20 bg-emerald-500/5 p-4 flex items-center gap-3">
-            <div className="size-10 rounded-xl bg-emerald-500/15 flex items-center justify-center shrink-0">
-              <Eye className="size-5 text-emerald-500" />
-            </div>
-            <div>
-              <p className="text-2xl font-bold leading-none text-emerald-400">{publishedCount}</p>
-              <p className="text-xs text-muted-foreground mt-0.5">Publiés</p>
-            </div>
-          </div>
-          <div className="rounded-2xl border border-amber-500/20 bg-amber-500/5 p-4 flex items-center gap-3">
-            <div className="size-10 rounded-xl bg-amber-500/15 flex items-center justify-center shrink-0">
-              <Star className="size-5 text-amber-500" />
-            </div>
-            <div>
-              <p className="text-2xl font-bold leading-none text-amber-400">{featuredCount}</p>
-              <p className="text-xs text-muted-foreground mt-0.5">En vedette</p>
-            </div>
-          </div>
+        <div className="flex flex-wrap gap-2">
+          <button
+            type="button"
+            onClick={() => setTypeFilter('')}
+            className={`inline-flex items-center gap-2 rounded-lg px-3 py-2 text-xs font-medium border transition-all duration-200 ${
+              typeFilter === ''
+                ? 'bg-amber-500/10 text-amber-400 border-amber-500/30 shadow-sm shadow-amber-500/10'
+                : 'bg-zinc-900/50 text-zinc-400 border-zinc-800 hover:border-zinc-700 hover:bg-zinc-900'
+            }`}
+          >
+            <Building2 className="size-3.5" />
+            Tous
+            <span className="tabular-nums font-semibold">{venues.length}</span>
+          </button>
+          {Object.entries(typeCounts).map(([type, count]) => (
+            <button
+              key={type}
+              type="button"
+              onClick={() => setTypeFilter(typeFilter === type ? '' : type)}
+              className={`inline-flex items-center gap-2 rounded-lg px-3 py-2 text-xs font-medium border transition-all duration-200 ${
+                typeFilter === type
+                  ? 'bg-amber-500/10 text-amber-400 border-amber-500/30 shadow-sm shadow-amber-500/10'
+                  : 'bg-zinc-900/50 text-zinc-400 border-zinc-800 hover:border-zinc-700 hover:bg-zinc-900'
+              }`}
+            >
+              <TypeBadge type={type} />
+              <span className="tabular-nums font-semibold">{count}</span>
+            </button>
+          ))}
         </div>
       )}
 
-      {/* ── Filters ── */}
-      <div className="flex flex-wrap gap-2 items-center">
-        <div className="relative flex-1 min-w-[200px] max-w-sm">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-muted-foreground pointer-events-none" />
-          <Input
-            placeholder="Rechercher par nom, ville…"
-            value={q}
-            onChange={(e) => setQ(e.target.value)}
-            className="pl-9 rounded-xl"
-          />
-        </div>
-        <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
-          <Filter className="size-3.5" />
-        </div>
-        <Select value={typeFilter || 'all'} onValueChange={(v) => setTypeFilter(v === 'all' ? '' : v)}>
-          <SelectTrigger className="w-[180px] rounded-xl">
-            <SelectValue placeholder="Type" />
-          </SelectTrigger>
-          <SelectContent>
-            {TYPE_OPTIONS.map((opt) => (
-              <SelectItem key={opt.value || 'all'} value={opt.value || 'all'}>
-                {opt.label}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
-        {(q || typeFilter) && (
-          <Button variant="ghost" size="sm" className="rounded-xl text-xs"
-            onClick={() => { setQ(''); setTypeFilter(''); }}>
-            Effacer
-          </Button>
-        )}
-      </div>
-
-      {/* ── Content ── */}
-      {isLoading ? (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-          {Array.from({ length: 6 }).map((_, i) => (
-            <div key={i} className="rounded-2xl border bg-card overflow-hidden animate-pulse">
-              <div className="aspect-video bg-muted/60" />
-              <div className="p-4 space-y-2">
-                <div className="h-4 bg-muted rounded-lg w-2/3" />
-                <div className="h-3 bg-muted rounded-lg w-1/3" />
-                <div className="h-8 bg-muted rounded-xl w-1/2 mt-3" />
-              </div>
+      {/* Filters */}
+      <Card className="border-zinc-800 bg-zinc-900/50">
+        <CardContent className="pt-5 pb-4">
+          <div className="flex flex-wrap gap-3">
+            <Select value={typeFilter || 'all'} onValueChange={(v) => setTypeFilter(v === 'all' ? '' : v)}>
+              <SelectTrigger className="w-[180px] h-9 border-zinc-700 bg-zinc-800/50 text-zinc-100 focus:border-amber-500 focus:ring-amber-500/20">
+                <SelectValue placeholder="Type" />
+              </SelectTrigger>
+              <SelectContent className="bg-zinc-900 border-zinc-800">
+                <SelectItem value="all">Tous les types</SelectItem>
+                {Object.entries(VENUE_TYPE_LABELS).map(([value, label]) => (
+                  <SelectItem key={value} value={value}>
+                    {label}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+            <div className="relative flex-1 max-w-sm">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-zinc-500" />
+              <Input
+                placeholder="Rechercher (nom, ville…)"
+                value={q}
+                onChange={(e) => setQ(e.target.value)}
+                className="pl-9 h-9 border-zinc-700 bg-zinc-800/50 text-zinc-100 placeholder:text-zinc-500 focus:border-amber-500 focus:ring-amber-500/20"
+              />
             </div>
-          ))}
-        </div>
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Table or Grid View */}
+      {isLoading ? (
+        <Card className="border-zinc-800 bg-zinc-900/50">
+          <CardContent className="p-0">
+            <Table>
+              <TableHeader>
+                <TableRow className="border-zinc-800 bg-zinc-900/80 hover:bg-zinc-900/80">
+                  <TableHead className="w-16 text-zinc-400">Image</TableHead>
+                  <TableHead className="text-zinc-400">Nom</TableHead>
+                  <TableHead className="text-zinc-400">Type</TableHead>
+                  <TableHead className="text-zinc-400">Ville</TableHead>
+                  <TableHead className="text-right text-zinc-400">Actions</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {Array.from({ length: 5 }).map((_, i) => (
+                  <TableRow key={i} className="border-zinc-800">
+                    {Array.from({ length: 5 }).map((__, j) => (
+                      <TableCell key={j}><Skeleton className="h-4 w-full bg-zinc-800" /></TableCell>
+                    ))}
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </CardContent>
+        </Card>
       ) : venues.length === 0 ? (
-        <div className="rounded-2xl border border-dashed border-muted p-12">
-          <EmptyState
-            icon={<MapPin className="size-12" />}
-            title="Aucun lieu"
-            description="Les lieux créés apparaîtront ici."
-          />
-        </div>
+        <Card className="border-zinc-800 bg-zinc-900/50">
+          <CardContent className="flex flex-col items-center justify-center py-20 text-zinc-500">
+            <div className="size-16 rounded-full bg-zinc-800/50 flex items-center justify-center mb-4">
+              <MapPin className="size-8" />
+            </div>
+            <p className="text-sm font-medium text-zinc-400">Aucun lieu trouvé</p>
+            <p className="text-xs mt-1 text-zinc-500">
+              {q || typeFilter ? 'Essayez de modifier vos filtres' : 'Les lieux créés apparaîtront ici'}
+            </p>
+          </CardContent>
+        </Card>
+      ) : viewMode === 'table' ? (
+        <Card className="border-zinc-800 bg-zinc-900/50">
+          <CardContent className="p-0">
+            <Table>
+              <TableHeader>
+                <TableRow className="border-zinc-800 bg-zinc-900/80 hover:bg-zinc-900/80">
+                  <TableHead className="text-zinc-400 pl-4">Lieu</TableHead>
+                  <TableHead className="text-zinc-400">Type</TableHead>
+                  <TableHead className="text-zinc-400">Ville</TableHead>
+                  <TableHead className="text-right pr-4 text-zinc-400">Actions</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {venues.map((v) => (
+                  <TableRow key={v._id} className="border-zinc-800 hover:bg-zinc-800/40 transition-colors duration-150 group">
+                    <TableCell className="pl-4">
+                      <div className="flex items-center gap-3">
+                        <VenueImage coverImage={v.coverImage} name={v.name} />
+                        <div>
+                          <p className="font-medium text-zinc-100 group-hover:text-white transition-colors duration-150">{v.name}</p>
+                          <p className="text-xs text-zinc-500 mt-0.5">
+                            ID: {v._id.slice(-6)}
+                          </p>
+                        </div>
+                      </div>
+                    </TableCell>
+                    <TableCell>
+                      <TypeBadge type={v.type} />
+                    </TableCell>
+                    <TableCell>
+                      <div className="flex items-center gap-1.5 text-sm text-zinc-400">
+                        <MapPin className="size-3.5 text-zinc-500" />
+                        {v.city}
+                      </div>
+                    </TableCell>
+                    <TableCell className="text-right pr-4">
+                      <div className="flex items-center justify-end gap-1">
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          asChild
+                          className="size-8 text-zinc-400 hover:text-blue-400 hover:bg-blue-500/10 transition-all duration-200"
+                          aria-label="Voir"
+                        >
+                          <Link href={`/lieu/${v._id}`} target="_blank">
+                            <Eye className="size-4" />
+                          </Link>
+                        </Button>
+                        <DropdownMenu>
+                          <DropdownMenuTrigger asChild>
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              className="size-8 text-zinc-400 hover:text-amber-400 hover:bg-amber-500/10 transition-all duration-200"
+                              aria-label="Plus d'actions"
+                            >
+                              <MoreHorizontal className="size-4" />
+                            </Button>
+                          </DropdownMenuTrigger>
+                          <DropdownMenuContent align="end" className="w-44 border-zinc-800 bg-zinc-900">
+                            <DropdownMenuItem asChild>
+                              <Link href={`/admin/venues/${v._id}`} className="flex items-center gap-2">
+                                <ExternalLink className="size-4" />
+                                Modifier
+                              </Link>
+                            </DropdownMenuItem>
+                            <DropdownMenuItem asChild>
+                              <Link href={`/lieu/${v._id}`} target="_blank" className="flex items-center gap-2">
+                                <Eye className="size-4" />
+                                Voir sur le site
+                              </Link>
+                            </DropdownMenuItem>
+                          </DropdownMenuContent>
+                        </DropdownMenu>
+                      </div>
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </CardContent>
+        </Card>
       ) : (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-          {venues.map((v) => {
-            const typeColor = TYPE_COLORS[v.type] ?? 'bg-zinc-500/15 text-zinc-400 border-zinc-500/30';
-            const isPublished = v.isPublished !== false;
-
-            return (
-              <div
-                key={v._id}
-                className="group rounded-2xl border border-border/40 bg-card overflow-hidden hover:border-primary/40 hover:shadow-xl hover:shadow-primary/5 transition-all duration-300 flex flex-col"
-              >
-                {/* Cover */}
-                <div className="relative aspect-video bg-muted overflow-hidden">
-                  {v.coverImage ? (
-                    <Image
-                      src={v.coverImage}
-                      alt={v.name}
-                      fill
-                      className="object-cover group-hover:scale-105 transition-transform duration-500"
-                      sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
-                    />
-                  ) : (
-                    <div className="h-full flex items-center justify-center bg-gradient-to-br from-muted to-muted/50">
-                      <Building2 className="size-12 text-muted-foreground/25" />
-                    </div>
-                  )}
-
-                  {/* Gradient overlay */}
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent" />
-
-                  {/* Badges top-left */}
-                  <div className="absolute top-3 left-3 flex flex-wrap gap-1.5">
-                    <span className={cn(
-                      'text-[10px] font-bold px-2 py-0.5 rounded-full border backdrop-blur-sm',
-                      typeColor
-                    )}>
-                      {VENUE_TYPE_LABELS[v.type] ?? v.type}
-                    </span>
-                    {v.isFeatured && (
-                      <span className="text-[10px] font-bold px-2 py-0.5 rounded-full border bg-amber-500/80 border-amber-400/50 text-black backdrop-blur-sm">
-                        ★ Vedette
-                      </span>
-                    )}
-                    {v.isSponsored && (
-                      <span className="text-[10px] font-bold px-2 py-0.5 rounded-full border bg-violet-500/80 border-violet-400/50 text-white backdrop-blur-sm">
-                        Sponsorisé
-                      </span>
-                    )}
+        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          {venues.map((v) => (
+            <Card key={v._id} className="group border-zinc-800 bg-zinc-900/50 hover:border-zinc-700 hover:bg-zinc-900 transition-all duration-200 overflow-hidden">
+              <div className="relative h-40 w-full bg-zinc-800 overflow-hidden">
+                {v.coverImage ? (
+                  <>
+                    <Image src={v.coverImage} alt={v.name} fill className="object-cover transition-transform duration-300 group-hover:scale-110" sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 33vw" />
+                    <div className="absolute inset-0 bg-gradient-to-t from-zinc-900 via-transparent to-transparent opacity-60" />
+                  </>
+                ) : (
+                  <div className="flex items-center justify-center h-full">
+                    <MapPin className="size-12 text-zinc-700" />
                   </div>
-
-                  {/* Published badge top-right */}
-                  <div className="absolute top-3 right-3">
-                    <span className={cn(
-                      'text-[10px] font-semibold px-2 py-0.5 rounded-full backdrop-blur-sm border',
-                      isPublished
-                        ? 'bg-emerald-500/80 border-emerald-400/50 text-white'
-                        : 'bg-zinc-800/80 border-zinc-700/50 text-zinc-400'
-                    )}>
-                      {isPublished ? '● Publié' : '○ Brouillon'}
-                    </span>
+                )}
+                <div className="absolute top-3 left-3">
+                  <TypeBadge type={v.type} />
+                </div>
+              </div>
+              <CardContent className="p-4">
+                <div className="flex items-start justify-between gap-3">
+                  <div className="flex-1 min-w-0">
+                    <h3 className="font-semibold text-zinc-100 truncate group-hover:text-white transition-colors duration-150">{v.name}</h3>
+                    <div className="flex items-center gap-1.5 mt-2 text-sm text-zinc-500">
+                      <MapPin className="size-3.5" />
+                      {v.city}
+                    </div>
                   </div>
                 </div>
-
-                {/* Body */}
-                <div className="p-4 flex items-center justify-between gap-3 flex-1">
-                  <div className="min-w-0 flex-1">
-                    <h3 className="font-semibold text-sm truncate leading-tight">{v.name}</h3>
-                    {v.city && (
-                      <p className="text-xs text-muted-foreground flex items-center gap-1 mt-1">
-                        <MapPin className="size-3 shrink-0" />
-                        {v.city}
-                      </p>
-                    )}
-                  </div>
+                <div className="flex items-center gap-2 mt-4 pt-4 border-t border-zinc-800">
                   <Button
-                    variant="outline" size="sm" asChild
-                    className="rounded-xl shrink-0 hover:bg-primary hover:text-primary-foreground hover:border-primary transition-colors"
+                    variant="outline"
+                    size="sm"
+                    asChild
+                    className="flex-1 border-zinc-700 bg-zinc-800/50 text-zinc-200 hover:bg-zinc-800 hover:text-zinc-100 hover:border-zinc-600 transition-all duration-200"
                   >
-                    <Link href={`/admin/venues/${v._id}`}>Modifier</Link>
+                    <Link href={`/admin/venues/${v._id}`} className="flex items-center gap-1.5 justify-center">
+                      <ExternalLink className="size-3.5" />
+                      Modifier
+                    </Link>
+                  </Button>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    asChild
+                    className="text-zinc-400 hover:text-blue-400 hover:bg-blue-500/10 transition-all duration-200"
+                  >
+                    <Link href={`/lieu/${v._id}`} target="_blank">
+                      <Eye className="size-4" />
+                    </Link>
                   </Button>
                 </div>
-              </div>
-            );
-          })}
+              </CardContent>
+            </Card>
+          ))}
         </div>
       )}
     </div>

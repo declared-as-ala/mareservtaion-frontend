@@ -36,8 +36,13 @@ export interface CartItem {
   menuTotal?: number;
 }
 
+/** Cart items expire after 24 hours (in milliseconds). */
+const CART_EXPIRY_MS = 24 * 60 * 60 * 1000;
+
 type CartState = {
   items: CartItem[];
+  /** Timestamp when the cart was last modified — used for expiry. */
+  lastModified: number;
   /** UI state: whether the cart drawer is open */
   drawerOpen: boolean;
   openDrawer: () => void;
@@ -54,10 +59,17 @@ export const useCartStore = create<CartState>()(
   persist(
     (set, get) => ({
       items: [],
+      lastModified: Date.now(),
       drawerOpen: false,
       openDrawer: () => set({ drawerOpen: true }),
       closeDrawer: () => set({ drawerOpen: false }),
       addItem: (payload) => {
+        // Expire stale items before adding new ones
+        const now = Date.now();
+        const state = get();
+        if (state.lastModified && now - state.lastModified > CART_EXPIRY_MS) {
+          set({ items: [], lastModified: now });
+        }
         const quantity = payload.quantity ?? 1;
         const existing = get().items.find((i) => i.id === payload.id);
         if (existing) {
@@ -65,22 +77,24 @@ export const useCartStore = create<CartState>()(
             items: get().items.map((i) =>
               i.id === payload.id ? { ...i, quantity: i.quantity + quantity } : i
             ),
+            lastModified: now,
           });
         } else {
-          set({ items: [...get().items, { ...payload, quantity }] });
+          set({ items: [...get().items, { ...payload, quantity }], lastModified: now });
         }
       },
-      removeItem: (id) => set({ items: get().items.filter((i) => i.id !== id) }),
+      removeItem: (id) => set({ items: get().items.filter((i) => i.id !== id), lastModified: Date.now() }),
       updateQuantity: (id, quantity) => {
         if (quantity <= 0) {
-          set({ items: get().items.filter((i) => i.id !== id) });
+          set({ items: get().items.filter((i) => i.id !== id), lastModified: Date.now() });
           return;
         }
         set({
           items: get().items.map((i) => (i.id === id ? { ...i, quantity } : i)),
+          lastModified: Date.now(),
         });
       },
-      clearCart: () => set({ items: [] }),
+      clearCart: () => set({ items: [], lastModified: Date.now() }),
       totalQuantity: () => get().items.reduce((acc, i) => acc + i.quantity, 0),
       totalAmount: () =>
         get().items.reduce((acc, i) => acc + i.price * i.quantity + (i.menuTotal ?? 0), 0),
@@ -88,7 +102,7 @@ export const useCartStore = create<CartState>()(
     {
       name: 'ma-reservation-cart',
       // Don't persist UI state
-      partialize: (state) => ({ items: state.items }),
+      partialize: (state) => ({ items: state.items, lastModified: state.lastModified }),
     }
   )
 );

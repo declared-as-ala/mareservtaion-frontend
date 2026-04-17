@@ -161,14 +161,14 @@ export function CategoryListingPage({
   return (
     <div className="min-h-screen">
       {/* Hero header */}
-      <div className="relative overflow-hidden bg-gradient-to-br from-[#0a0a0a] via-[#111] to-[#0a0a0a] py-16 sm:py-20">
-        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,rgba(212,175,55,0.08),transparent_70%)]" />
+      <div className="relative overflow-hidden bg-gradient-to-br from-gray-50 via-white to-gray-50 py-16 sm:py-20">
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,rgba(212,175,55,0.06),transparent_70%)]" />
         <div className="relative mx-auto max-w-7xl px-4 text-center">
-          <h1 className="font-serif text-3xl font-bold tracking-tight text-amber-100 sm:text-4xl lg:text-5xl">
+          <h1 className="font-serif text-3xl font-bold tracking-tight text-[#111111] sm:text-4xl lg:text-5xl">
             {title}
           </h1>
-          <div className="mx-auto mt-3 h-px w-16 bg-amber-500/50" />
-          <p className="mx-auto mt-4 max-w-lg text-base text-amber-100/60">
+          <div className="mx-auto mt-3 h-px w-16 bg-[#D4AF37]/60" />
+          <p className="mx-auto mt-4 max-w-lg text-base text-[#666666]">
             {subtitle}
           </p>
         </div>
@@ -253,7 +253,7 @@ export function CategoryListingPage({
           />
         ) : (
           <>
-            <p className="mb-4 text-sm text-muted-foreground">
+            <p className="mb-4 text-sm text-[#666666]">
               {itemCount} résultat{itemCount !== 1 ? 's' : ''}
             </p>
             <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">

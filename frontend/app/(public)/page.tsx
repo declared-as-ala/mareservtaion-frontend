@@ -1,17 +1,15 @@
 import { HeroSliderSection } from '@/components/home/HeroSliderSection';
 import { ExperienceCategoriesSection } from '@/components/home/ExperienceCategoriesSection';
-import { FeaturedVenuesSection } from '@/components/home/FeaturedVenuesSection';
-import { SponsoredVenuesSection } from '@/components/home/SponsoredVenuesSection';
+import { VedetteByCategorySection } from '@/components/home/VedetteByCategorySection';
 import { HowItWorksSection } from '@/components/home/HowItWorksSection';
 import { WorldPresenceSection } from '@/components/home/WorldPresenceSection';
 
 export default function HomePage() {
   return (
-    <div className="min-h-screen bg-black text-amber-50">
+    <div className="min-h-screen bg-[#0B0B0C] text-white">
       <HeroSliderSection />
       <ExperienceCategoriesSection />
-      <FeaturedVenuesSection />
-      <SponsoredVenuesSection />
+      <VedetteByCategorySection />
       <HowItWorksSection />
       <WorldPresenceSection />
     </div>

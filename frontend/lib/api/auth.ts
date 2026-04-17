@@ -20,12 +20,11 @@ export interface AuthMeResponse {
   createdAt?: string;
 }
 
-export async function login(body: LoginBody): Promise<{ accessToken: string; user: AuthMeResponse }> {
-  const res = await api.post<{ accessToken?: string; token?: string; user?: AuthMeResponse }>('/auth/login', body);
+export async function login(body: LoginBody): Promise<{ user: AuthMeResponse; accessToken?: string }> {
+  const res = await api.post<{ user?: AuthMeResponse; message?: string; accessToken?: string }>('/auth/login', body);
   const data = res?.data ?? (res as unknown as Record<string, unknown>);
-  const token = (data?.accessToken ?? data?.token) as string | undefined;
   const rawUser = data?.user as AuthMeResponse | undefined;
-  if (!token || !rawUser) throw new Error('Réponse de connexion invalide');
+  if (!rawUser) throw new Error((data?.message as string) || 'Réponse de connexion invalide');
   const user: AuthMeResponse = {
     _id: (rawUser as { id?: string }).id ?? rawUser._id ?? '',
     fullName: rawUser.fullName,
@@ -33,18 +32,17 @@ export async function login(body: LoginBody): Promise<{ accessToken: string; use
     role: rawUser.role,
     createdAt: rawUser.createdAt,
   };
-  return { accessToken: token, user };
+  return { user, accessToken: data.accessToken as string | undefined };
 }
 
-export async function register(body: RegisterBody): Promise<{ accessToken: string; user: AuthMeResponse }> {
-  const res = await api.post<{ accessToken?: string; token?: string; user?: AuthMeResponse; message?: string }>(
+export async function register(body: RegisterBody): Promise<{ user: AuthMeResponse; accessToken?: string }> {
+  const res = await api.post<{ user?: AuthMeResponse; message?: string; accessToken?: string }>(
     '/auth/register',
     body
   );
   const data = res?.data ?? (res as unknown as Record<string, unknown>);
-  const token = (data?.accessToken ?? data?.token) as string | undefined;
   const rawUser = data?.user as AuthMeResponse | undefined;
-  if (!token || !rawUser) throw new Error((data?.message as string) || 'Inscription échouée');
+  if (!rawUser) throw new Error((data?.message as string) || 'Inscription échouée');
   const user: AuthMeResponse = {
     _id: (rawUser as { id?: string }).id ?? rawUser._id ?? '',
     fullName: rawUser.fullName,
@@ -52,7 +50,7 @@ export async function register(body: RegisterBody): Promise<{ accessToken: strin
     role: rawUser.role,
     createdAt: rawUser.createdAt,
   };
-  return { accessToken: token, user };
+  return { user, accessToken: data.accessToken as string | undefined };
 }
 
 export async function forgotPassword(email: string): Promise<void> {

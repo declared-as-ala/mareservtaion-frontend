@@ -9,7 +9,7 @@ export interface VenuesQuery {
   hasEvent?: boolean;
   hasVirtualTour?: boolean;
   isFeatured?: boolean;
-  isSponsored?: boolean;
+  isVedette?: boolean;
   priceMin?: number;
   priceMax?: number;
   q?: string;
@@ -21,7 +21,7 @@ export async function fetchVenues(query: VenuesQuery = {}): Promise<Venue[]> {
   if (query.city) params.set('city', query.city);
   if (query.governorate) params.set('governorate', query.governorate);
   if (query.isFeatured === true) params.set('isFeatured', 'true');
-  if (query.isSponsored === true) params.set('isSponsored', 'true');
+  if (query.isVedette === true) params.set('isVedette', 'true');
   if (query.categoryId) params.set('categoryId', query.categoryId);
   if (query.hasEvent === true) params.set('hasEvent', 'true');
   if (query.hasVirtualTour === true) params.set('hasVirtualTour', 'true');

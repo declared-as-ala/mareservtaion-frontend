@@ -26,6 +26,7 @@ import {
   DialogContent,
   DialogHeader,
   DialogTitle,
+  DialogDescription,
   DialogFooter,
 } from '@/components/ui/dialog';
 import {
@@ -51,16 +52,16 @@ import { toast } from 'sonner';
 const ROLES = ['USER', 'ADMIN', 'VENUE_OWNER', 'ORGANIZER'] as const;
 
 function RoleBadge({ role }: { role?: string }) {
-  if (!role) return <span className="text-muted-foreground">—</span>;
+  if (!role) return <span className="text-zinc-500">—</span>;
   const map: Record<string, { label: string; className: string }> = {
-    ADMIN: { label: 'Admin', className: 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400' },
-    VENUE_OWNER: { label: 'Propriétaire', className: 'bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400' },
-    ORGANIZER: { label: 'Organisateur', className: 'bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-400' },
-    USER: { label: 'Utilisateur', className: 'bg-zinc-100 text-zinc-600 dark:bg-zinc-800 dark:text-zinc-400' },
+    ADMIN: { label: 'Admin', className: 'bg-red-500/10 text-red-400 border border-red-500/20' },
+    VENUE_OWNER: { label: 'Propriétaire', className: 'bg-amber-500/10 text-amber-400 border border-amber-500/20' },
+    ORGANIZER: { label: 'Organisateur', className: 'bg-purple-500/10 text-purple-400 border border-purple-500/20' },
+    USER: { label: 'Utilisateur', className: 'bg-zinc-800 text-zinc-400 border border-zinc-700' },
   };
-  const config = map[role] ?? { label: role, className: 'bg-zinc-100 text-zinc-600' };
+  const config = map[role] ?? { label: role, className: 'bg-zinc-800 text-zinc-400 border border-zinc-700' };
   return (
-    <span className={`inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[11px] font-semibold ${config.className}`}>
+    <span className={`inline-flex items-center gap-1.5 rounded-md px-2 py-1 text-[11px] font-semibold ${config.className}`}>
       {role === 'ADMIN' && <ShieldCheck className="size-3" />}
       {role === 'VENUE_OWNER' && <Crown className="size-3" />}
       {role === 'USER' && <User2 className="size-3" />}
@@ -132,10 +133,11 @@ export default function AdminUsersPage() {
 
   return (
     <div className="space-y-6">
+      {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold">Utilisateurs</h1>
-          <p className="text-sm text-muted-foreground mt-0.5">
+          <h1 className="text-2xl font-bold text-white">Utilisateurs</h1>
+          <p className="mt-1 text-sm text-zinc-400">
             {users.length} utilisateur{users.length !== 1 ? 's' : ''} au total
           </p>
         </div>
@@ -149,41 +151,54 @@ export default function AdminUsersPage() {
               key={role}
               type="button"
               onClick={() => setRoleFilter(roleFilter === role ? 'all' : role)}
-              className={`inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-medium border transition-colors ${
+              className={`inline-flex items-center gap-2 rounded-lg px-3 py-2 text-xs font-medium border transition-all duration-200 cursor-pointer ${
                 roleFilter === role
-                  ? 'bg-primary text-primary-foreground border-primary'
-                  : 'bg-muted text-muted-foreground border-transparent hover:border-border'
+                  ? 'bg-matable-primary/10 text-matable-primary border-matable-primary/30 shadow-sm shadow-matable-primary/10'
+                  : 'bg-zinc-900/50 text-zinc-400 border-zinc-800 hover:border-zinc-700 hover:bg-zinc-900'
               }`}
             >
               <RoleBadge role={role} />
-              <span className="tabular-nums">{count}</span>
+              <span className="tabular-nums font-semibold">{count}</span>
             </button>
           ))}
+          <button
+            type="button"
+            onClick={() => setRoleFilter('all')}
+            className={`inline-flex items-center gap-2 rounded-lg px-3 py-2 text-xs font-medium border transition-all duration-200 cursor-pointer ${
+              roleFilter === 'all'
+                ? 'bg-matable-primary/10 text-matable-primary border-matable-primary/30 shadow-sm shadow-matable-primary/10'
+                : 'bg-zinc-900/50 text-zinc-400 border-zinc-800 hover:border-zinc-700 hover:bg-zinc-900'
+            }`}
+          >
+            Tous
+            <span className="tabular-nums font-semibold">{users.length}</span>
+          </button>
         </div>
       )}
 
-      <Card>
-        <CardHeader className="pb-3">
+      {/* Table Card */}
+      <Card className="border border-zinc-800 bg-zinc-900/60 backdrop-blur-sm">
+        <CardHeader className="pb-4 border-b border-zinc-800">
           <div className="flex items-center justify-between gap-4 flex-wrap">
-            <CardTitle className="flex items-center gap-2">
-              <Users className="size-4 text-muted-foreground" />
+            <CardTitle className="flex items-center gap-2 text-base text-zinc-100">
+              <Users className="size-4 text-matable-primary" />
               Liste des utilisateurs
             </CardTitle>
             <div className="flex items-center gap-2">
               <div className="relative">
-                <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 size-3.5 text-muted-foreground" />
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-zinc-500" />
                 <Input
-                  placeholder="Rechercher..."
+                  placeholder="Rechercher un utilisateur..."
                   value={search}
                   onChange={(e) => setSearch(e.target.value)}
-                  className="pl-8 h-8 text-sm w-[200px]"
+                  className="pl-9 h-9 text-sm w-[220px] border-zinc-700 bg-zinc-800/50 text-zinc-100 placeholder:text-zinc-500 focus:border-matable-primary focus:ring-matable-primary/20 transition-all duration-200"
                 />
               </div>
               <Select value={roleFilter} onValueChange={setRoleFilter}>
-                <SelectTrigger className="h-8 text-sm w-[140px]">
+                <SelectTrigger className="h-9 text-sm w-[150px] border-zinc-700 bg-zinc-800/50 text-zinc-100 focus:border-matable-primary focus:ring-matable-primary/20 transition-all duration-200">
                   <SelectValue placeholder="Tous les rôles" />
                 </SelectTrigger>
-                <SelectContent>
+                <SelectContent className="bg-zinc-900 border-zinc-800">
                   <SelectItem value="all">Tous les rôles</SelectItem>
                   {ROLES.map((r) => (
                     <SelectItem key={r} value={r}>{r}</SelectItem>
@@ -196,67 +211,85 @@ export default function AdminUsersPage() {
         <CardContent className="p-0">
           <Table>
             <TableHeader>
-              <TableRow>
-                <TableHead className="pl-4">Utilisateur</TableHead>
-                <TableHead>Email</TableHead>
-                <TableHead>Rôle</TableHead>
-                <TableHead>Inscription</TableHead>
-                <TableHead className="text-right pr-4">Actions</TableHead>
+              <TableRow className="border-zinc-800 bg-zinc-900/80 hover:bg-zinc-900/80">
+                <TableHead className="pl-4 text-zinc-400">Utilisateur</TableHead>
+                <TableHead className="text-zinc-400">Email</TableHead>
+                <TableHead className="text-zinc-400">Rôle</TableHead>
+                <TableHead className="text-zinc-400">Inscription</TableHead>
+                <TableHead className="text-right pr-4 text-zinc-400">Actions</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
               {isLoading ? (
                 Array.from({ length: 6 }).map((_, i) => (
-                  <TableRow key={i}>
+                  <TableRow key={i} className="border-zinc-800">
                     {Array.from({ length: 5 }).map((__, j) => (
-                      <TableCell key={j}><Skeleton className="h-4 w-full" /></TableCell>
+                      <TableCell key={j}><Skeleton className="h-4 w-full bg-zinc-800" /></TableCell>
                     ))}
                   </TableRow>
                 ))
               ) : filtered.length === 0 ? (
-                <TableRow>
-                  <TableCell colSpan={5} className="h-32 text-center text-muted-foreground">
-                    {search || roleFilter !== 'all' ? 'Aucun utilisateur trouvé' : 'Aucun utilisateur'}
+                <TableRow className="border-zinc-800">
+                  <TableCell colSpan={5} className="h-40">
+                    <div className="flex flex-col items-center justify-center gap-2 text-zinc-500">
+                      <Users className="size-8" />
+                      <p className="text-sm font-medium">
+                        {search || roleFilter !== 'all' ? 'Aucun utilisateur trouvé' : 'Aucun utilisateur'}
+                      </p>
+                      <p className="text-xs">
+                        {search || roleFilter !== 'all' 
+                          ? 'Essayez de modifier vos filtres' 
+                          : 'Les utilisateurs apparaîtront ici'}
+                      </p>
+                    </div>
                   </TableCell>
                 </TableRow>
               ) : (
                 filtered.map((u) => (
-                  <TableRow key={u._id}>
+                  <TableRow 
+                    key={u._id} 
+                    className="border-zinc-800 hover:bg-matable-primary/5 transition-all duration-200 cursor-pointer group"
+                    title={`Voir les détails de ${getDisplayName(u)}`}
+                  >
                     <TableCell className="pl-4">
                       <div className="flex items-center gap-3">
-                        <div className="size-8 rounded-full bg-primary/10 flex items-center justify-center text-xs font-bold text-primary shrink-0">
+                        <div className="size-9 rounded-full bg-gradient-to-br from-amber-400/20 to-amber-600/20 border border-amber-500/30 flex items-center justify-center text-xs font-bold text-amber-400 shrink-0 group-hover:scale-105 transition-transform duration-200">
                           {getInitials(u)}
                         </div>
-                        <span className="font-medium text-sm">{getDisplayName(u)}</span>
+                        <span className="font-medium text-sm text-zinc-100 group-hover:text-matable-cta transition-colors duration-200">{getDisplayName(u)}</span>
                       </div>
                     </TableCell>
-                    <TableCell className="text-sm text-muted-foreground">{u.email}</TableCell>
+                    <TableCell className="text-sm text-zinc-400">{u.email}</TableCell>
                     <TableCell><RoleBadge role={u.role} /></TableCell>
-                    <TableCell className="text-sm text-muted-foreground">
+                    <TableCell className="text-sm text-zinc-500 tabular-nums">
                       {u.createdAt
                         ? new Date(u.createdAt).toLocaleDateString('fr-FR', { day: '2-digit', month: 'short', year: 'numeric' })
                         : '—'}
                     </TableCell>
                     <TableCell className="text-right pr-4">
-                      <div className="flex items-center justify-end gap-1">
+                      <div className="flex items-center justify-end gap-1 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
                         <Button
                           variant="ghost"
                           size="icon"
-                          className="size-8"
+                          className="size-8 text-zinc-400 hover:text-matable-primary hover:bg-matable-primary/10 transition-all duration-200 cursor-pointer"
                           onClick={() => {
                             setEditTarget(u);
                             setEditRole(u.role ?? 'USER');
                           }}
+                          aria-label="Modifier"
+                          title="Modifier le rôle"
                         >
-                          <Pencil className="size-3.5" />
+                          <Pencil className="size-4" />
                         </Button>
                         <Button
                           variant="ghost"
                           size="icon"
-                          className="size-8 text-destructive hover:text-destructive"
+                          className="size-8 text-zinc-400 hover:text-red-400 hover:bg-red-500/10 transition-all duration-200 cursor-pointer"
                           onClick={() => setDeleteTarget(u)}
+                          aria-label="Supprimer"
+                          title="Supprimer l'utilisateur"
                         >
-                          <Trash2 className="size-3.5" />
+                          <Trash2 className="size-4" />
                         </Button>
                       </div>
                     </TableCell>
@@ -270,27 +303,30 @@ export default function AdminUsersPage() {
 
       {/* Edit Role Dialog */}
       <Dialog open={!!editTarget} onOpenChange={(o: boolean) => !o && setEditTarget(null)}>
-        <DialogContent className="max-w-sm">
+        <DialogContent className="max-w-sm border-zinc-800 bg-zinc-900">
           <DialogHeader>
-            <DialogTitle>Modifier le rôle</DialogTitle>
+            <DialogTitle className="text-white">Modifier le rôle</DialogTitle>
+            <DialogDescription>
+              Modifier le rôle de <span className="font-medium text-zinc-200">{editTarget ? getDisplayName(editTarget) : ''}</span>
+            </DialogDescription>
           </DialogHeader>
           <div className="space-y-4 pt-2">
-            <div className="flex items-center gap-3 p-3 rounded-lg bg-muted">
-              <div className="size-9 rounded-full bg-primary/10 flex items-center justify-center text-sm font-bold text-primary">
+            <div className="flex items-center gap-3 p-3 rounded-lg bg-zinc-800/60 border border-zinc-700/50">
+              <div className="size-10 rounded-full bg-gradient-to-br from-matable-primary/20 to-matable-primary/40 border border-matable-primary/30 flex items-center justify-center text-sm font-bold text-matable-primary">
                 {editTarget ? getInitials(editTarget) : ''}
               </div>
               <div>
-                <p className="text-sm font-medium">{editTarget ? getDisplayName(editTarget) : ''}</p>
-                <p className="text-xs text-muted-foreground">{editTarget?.email}</p>
+                <p className="text-sm font-medium text-zinc-100">{editTarget ? getDisplayName(editTarget) : ''}</p>
+                <p className="text-xs text-zinc-500">{editTarget?.email}</p>
               </div>
             </div>
             <div className="space-y-1.5">
-              <Label>Rôle</Label>
+              <Label className="text-zinc-300">Rôle</Label>
               <Select value={editRole} onValueChange={setEditRole}>
-                <SelectTrigger>
+                <SelectTrigger className="border-zinc-700 bg-zinc-800/50 text-zinc-100 focus:border-matable-primary focus:ring-matable-primary/20">
                   <SelectValue />
                 </SelectTrigger>
-                <SelectContent>
+                <SelectContent className="bg-zinc-900 border-zinc-800">
                   {ROLES.map((r) => (
                     <SelectItem key={r} value={r}>{r}</SelectItem>
                   ))}
@@ -299,10 +335,13 @@ export default function AdminUsersPage() {
             </div>
           </div>
           <DialogFooter>
-            <Button variant="outline" onClick={() => setEditTarget(null)}>Annuler</Button>
+            <Button variant="outline" onClick={() => setEditTarget(null)} className="border-zinc-700 bg-zinc-800 text-zinc-200 hover:bg-zinc-700 cursor-pointer">
+              Annuler
+            </Button>
             <Button
               onClick={() => editTarget && updateMut.mutate({ id: editTarget._id, role: editRole })}
               disabled={updateMut.isPending}
+              className="bg-matable-primary text-white hover:bg-matable-primary-light cursor-pointer"
             >
               {updateMut.isPending ? 'Enregistrement...' : 'Mettre à jour'}
             </Button>
@@ -312,18 +351,18 @@ export default function AdminUsersPage() {
 
       {/* Delete Confirm */}
       <AlertDialog open={!!deleteTarget} onOpenChange={(o: boolean) => !o && setDeleteTarget(null)}>
-        <AlertDialogContent>
+        <AlertDialogContent className="border-zinc-800 bg-zinc-900">
           <AlertDialogHeader>
-            <AlertDialogTitle>Supprimer l&apos;utilisateur ?</AlertDialogTitle>
-            <AlertDialogDescription>
-              L&apos;utilisateur <strong>{deleteTarget ? getDisplayName(deleteTarget) : ''}</strong> ({deleteTarget?.email}) sera
+            <AlertDialogTitle className="text-white">Supprimer l&apos;utilisateur ?</AlertDialogTitle>
+            <AlertDialogDescription className="text-zinc-400">
+              L&apos;utilisateur <strong className="text-zinc-200">{deleteTarget ? getDisplayName(deleteTarget) : ''}</strong> ({deleteTarget?.email}) sera
               définitivement supprimé. Cette action est irréversible.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel>Annuler</AlertDialogCancel>
+            <AlertDialogCancel className="border-zinc-700 bg-zinc-800 text-zinc-200 hover:bg-zinc-700">Annuler</AlertDialogCancel>
             <AlertDialogAction
-              className="bg-destructive hover:bg-destructive/90"
+              className="bg-red-500 hover:bg-red-400 text-white"
               onClick={() => deleteTarget && deleteMut.mutate(deleteTarget._id)}
               disabled={deleteMut.isPending}
             >

@@ -23,13 +23,13 @@ function FavoriteVenueCard({ venue }: { venue: Venue }) {
   const href = `/lieu/${venue.slug ?? venue._id}`;
 
   return (
-    <div className="group rounded-2xl border border-zinc-800 bg-zinc-900/60 overflow-hidden hover:border-amber-400/30 transition-all duration-200">
-      <div className="relative aspect-[16/9] overflow-hidden bg-zinc-800">
+    <div className="group rounded-2xl border border-gray-200 bg-white overflow-hidden hover:border-[#D4AF37]/50 transition-all duration-200 shadow-sm">
+      <div className="relative aspect-[16/9] overflow-hidden bg-gray-100">
         {img ? (
           <Image src={img} alt={venue.name} fill className="object-cover transition-transform duration-500 group-hover:scale-105" sizes="(max-width: 640px) 100vw, 50vw" />
         ) : (
           <div className="size-full flex items-center justify-center">
-            <MapPin className="size-10 text-zinc-600" />
+            <MapPin className="size-10 text-gray-400" />
           </div>
         )}
         <button
@@ -50,11 +50,6 @@ function FavoriteVenueCard({ venue }: { venue: Venue }) {
           <MapPin className="size-3.5 shrink-0" />
           {venue.city}
         </div>
-        {venue.startingPrice != null && (
-          <p className="text-amber-400 text-sm font-medium mb-3">
-            À partir de {venue.startingPrice} TND
-          </p>
-        )}
         <Button asChild size="sm" className="w-full rounded-full bg-zinc-800 hover:bg-zinc-700 text-zinc-100 gap-1.5">
           <Link href={href}>
             Voir le lieu <ArrowRight className="size-3.5" />

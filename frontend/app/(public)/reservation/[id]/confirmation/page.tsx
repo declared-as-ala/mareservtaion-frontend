@@ -1,121 +1,20 @@
 'use client';
 
-import { useState } from 'react';
 import { useParams } from 'next/navigation';
 import Link from 'next/link';
 import Image from 'next/image';
-import { useQuery, useMutation } from '@tanstack/react-query';
+import { useQuery } from '@tanstack/react-query';
 import { fetchReservationById } from '@/lib/api/reservations';
-import { createReview } from '@/lib/api/reviews';
 import { Button } from '@/components/ui/button';
-import { Textarea } from '@/components/ui/textarea';
 import { DetailPageSkeleton } from '@/components/shared/skeletons';
 import { ErrorState } from '@/components/shared/ErrorState';
 import {
   Calendar,
   CheckCircle2,
   QrCode,
-  Star,
   Users,
   MapPin,
-  MessageSquare,
-  Send,
 } from 'lucide-react';
-import { toast } from 'sonner';
-import { cn } from '@/lib/utils';
-
-/* ------------------------------------------------------------------ */
-/* Star rating picker                                                    */
-/* ------------------------------------------------------------------ */
-function StarPicker({ value, onChange }: { value: number; onChange: (v: number) => void }) {
-  const [hover, setHover] = useState(0);
-  return (
-    <div className="flex gap-1">
-      {[1, 2, 3, 4, 5].map((s) => (
-        <button
-          key={s}
-          type="button"
-          onMouseEnter={() => setHover(s)}
-          onMouseLeave={() => setHover(0)}
-          onClick={() => onChange(s)}
-          className="transition-transform hover:scale-110"
-          aria-label={`${s} étoile${s > 1 ? 's' : ''}`}
-        >
-          <Star
-            className={cn(
-              'size-7 transition-colors',
-              (hover || value) >= s
-                ? 'fill-amber-400 text-amber-400'
-                : 'text-zinc-700'
-            )}
-          />
-        </button>
-      ))}
-    </div>
-  );
-}
-
-/* ------------------------------------------------------------------ */
-/* Review form block                                                     */
-/* ------------------------------------------------------------------ */
-function ReviewForm({
-  reservationId,
-  venueId,
-}: {
-  reservationId: string;
-  venueId: string;
-}) {
-  const [rating, setRating] = useState(0);
-  const [comment, setComment] = useState('');
-  const [submitted, setSubmitted] = useState(false);
-
-  const mut = useMutation({
-    mutationFn: () => createReview({ venueId, reservationId, rating, comment }),
-    onSuccess: () => {
-      setSubmitted(true);
-      toast.success('Merci pour votre avis !');
-    },
-    onError: (e: Error) => toast.error(e.message),
-  });
-
-  if (submitted) {
-    return (
-      <div className="flex items-center gap-2 text-emerald-400 text-sm">
-        <CheckCircle2 className="size-4" />
-        Avis publié — merci !
-      </div>
-    );
-  }
-
-  return (
-    <div className="space-y-4">
-      <div>
-        <p className="text-zinc-400 text-sm mb-2">Votre note</p>
-        <StarPicker value={rating} onChange={setRating} />
-      </div>
-      <div>
-        <p className="text-zinc-400 text-sm mb-2">Votre commentaire</p>
-        <Textarea
-          value={comment}
-          onChange={(e) => setComment(e.target.value)}
-          placeholder="Partagez votre expérience…"
-          className="bg-zinc-800/60 border-zinc-700 text-zinc-100 placeholder:text-zinc-500 resize-none min-h-[90px]"
-          maxLength={1000}
-        />
-        <p className="text-zinc-600 text-xs mt-1 text-right">{comment.length}/1000</p>
-      </div>
-      <Button
-        type="button"
-        onClick={() => mut.mutate()}
-        disabled={rating === 0 || comment.trim().length < 5 || mut.isPending}
-        className="rounded-full bg-amber-400 hover:bg-amber-300 text-zinc-950 font-semibold gap-2"
-      >
-        <Send className="size-4" />
-        {mut.isPending ? 'Envoi…' : 'Publier l\'avis'}
-      </Button>
-    </div>
-  );
-}
 
 /* ------------------------------------------------------------------ */
 /* Helpers                                                               */
@@ -254,17 +153,6 @@ export default function ReservationConfirmationPage() {
             <QrCode className="size-10 text-zinc-600 mx-auto mb-2" />
             <p className="text-zinc-500 text-sm font-mono tracking-widest">{code}</p>
             <p className="text-zinc-600 text-xs mt-1">Présentez ce code à l&apos;entrée</p>
-          </div>
-        )}
-
-        {/* Review */}
-        {venueId && (
-          <div className="rounded-2xl border border-zinc-800 bg-zinc-900/60 p-6">
-            <div className="flex items-center gap-2 text-zinc-300 font-semibold mb-4">
-              <MessageSquare className="size-5 text-amber-400" />
-              Laisser un avis
-            </div>
-            <ReviewForm reservationId={reservation._id} venueId={venueId} />
           </div>
         )}
 

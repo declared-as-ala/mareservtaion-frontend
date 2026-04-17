@@ -26,6 +26,7 @@ import {
   DialogContent,
   DialogHeader,
   DialogTitle,
+  DialogDescription,
   DialogFooter,
 } from '@/components/ui/dialog';
 import {
@@ -40,7 +41,7 @@ import {
 } from '@/components/ui/alert-dialog';
 import { Badge } from '@/components/ui/badge';
 import { Skeleton } from '@/components/ui/skeleton';
-import { Plus, Pencil, Trash2, FolderTree } from 'lucide-react';
+import { Plus, Pencil, Trash2, FolderTree, Search } from 'lucide-react';
 import { toast } from 'sonner';
 
 function slugify(str: string) {
@@ -160,86 +161,106 @@ export default function AdminCategoriesPage() {
 
   return (
     <div className="space-y-6">
+      {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold">Catégories</h1>
-          <p className="text-sm text-muted-foreground mt-0.5">
+          <h1 className="text-2xl font-bold text-white">Catégories</h1>
+          <p className="mt-1 text-sm text-zinc-400">
             {categories.length} catégorie{categories.length !== 1 ? 's' : ''} au total
           </p>
         </div>
-        <Button onClick={openCreate} className="gap-2">
+        <Button 
+          onClick={openCreate} 
+          className="gap-2 bg-amber-500 text-black hover:bg-amber-400 transition-all duration-200"
+        >
           <Plus className="size-4" />
           Nouvelle catégorie
         </Button>
       </div>
 
-      <Card>
-        <CardHeader className="pb-3">
+      {/* Table Card */}
+      <Card className="border-zinc-800 bg-zinc-900/50">
+        <CardHeader className="pb-4 border-b border-zinc-800">
           <div className="flex items-center justify-between gap-4">
-            <CardTitle className="flex items-center gap-2">
-              <FolderTree className="size-4 text-muted-foreground" />
+            <CardTitle className="flex items-center gap-2 text-base text-zinc-100">
+              <FolderTree className="size-4 text-amber-400" />
               Liste des catégories
             </CardTitle>
-            <Input
-              placeholder="Rechercher..."
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-              className="max-w-[220px] h-8 text-sm"
-            />
+            <div className="relative">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-zinc-500" />
+              <Input
+                placeholder="Rechercher une catégorie..."
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+                className="pl-9 h-9 text-sm w-[220px] border-zinc-700 bg-zinc-800/50 text-zinc-100 placeholder:text-zinc-500 focus:border-amber-500 focus:ring-amber-500/20"
+              />
+            </div>
           </div>
         </CardHeader>
         <CardContent className="p-0">
           <Table>
             <TableHeader>
-              <TableRow>
-                <TableHead>Nom</TableHead>
-                <TableHead>Slug</TableHead>
-                <TableHead>Type</TableHead>
-                <TableHead>Ordre</TableHead>
-                <TableHead className="text-right pr-4">Actions</TableHead>
+              <TableRow className="border-zinc-800 bg-zinc-900/80 hover:bg-zinc-900/80">
+                <TableHead className="text-zinc-400">Nom</TableHead>
+                <TableHead className="text-zinc-400">Slug</TableHead>
+                <TableHead className="text-zinc-400">Type</TableHead>
+                <TableHead className="text-zinc-400">Ordre</TableHead>
+                <TableHead className="text-right pr-4 text-zinc-400">Actions</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
               {isLoading ? (
                 Array.from({ length: 5 }).map((_, i) => (
-                  <TableRow key={i}>
+                  <TableRow key={i} className="border-zinc-800">
                     {Array.from({ length: 5 }).map((__, j) => (
                       <TableCell key={j}>
-                        <Skeleton className="h-4 w-full" />
+                        <Skeleton className="h-4 w-full bg-zinc-800" />
                       </TableCell>
                     ))}
                   </TableRow>
                 ))
               ) : filtered.length === 0 ? (
-                <TableRow>
-                  <TableCell colSpan={5} className="h-32 text-center text-muted-foreground">
-                    {search ? 'Aucune catégorie trouvée' : 'Aucune catégorie — créez-en une ci-dessus'}
+                <TableRow className="border-zinc-800">
+                  <TableCell colSpan={5} className="h-40">
+                    <div className="flex flex-col items-center justify-center gap-2 text-zinc-500">
+                      <FolderTree className="size-8" />
+                      <p className="text-sm font-medium">
+                        {search ? 'Aucune catégorie trouvée' : 'Aucune catégorie'}
+                      </p>
+                      <p className="text-xs">
+                        {search ? 'Essayez de modifier votre recherche' : 'Créez-en une avec le bouton ci-dessus'}
+                      </p>
+                    </div>
                   </TableCell>
                 </TableRow>
               ) : (
                 filtered.map((cat) => (
-                  <TableRow key={cat._id}>
-                    <TableCell className="font-medium">
+                  <TableRow key={cat._id} className="border-zinc-800 hover:bg-zinc-800/40 transition-colors duration-150">
+                    <TableCell className="font-medium text-zinc-100">
                       <div className="flex items-center gap-2">
-                        {cat.icon && <span className="text-base">{cat.icon}</span>}
-                        {cat.name}
+                        {cat.icon && (
+                          <span className="size-8 rounded-lg bg-zinc-800 border border-zinc-700 flex items-center justify-center text-base">
+                            {cat.icon}
+                          </span>
+                        )}
+                        <span>{cat.name}</span>
                       </div>
                     </TableCell>
                     <TableCell>
-                      <code className="text-xs bg-muted px-1.5 py-0.5 rounded">{cat.slug}</code>
+                      <code className="text-xs bg-zinc-800 border border-zinc-700 px-2 py-1 rounded text-zinc-400 font-mono">{cat.slug}</code>
                     </TableCell>
                     <TableCell>
                       {cat.type ? (
-                        <Badge variant="secondary" className="text-xs">
+                        <Badge variant="secondary" className="text-xs bg-zinc-800 text-zinc-400 border-zinc-700">
                           {cat.type}
                         </Badge>
                       ) : (
-                        <span className="text-muted-foreground text-sm">—</span>
+                        <span className="text-zinc-500 text-sm">—</span>
                       )}
                     </TableCell>
                     <TableCell>
-                      <span className="text-sm tabular-nums">
-                        {cat.displayOrder ?? <span className="text-muted-foreground">—</span>}
+                      <span className="text-sm tabular-nums text-zinc-400">
+                        {cat.displayOrder ?? <span className="text-zinc-500">—</span>}
                       </span>
                     </TableCell>
                     <TableCell className="text-right pr-4">
@@ -247,18 +268,20 @@ export default function AdminCategoriesPage() {
                         <Button
                           variant="ghost"
                           size="icon"
-                          className="size-8"
+                          className="size-8 text-zinc-400 hover:text-amber-400 hover:bg-amber-500/10 transition-all duration-200"
                           onClick={() => openEdit(cat)}
+                          aria-label="Modifier"
                         >
-                          <Pencil className="size-3.5" />
+                          <Pencil className="size-4" />
                         </Button>
                         <Button
                           variant="ghost"
                           size="icon"
-                          className="size-8 text-destructive hover:text-destructive"
+                          className="size-8 text-zinc-400 hover:text-red-400 hover:bg-red-500/10 transition-all duration-200"
                           onClick={() => setDeleteTarget(cat)}
+                          aria-label="Supprimer"
                         >
-                          <Trash2 className="size-3.5" />
+                          <Trash2 className="size-4" />
                         </Button>
                       </div>
                     </TableCell>
@@ -272,15 +295,20 @@ export default function AdminCategoriesPage() {
 
       {/* Create / Edit Dialog */}
       <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
-        <DialogContent className="max-w-md">
+        <DialogContent className="max-w-md border-zinc-800 bg-zinc-900">
           <DialogHeader>
-            <DialogTitle>
+            <DialogTitle className="text-white">
               {editTarget ? 'Modifier la catégorie' : 'Nouvelle catégorie'}
             </DialogTitle>
+            <DialogDescription className="text-zinc-400">
+              {editTarget 
+                ? 'Modifiez les informations de cette catégorie'
+                : 'Remplissez les informations pour créer une nouvelle catégorie'}
+            </DialogDescription>
           </DialogHeader>
           <form onSubmit={handleSubmit} className="space-y-4 pt-2">
-            <div className="space-y-1.5">
-              <Label htmlFor="cat-name">Nom *</Label>
+            <div className="space-y-2">
+              <Label htmlFor="cat-name" className="text-zinc-300">Nom *</Label>
               <Input
                 id="cat-name"
                 value={form.name}
@@ -294,30 +322,33 @@ export default function AdminCategoriesPage() {
                 }}
                 placeholder="Ex: Restaurants"
                 required
+                className="border-zinc-700 bg-zinc-800/50 text-zinc-100 placeholder:text-zinc-500 focus:border-amber-500 focus:ring-amber-500/20"
               />
             </div>
-            <div className="space-y-1.5">
-              <Label htmlFor="cat-slug">Slug *</Label>
+            <div className="space-y-2">
+              <Label htmlFor="cat-slug" className="text-zinc-300">Slug *</Label>
               <Input
                 id="cat-slug"
                 value={form.slug}
                 onChange={(e) => setForm((f) => ({ ...f, slug: e.target.value }))}
                 placeholder="Ex: restaurants"
                 required
+                className="border-zinc-700 bg-zinc-800/50 text-zinc-100 placeholder:text-zinc-500 focus:border-amber-500 focus:ring-amber-500/20"
               />
             </div>
             <div className="grid grid-cols-2 gap-3">
-              <div className="space-y-1.5">
-                <Label htmlFor="cat-type">Type</Label>
+              <div className="space-y-2">
+                <Label htmlFor="cat-type" className="text-zinc-300">Type</Label>
                 <Input
                   id="cat-type"
                   value={form.type}
                   onChange={(e) => setForm((f) => ({ ...f, type: e.target.value }))}
                   placeholder="Ex: RESTAURANT"
+                  className="border-zinc-700 bg-zinc-800/50 text-zinc-100 placeholder:text-zinc-500 focus:border-amber-500 focus:ring-amber-500/20"
                 />
               </div>
-              <div className="space-y-1.5">
-                <Label htmlFor="cat-order">Ordre d&apos;affichage</Label>
+              <div className="space-y-2">
+                <Label htmlFor="cat-order" className="text-zinc-300">Ordre d&apos;affichage</Label>
                 <Input
                   id="cat-order"
                   type="number"
@@ -325,32 +356,39 @@ export default function AdminCategoriesPage() {
                   onChange={(e) => setForm((f) => ({ ...f, displayOrder: e.target.value }))}
                   placeholder="0"
                   min={0}
+                  className="border-zinc-700 bg-zinc-800/50 text-zinc-100 placeholder:text-zinc-500 focus:border-amber-500 focus:ring-amber-500/20"
                 />
               </div>
             </div>
-            <div className="space-y-1.5">
-              <Label htmlFor="cat-icon">Icône (emoji)</Label>
+            <div className="space-y-2">
+              <Label htmlFor="cat-icon" className="text-zinc-300">Icône (emoji)</Label>
               <Input
                 id="cat-icon"
                 value={form.icon}
                 onChange={(e) => setForm((f) => ({ ...f, icon: e.target.value }))}
                 placeholder="Ex: 🍽️"
+                className="border-zinc-700 bg-zinc-800/50 text-zinc-100 placeholder:text-zinc-500 focus:border-amber-500 focus:ring-amber-500/20"
               />
             </div>
-            <div className="space-y-1.5">
-              <Label htmlFor="cat-desc">Description</Label>
+            <div className="space-y-2">
+              <Label htmlFor="cat-desc" className="text-zinc-300">Description</Label>
               <Input
                 id="cat-desc"
                 value={form.description}
                 onChange={(e) => setForm((f) => ({ ...f, description: e.target.value }))}
                 placeholder="Description courte"
+                className="border-zinc-700 bg-zinc-800/50 text-zinc-100 placeholder:text-zinc-500 focus:border-amber-500 focus:ring-amber-500/20"
               />
             </div>
             <DialogFooter>
-              <Button type="button" variant="outline" onClick={() => setDialogOpen(false)}>
+              <Button type="button" variant="outline" onClick={() => setDialogOpen(false)} className="border-zinc-700 bg-zinc-800 text-zinc-200 hover:bg-zinc-700">
                 Annuler
               </Button>
-              <Button type="submit" disabled={isSaving || !form.name.trim()}>
+              <Button 
+                type="submit" 
+                disabled={isSaving || !form.name.trim()}
+                className="bg-amber-500 text-black hover:bg-amber-400"
+              >
                 {isSaving ? 'Enregistrement...' : editTarget ? 'Mettre à jour' : 'Créer'}
               </Button>
             </DialogFooter>
@@ -360,18 +398,18 @@ export default function AdminCategoriesPage() {
 
       {/* Delete Confirm */}
       <AlertDialog open={!!deleteTarget} onOpenChange={(o: boolean) => !o && setDeleteTarget(null)}>
-        <AlertDialogContent>
+        <AlertDialogContent className="border-zinc-800 bg-zinc-900">
           <AlertDialogHeader>
-            <AlertDialogTitle>Supprimer la catégorie ?</AlertDialogTitle>
-            <AlertDialogDescription>
-              La catégorie <strong>{deleteTarget?.name}</strong> sera définitivement supprimée.
+            <AlertDialogTitle className="text-white">Supprimer la catégorie ?</AlertDialogTitle>
+            <AlertDialogDescription className="text-zinc-400">
+              La catégorie <strong className="text-zinc-200">{deleteTarget?.name}</strong> sera définitivement supprimée.
               Cette action est irréversible.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel>Annuler</AlertDialogCancel>
+            <AlertDialogCancel className="border-zinc-700 bg-zinc-800 text-zinc-200 hover:bg-zinc-700">Annuler</AlertDialogCancel>
             <AlertDialogAction
-              className="bg-destructive hover:bg-destructive/90"
+              className="bg-red-500 hover:bg-red-400 text-white"
               onClick={() => deleteTarget && deleteMut.mutate(deleteTarget._id)}
               disabled={deleteMut.isPending}
             >

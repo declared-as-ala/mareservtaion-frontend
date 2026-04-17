@@ -20,11 +20,9 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { VenueGallery } from '@/components/venue/VenueGallery';
 import { VenueMap } from '@/components/venue/VenueMap';
 import { SimilarVenues } from '@/components/venue/SimilarVenues';
-import { ReviewsSection } from '@/components/venue/ReviewsSection';
 import { ShareButton } from '@/components/venue/ShareButton';
 import { useCartStore } from '@/stores/cart';
 import {
-  Star,
   Video,
   Eye,
   Users,
@@ -33,13 +31,12 @@ import {
   Phone,
   MapPin,
   Clock,
-  MessageCircle,
-  Info,
+  Crown,
 } from 'lucide-react';
 import { toast } from 'sonner';
 import type { TablePlacement } from '@/lib/api/types';
 import type { Venue } from '@/lib/api/types';
-import { TableReservationModal } from '@/components/reservation/TableReservationModal';
+import { StepReservationModal } from '@/components/reservation/StepReservationModal';
 import { TablePickerSheet } from '@/components/reservation/TablePickerSheet';
 
 const RESERVATION_DURATION_MS = 2 * 60 * 60 * 1000;
@@ -162,7 +159,11 @@ export default function VenueDetailPage() {
   const img = getVenueImage(venue);
   const allImages = getAllImages(venue);
 
-  const hasNewImmersive = true; // Par défaut tous les lieux ont une vue 360 avec l'image par défaut
+  const hasNewImmersive =
+    !!venue.immersiveType &&
+    venue.immersiveType !== 'none' &&
+    ((venue.immersiveSourceType === 'url' && !!venue.immersiveUrl) ||
+      (venue.immersiveSourceType === 'upload' && !!venue.immersiveFile));
   const tabsDefaultValue = hasNewImmersive ? 'visite' : 'apercu';
   const hasTablePlacements = allPlacements.length > 0;
 
@@ -209,9 +210,9 @@ export default function VenueDetailPage() {
           badges={
             <>
               <TypeBadge type={venue.type} />
-              {venue.isSponsored && (
-                <span className="rounded-full bg-violet-600/90 px-2 py-0.5 text-xs font-medium text-white">
-                  Sponsorisé
+              {venue.isVedette && (
+                <span className="rounded-full bg-amber-500/90 px-2 py-0.5 text-xs font-bold text-black">
+                  ⭐ Vedette
                 </span>
               )}
               {venue.isFeatured && (
@@ -224,7 +225,7 @@ export default function VenueDetailPage() {
                   <Video className="size-3" /> Visite virtuelle
                 </span>
               )}
-              {(venue.immersiveType === 'view-360' || !venue.immersiveType || venue.immersiveType === 'none') && (
+              {venue.immersiveType === 'view-360' && (
                 <span className="inline-flex items-center gap-1 rounded-full border border-white/40 bg-black/30 px-2 py-0.5 text-xs font-medium text-white">
                   <Eye className="size-3" /> Vue 360°
                 </span>
@@ -234,111 +235,31 @@ export default function VenueDetailPage() {
           metaRight={
             <div className="flex flex-col items-end gap-2">
               <ShareButton title={venue.name} />
-              {venue.rating > 0 && (
-                <div className="flex items-center gap-1">
-                  <Star className="size-4 fill-amber-400 text-amber-400" />
-                  <span className="font-semibold">{venue.rating}</span>
-                </div>
-              )}
             </div>
           }
         />
       </div>
 
       <div className="mx-auto max-w-5xl px-4 py-8">
-
-        {/* ── Quick info bar ── */}
-        <div className="mb-6 flex flex-wrap gap-2.5">
-          {venue.rating > 0 && (
-            <div className="flex items-center gap-2 rounded-2xl bg-amber-500/10 border border-amber-500/25 px-4 py-2.5">
-              <Star className="size-4 fill-amber-400 text-amber-400" />
-              <span className="font-bold text-sm text-amber-400">{venue.rating}</span>
-              <span className="text-xs text-muted-foreground">/ 5</span>
-            </div>
-          )}
-          {venue.city && (
-            <div className="flex items-center gap-2 rounded-2xl bg-muted/50 border border-border/40 px-4 py-2.5">
-              <MapPin className="size-3.5 text-muted-foreground" />
-              <span className="text-sm font-medium">{venue.city}</span>
-            </div>
-          )}
-          {venue.startingPrice != null && venue.startingPrice > 0 && (
-            <div className="flex items-center gap-2 rounded-2xl bg-muted/50 border border-border/40 px-4 py-2.5">
-              <span className="text-xs text-muted-foreground">À partir de</span>
-              <span className="text-sm font-bold text-amber-400">{venue.startingPrice} TND</span>
-            </div>
-          )}
-          {venue.phone && (
-            <a
-              href={`tel:${venue.phone}`}
-              className="flex items-center gap-2 rounded-2xl bg-muted/50 border border-border/40 px-4 py-2.5 hover:border-primary/40 transition-colors group"
-            >
-              <Phone className="size-3.5 text-muted-foreground group-hover:text-primary transition-colors" />
-              <span className="text-sm font-medium">{venue.phone}</span>
-            </a>
-          )}
-        </div>
-
         <Tabs defaultValue={tabsDefaultValue} className="space-y-4">
-          <TabsList className="w-full justify-start overflow-x-auto bg-card/60 backdrop-blur border border-border/50 rounded-2xl p-1.5 gap-0.5 h-auto">
-            <TabsTrigger
-              value="apercu"
-              className="rounded-xl gap-1.5 px-4 py-2 text-sm data-[state=active]:bg-background data-[state=active]:shadow-sm"
-            >
-              <Eye className="size-3.5" /> Aperçu
-            </TabsTrigger>
+          <TabsList className="w-full justify-start overflow-x-auto">
+            <TabsTrigger value="apercu">Aperçu</TabsTrigger>
             {hasNewImmersive && (
-              <TabsTrigger
-                value="visite"
-                className="rounded-xl gap-1.5 px-4 py-2 text-sm data-[state=active]:bg-amber-500/20 data-[state=active]:text-amber-400 data-[state=active]:shadow-sm"
-              >
-                <Video className="size-3.5" /> Expérience immersive
-              </TabsTrigger>
+              <TabsTrigger value="visite">Expérience immersive</TabsTrigger>
             )}
             {hasTablePlacements && (
-              <TabsTrigger value="tables" className="rounded-xl gap-1.5 px-4 py-2 text-sm data-[state=active]:bg-background data-[state=active]:shadow-sm">
-                <Users className="size-3.5" /> Tables
+              <TabsTrigger value="tables" className="gap-1.5">
+                Tables
                 <span className="inline-flex items-center justify-center rounded-full bg-amber-500/20 text-amber-400 text-[10px] font-bold px-1.5 min-w-[18px] h-[18px]">
                   {allPlacements.length}
                 </span>
               </TabsTrigger>
             )}
-            <TabsTrigger
-              value="avis"
-              className="rounded-xl gap-1.5 px-4 py-2 text-sm data-[state=active]:bg-background data-[state=active]:shadow-sm"
-            >
-              <MessageCircle className="size-3.5" /> Avis
-            </TabsTrigger>
-            <TabsTrigger
-              value="infos"
-              className="rounded-xl gap-1.5 px-4 py-2 text-sm data-[state=active]:bg-background data-[state=active]:shadow-sm"
-            >
-              <Info className="size-3.5" /> Infos
-            </TabsTrigger>
+            <TabsTrigger value="infos">Infos pratiques</TabsTrigger>
           </TabsList>
 
           {/* ── Aperçu ── */}
           <TabsContent value="apercu" className="space-y-8 mt-4">
-            {/* 360° Preview */}
-            <div className="space-y-3">
-              <h2 className="font-semibold flex items-center gap-2">
-                <Eye className="size-4 text-amber-400" />
-                Vue 360°
-              </h2>
-              <div className="relative rounded-xl overflow-hidden border border-white/10 aspect-[2/1] bg-black/40">
-                <img
-                  src={venue.immersiveFile || '/default-360.jpg'}
-                  alt={`Vue 360° - ${venue.name}`}
-                  className="w-full h-full object-cover"
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent flex items-end justify-center pb-6">
-                  <span className="text-sm font-medium text-white/90">
-                    Cliquez sur "Expérience immersive" pour explorer en 360°
-                  </span>
-                </div>
-              </div>
-            </div>
-
             {venue.description && (
               <div>
                 <h2 className="font-semibold mb-2">Description</h2>
@@ -356,13 +277,14 @@ export default function VenueDetailPage() {
           <TabsContent value="visite" className="mt-4">
             <div className="space-y-4">
               {(() => {
-                const effImmersiveType = (venue.immersiveType && venue.immersiveType !== 'none') ? venue.immersiveType : 'view-360';
-                const effImmersiveSourceType = venue.immersiveSourceType === 'url' && venue.immersiveUrl ? 'url' : 'upload';
-                const effImmersiveFile = venue.immersiveFile || '/default-360.jpg';
-                const hasNewImmersiveLocal = true;
+                const hasNewImmersiveLocal =
+                  venue.immersiveType &&
+                  venue.immersiveType !== 'none' &&
+                  ((venue.immersiveSourceType === 'url' && venue.immersiveUrl) ||
+                    (venue.immersiveSourceType === 'upload' && venue.immersiveFile));
 
                 const tableReservationModal = selectedTable ? (
-                  <TableReservationModal
+                  <StepReservationModal
                     open={!!selectedTable}
                     onOpenChange={(open) => { if (!open) setSelectedTable(null); }}
                     placement={selectedTable}
@@ -375,7 +297,7 @@ export default function VenueDetailPage() {
 
                 if (hasNewImmersiveLocal) {
                   const typeLabel =
-                    effImmersiveType === 'virtual-tour' ? 'Visite virtuelle' : 'Vue 360°';
+                    venue.immersiveType === 'virtual-tour' ? 'Visite virtuelle' : 'Vue 360°';
 
                   if (isMatterport && venue.immersiveUrl) {
                     return (
@@ -391,15 +313,15 @@ export default function VenueDetailPage() {
                     );
                   }
 
-                  if (effImmersiveSourceType === 'upload' && effImmersiveFile) {
-                    const isVideo = /\.(mp4|webm|ogg)$/i.test(effImmersiveFile);
+                  if (venue.immersiveSourceType === 'upload' && venue.immersiveFile) {
+                    const isVideo = /\.(mp4|webm|ogg)$/i.test(venue.immersiveFile);
                     if (isVideo) {
                       return (
                         <div className="space-y-3">
                           <h3 className="font-semibold">{typeLabel}</h3>
                           <div className="aspect-video w-full overflow-hidden rounded-xl border bg-muted">
                             <video
-                              src={effImmersiveFile}
+                              src={venue.immersiveFile}
                               controls
                               className="h-full w-full object-contain"
                             />
@@ -453,8 +375,8 @@ export default function VenueDetailPage() {
                           <PanoramaEngine
                             imageUrl={
                               scenes.length > 0 && effectiveSceneId
-                                ? (scenes.find((s) => s._id === effectiveSceneId)?.image ?? effImmersiveFile)
-                                : effImmersiveFile
+                                ? (scenes.find((s) => s._id === effectiveSceneId)?.image ?? venue.immersiveFile)
+                                : venue.immersiveFile
                             }
                             markers={panoramaMarkers}
                             selectedMarkerId={null}
@@ -697,12 +619,12 @@ export default function VenueDetailPage() {
                 return (
                   <div className="flex items-center gap-3 mb-5">
                     <div className="flex items-center gap-1.5 rounded-full bg-emerald-500/10 border border-emerald-500/20 px-3 py-1.5 text-xs font-medium text-emerald-400">
-                      <span className="size-2 rounded-full bg-emerald-400" />
+                      <span className="size-2 rounded-full bg-emerald-500" />
                       {availableCount} disponible{availableCount !== 1 ? 's' : ''}
                     </div>
                     {reservedCount > 0 && (
                       <div className="flex items-center gap-1.5 rounded-full bg-red-500/10 border border-red-500/20 px-3 py-1.5 text-xs font-medium text-red-400">
-                        <span className="size-2 rounded-full bg-red-400" />
+                        <span className="size-2 rounded-full bg-red-500" />
                         {reservedCount} réservée{reservedCount !== 1 ? 's' : ''}
                       </div>
                     )}
@@ -715,6 +637,7 @@ export default function VenueDetailPage() {
                   const { table } = placement;
                   const isAvailable = table.status === 'available';
                   const price = table.price ?? venue.startingPrice ?? 0;
+                  const isSelected = selectedTable?._id === placement._id;
 
                   return (
                     <button
@@ -724,59 +647,64 @@ export default function VenueDetailPage() {
                       onClick={() => isAvailable && handleImmersiveTableSelect(placement)}
                       className={`group relative rounded-2xl border p-5 text-left transition-all duration-200 ${
                         isAvailable
-                          ? 'border-zinc-700 bg-zinc-900/60 hover:border-amber-400/50 hover:bg-zinc-900 hover:shadow-lg hover:shadow-amber-400/5 cursor-pointer active:scale-[0.98]'
-                          : 'border-zinc-800/40 bg-zinc-950/60 opacity-60 cursor-not-allowed'
+                          ? isSelected
+                            ? 'border-amber-400/50 bg-amber-400/5 shadow-lg shadow-amber-400/10 ring-1 ring-amber-400/20'
+                            : 'border-white/[0.08] bg-white/[0.04] hover:border-amber-400/40 hover:shadow-lg hover:shadow-amber-400/10 cursor-pointer active:scale-[0.98]'
+                          : 'border-white/[0.04] bg-white/[0.02] opacity-50 cursor-not-allowed'
                       }`}
                     >
                       {/* Status pill */}
                       <span className={`absolute top-4 right-4 inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-[11px] font-semibold ${
                         isAvailable
-                          ? 'bg-emerald-500/15 text-emerald-400 ring-1 ring-emerald-500/30'
-                          : 'bg-red-500/15 text-red-400 ring-1 ring-red-500/30'
+                          ? 'bg-emerald-500/15 text-emerald-400 ring-1 ring-emerald-500/20'
+                          : 'bg-red-500/15 text-red-400 ring-1 ring-red-500/20'
                       }`}>
-                        <span className={`size-1.5 rounded-full ${isAvailable ? 'bg-emerald-400 animate-pulse' : 'bg-red-400'}`} />
+                        <span className={`size-1.5 rounded-full ${isAvailable ? 'bg-emerald-500 animate-pulse' : 'bg-red-500'}`} />
                         {isAvailable ? 'Disponible' : 'Réservée'}
                       </span>
 
                       {/* Table number */}
                       <div className={`size-12 rounded-2xl flex items-center justify-center text-base font-black mb-3 transition-all ${
                         isAvailable
-                          ? 'bg-amber-400/15 text-amber-400 group-hover:bg-amber-400/25'
-                          : 'bg-zinc-800 text-zinc-500'
+                          ? isSelected
+                            ? 'bg-amber-400/20 text-amber-400'
+                            : 'bg-amber-400/10 text-amber-400 group-hover:bg-amber-400/20'
+                          : 'bg-white/[0.04] text-neutral-600'
                       }`}>
                         {table.tableNumber}
                       </div>
 
-                      <h4 className="font-bold text-zinc-100 pr-24 leading-tight text-sm">
+                      <h4 className="font-bold text-neutral-100 pr-24 leading-tight text-sm">
                         {table.name || `Table ${table.tableNumber}`}
                         {table.isVip && (
                           <span className="ml-1.5 inline-flex items-center rounded-full bg-amber-400/15 px-1.5 py-0.5 text-[10px] font-bold text-amber-400">
-                            ★ VIP
+                            <Crown className="size-2.5 inline -mt-px" /> VIP
                           </span>
                         )}
                       </h4>
 
-                      <div className="mt-2 flex flex-wrap items-center gap-3 text-xs text-zinc-500">
+                      <div className="mt-2 flex flex-wrap items-center gap-3 text-xs text-neutral-500">
                         <span className="flex items-center gap-1">
                           <Users className="size-3" /> {table.capacity} pers. max
                         </span>
-                        {price > 0 && (
-                          <span className="font-semibold text-amber-400/80">{price} TND</span>
-                        )}
                         {table.locationLabel && (
-                          <span className="text-zinc-600">{table.locationLabel}</span>
+                          <span className="flex items-center gap-1 text-neutral-600">
+                            <MapPin className="size-3" /> {table.locationLabel}
+                          </span>
+                        )}
+                        {price > 0 && (
+                          <span className="font-semibold text-amber-400">{price} TND min.</span>
                         )}
                       </div>
 
                       {/* Hover CTA hint */}
                       {isAvailable && (
-                        <div className="mt-4 flex items-center gap-2 text-xs text-amber-400 opacity-0 group-hover:opacity-100 transition-opacity">
-                          <ShoppingCart className="size-3.5" />
-                          Cliquer pour sélectionner
+                        <div className="mt-4 flex items-center gap-2 text-xs text-amber-400 opacity-0 group-hover:opacity-100 transition-opacity font-semibold">
+                          {isSelected ? '✓ Sélectionnée' : 'Cliquer pour sélectionner →'}
                         </div>
                       )}
                       {!isAvailable && (
-                        <div className="mt-4 flex items-center gap-2 text-xs text-zinc-600">
+                        <div className="mt-4 flex items-center gap-2 text-xs text-neutral-600">
                           <Lock className="size-3.5" />
                           Indisponible
                         </div>
@@ -787,7 +715,7 @@ export default function VenueDetailPage() {
               </div>
 
               {selectedTable && (
-                <TableReservationModal
+                <StepReservationModal
                   open={!!selectedTable}
                   onOpenChange={(open) => { if (!open) setSelectedTable(null); }}
                   placement={selectedTable}
@@ -800,70 +728,32 @@ export default function VenueDetailPage() {
             </TabsContent>
           )}
 
-          {/* ── Avis ── */}
-          <TabsContent value="avis" className="mt-4">
-            <ReviewsSection venueId={venue._id} />
-          </TabsContent>
-
           {/* ── Infos pratiques ── */}
           <TabsContent value="infos" className="mt-4 space-y-6">
-            <div className="grid sm:grid-cols-2 gap-3">
+            <dl className="space-y-3 text-sm">
               {venue.address && (
-                <div className="flex items-start gap-3 rounded-2xl border border-border/40 bg-muted/20 p-4">
-                  <div className="size-10 rounded-xl bg-primary/10 flex items-center justify-center shrink-0">
-                    <MapPin className="size-4 text-primary" />
-                  </div>
-                  <div>
-                    <p className="text-[10px] font-semibold uppercase tracking-widest text-muted-foreground mb-1">Adresse</p>
-                    <p className="text-sm font-medium leading-snug">{venue.address}</p>
-                    {venue.city && <p className="text-xs text-muted-foreground mt-0.5">{venue.city}</p>}
-                  </div>
+                <div>
+                  <dt className="font-medium flex items-center gap-1.5 mb-0.5">
+                    <MapPin className="size-3.5" /> Adresse
+                  </dt>
+                  <dd className="text-muted-foreground pl-5">
+                    {venue.address}, {venue.city}
+                  </dd>
                 </div>
               )}
               {venue.phone && (
-                <a
-                  href={`tel:${venue.phone}`}
-                  className="flex items-start gap-3 rounded-2xl border border-border/40 bg-muted/20 p-4 hover:border-primary/40 hover:bg-primary/5 transition-colors group"
-                >
-                  <div className="size-10 rounded-xl bg-primary/10 flex items-center justify-center shrink-0 group-hover:bg-primary/20 transition-colors">
-                    <Phone className="size-4 text-primary" />
-                  </div>
-                  <div>
-                    <p className="text-[10px] font-semibold uppercase tracking-widest text-muted-foreground mb-1">Téléphone</p>
-                    <p className="text-sm font-medium">{venue.phone}</p>
-                    <p className="text-xs text-primary mt-0.5 opacity-0 group-hover:opacity-100 transition-opacity">Appeler →</p>
-                  </div>
-                </a>
-              )}
-              {venue.startingPrice != null && (
-                <div className="flex items-start gap-3 rounded-2xl border border-amber-500/20 bg-amber-500/5 p-4">
-                  <div className="size-10 rounded-xl bg-amber-500/15 flex items-center justify-center shrink-0">
-                    <Clock className="size-4 text-amber-500" />
-                  </div>
-                  <div>
-                    <p className="text-[10px] font-semibold uppercase tracking-widest text-muted-foreground mb-1">Tarif</p>
-                    <p className="text-sm">
-                      À partir de{' '}
-                      <span className="font-bold text-amber-400">{venue.startingPrice} TND</span>
-                    </p>
-                  </div>
+                <div>
+                  <dt className="font-medium flex items-center gap-1.5 mb-0.5">
+                    <Phone className="size-3.5" /> Téléphone
+                  </dt>
+                  <dd className="pl-5">
+                    <a href={`tel:${venue.phone}`} className="text-primary hover:underline">
+                      {venue.phone}
+                    </a>
+                  </dd>
                 </div>
               )}
-              {venue.rating > 0 && (
-                <div className="flex items-start gap-3 rounded-2xl border border-amber-500/20 bg-amber-500/5 p-4">
-                  <div className="size-10 rounded-xl bg-amber-500/15 flex items-center justify-center shrink-0">
-                    <Star className="size-4 fill-amber-400 text-amber-400" />
-                  </div>
-                  <div>
-                    <p className="text-[10px] font-semibold uppercase tracking-widest text-muted-foreground mb-1">Note moyenne</p>
-                    <p className="text-sm font-bold text-amber-400">
-                      {venue.rating}{' '}
-                      <span className="text-muted-foreground font-normal text-xs">/ 5</span>
-                    </p>
-                  </div>
-                </div>
-              )}
-            </div>
+            </dl>
 
             {venue.address && venue.city && (
               <VenueMap address={venue.address} city={venue.city} />

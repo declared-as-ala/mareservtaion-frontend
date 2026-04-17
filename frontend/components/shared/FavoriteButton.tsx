@@ -56,8 +56,8 @@ export function FavoriteButton({ venueId, className, size = 'md' }: FavoriteButt
       className={cn(
         btnSize,
         'rounded-full flex items-center justify-center transition-all duration-200',
-        'bg-black/40 backdrop-blur-sm border border-white/10',
-        'hover:bg-black/60 hover:border-white/20',
+        'bg-white backdrop-blur-sm border border-gray-200 shadow-sm',
+        'hover:bg-gray-50 hover:border-[#D4AF37]/30 hover:shadow-md',
         'disabled:opacity-50 disabled:cursor-not-allowed',
         loading && 'animate-pulse',
         className
@@ -69,7 +69,7 @@ export function FavoriteButton({ venueId, className, size = 'md' }: FavoriteButt
           'transition-all duration-200',
           favorited
             ? 'fill-red-500 text-red-500 scale-110'
-            : 'text-white'
+            : 'text-[#666666]'
         )}
       />
     </button>

@@ -18,13 +18,13 @@ export function ErrorState({
   return (
     <div
       className={cn(
-        'flex flex-col items-center justify-center rounded-lg border border-destructive/20 bg-destructive/5 px-6 py-12 text-center',
+        'flex flex-col items-center justify-center rounded-lg border border-red-200 bg-red-50 px-6 py-12 text-center',
         className
       )}
     >
-      <AlertCircle className="size-12 text-destructive mb-4" />
-      <h3 className="font-semibold">{title}</h3>
-      <p className="mt-1 max-w-sm text-sm text-muted-foreground">{message}</p>
+      <AlertCircle className="size-12 text-red-500 mb-4" />
+      <h3 className="font-semibold text-[#111111]">{title}</h3>
+      <p className="mt-1 max-w-sm text-sm text-[#666666]">{message}</p>
       {onRetry && (
         <Button variant="outline" size="sm" className="mt-6" onClick={onRetry}>
           Réessayer

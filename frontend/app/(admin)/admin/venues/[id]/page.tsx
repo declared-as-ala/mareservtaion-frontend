@@ -61,7 +61,7 @@ type VenueForm = {
   name: string; type: string; city: string; address: string;
   description: string; shortDescription: string; coverImage: string;
   gallery: string[]; isPublished: boolean; isFeatured: boolean;
-  isSponsored: boolean; phone: string; slug: string;
+  isVedette: boolean; phone: string; slug: string;
   immersiveType: ImmersiveType; immersiveSourceType: ImmersiveSourceType | '';
   immersiveUrl: string; immersiveFile: string;
 };
@@ -78,7 +78,7 @@ function toForm(venue: Record<string, unknown>): VenueForm {
     gallery: Array.isArray(venue.gallery) ? venue.gallery as string[] : [],
     isPublished: Boolean(venue.isPublished !== false),
     isFeatured: Boolean(venue.isFeatured),
-    isSponsored: Boolean(venue.isSponsored),
+    isVedette: Boolean(venue.isVedette),
     phone: String(venue.phone ?? ''),
     slug: String(venue.slug ?? ''),
     immersiveType: (['none', 'virtual-tour', 'view-360'].includes(venue.immersiveType as string)
@@ -498,10 +498,9 @@ export default function AdminVenueDetailPage() {
   const selectedMarkerId =
     editorMode.type === 'moving' ? editorMode.placementId : null;
 
-  const effImmersiveFile = form?.immersiveFile || '/default-360.jpg';
-  const hasPanorama = effImmersiveFile &&
-    (form?.immersiveSourceType === 'upload' || !form?.immersiveSourceType) &&
-    !effImmersiveFile.match(/\.(mp4|webm|ogg)$/i);
+  const hasPanorama = !!form?.immersiveFile &&
+    form.immersiveSourceType === 'upload' &&
+    !form.immersiveFile.match(/\.(mp4|webm|ogg)$/i);
 
   // ── Early returns ──
   if (!id) return (
@@ -522,30 +521,18 @@ export default function AdminVenueDetailPage() {
   return (
     <div className="space-y-6 pb-10">
       {/* ── Premium Header ───────────────────────────────────── */}
-      <div className="rounded-2xl border border-border/40 bg-card p-4 flex items-center justify-between gap-4">
-        <div className="flex items-center gap-3">
-          <Button variant="ghost" size="icon" asChild className="size-9 rounded-xl border border-border/50 hover:border-border shrink-0">
+      <div className="flex items-center justify-between">
+        <div className="flex items-center gap-4">
+          <Button variant="ghost" size="icon" asChild className="size-9 rounded-xl border border-border/50 hover:border-border">
             <Link href="/admin/venues"><ArrowLeft className="size-4" /></Link>
           </Button>
-
-          {/* Mini cover thumbnail */}
-          <div className={cn(
-            'relative size-12 rounded-xl overflow-hidden border border-border/40 bg-muted shrink-0',
-            !form.coverImage && 'flex items-center justify-center'
-          )}>
-            {form.coverImage
-              ? <Image src={form.coverImage} alt="" fill className="object-cover" sizes="48px" />
-              : <Building2 className="size-5 text-muted-foreground/40" />
-            }
-          </div>
-
           <div>
-            <div className="flex items-center gap-1.5 text-xs text-muted-foreground mb-0.5">
+            <div className="flex items-center gap-2 text-xs text-muted-foreground mb-0.5">
               <Link href="/admin/venues" className="hover:text-foreground transition-colors">Lieux</Link>
               <span>/</span>
-              <span className="text-foreground font-medium truncate max-w-[200px]">{form.name || 'Édition'}</span>
+              <span className="text-foreground font-medium">{form.name || 'Édition'}</span>
             </div>
-            <h1 className="text-xl font-bold tracking-tight leading-none">{form.name || 'Nouveau lieu'}</h1>
+            <h1 className="text-xl font-bold tracking-tight">{form.name || 'Nouveau lieu'}</h1>
           </div>
         </div>
         <div className="flex items-center gap-3">
@@ -730,16 +717,16 @@ export default function AdminVenueDetailPage() {
                     <div className="flex items-center justify-between rounded-xl bg-muted/50 p-3">
                       <div className="flex items-center gap-3">
                         <div className={cn('size-8 rounded-lg flex items-center justify-center',
-                          form.isSponsored ? 'bg-violet-500/15' : 'bg-muted')}>
-                          <BadgeCheck className={cn('size-4', form.isSponsored ? 'text-violet-500' : 'text-muted-foreground')} />
+                          form.isVedette ? 'bg-amber-500/15' : 'bg-muted')}>
+                          <Star className={cn('size-4', form.isVedette ? 'text-amber-500' : 'text-muted-foreground')} />
                         </div>
                         <div>
-                          <p className="text-sm font-medium">Sponsorisé</p>
-                          <p className="text-[11px] text-muted-foreground">Promotion payante</p>
+                          <p className="text-sm font-medium">En vedette</p>
+                          <p className="text-[11px] text-muted-foreground">Affiché sur la page d&apos;accueil</p>
                         </div>
                       </div>
-                      <Switch checked={form.isSponsored}
-                        onCheckedChange={(v) => setForm({ ...form, isSponsored: v })} />
+                      <Switch checked={form.isVedette}
+                        onCheckedChange={(v) => setForm({ ...form, isVedette: v })} />
                     </div>
                   </CardContent>
                 </Card>
@@ -1176,8 +1163,8 @@ export default function AdminVenueDetailPage() {
                     <PanoramaEngine
                       imageUrl={
                         scenes.length > 0 && effectiveSceneId
-                          ? (scenes.find((s) => s._id === effectiveSceneId)?.image ?? effImmersiveFile)
-                          : effImmersiveFile
+                          ? (scenes.find((s) => s._id === effectiveSceneId)?.image ?? form.immersiveFile)
+                          : form.immersiveFile
                       }
                       markers={panoMarkers}
                       selectedMarkerId={selectedMarkerId}

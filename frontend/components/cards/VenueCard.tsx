@@ -25,10 +25,10 @@ export function VenueCard({ venue, className }: VenueCardProps) {
 
   return (
     <Link href={href} className={cn('group block', className)}>
-      <div className="relative flex flex-col overflow-hidden rounded-2xl border border-zinc-800 bg-zinc-900 transition-all duration-300 hover:border-zinc-700 hover:shadow-xl hover:shadow-black/40 hover:-translate-y-0.5">
+      <div className="relative flex flex-col overflow-hidden rounded-2xl border border-white/[0.08] bg-white/[0.04] shadow-md transition-all duration-300 hover:border-amber-400/30 hover:shadow-xl hover:shadow-black/40 hover:-translate-y-0.5">
 
         {/* Image */}
-        <div className="relative aspect-[4/3] w-full overflow-hidden bg-zinc-800">
+        <div className="relative aspect-[4/3] w-full overflow-hidden bg-white/[0.04]">
           {img ? (
             <Image
               src={img}
@@ -38,8 +38,8 @@ export function VenueCard({ venue, className }: VenueCardProps) {
               sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 320px"
             />
           ) : (
-            <div className="flex h-full items-center justify-center bg-zinc-800">
-              <MapPin className="size-10 text-zinc-600" />
+            <div className="flex h-full items-center justify-center bg-white/[0.04]">
+              <MapPin className="size-10 text-neutral-600" />
             </div>
           )}
 
@@ -54,9 +54,9 @@ export function VenueCard({ venue, className }: VenueCardProps) {
                 Vedette
               </span>
             )}
-            {venue.isSponsored && (
-              <span className="inline-flex items-center rounded-full bg-violet-500/90 px-2.5 py-0.5 text-[10px] font-semibold text-white backdrop-blur-sm">
-                Sponsorisé
+            {venue.isVedette && (
+              <span className="inline-flex items-center rounded-full bg-amber-400/90 px-2.5 py-0.5 text-[10px] font-bold text-black backdrop-blur-sm">
+                ⭐ Vedette
               </span>
             )}
           </div>
@@ -64,7 +64,7 @@ export function VenueCard({ venue, className }: VenueCardProps) {
           {/* Top-right: 360 badge */}
           {venue.hasVirtualTour && (
             <div className="absolute top-3 right-3">
-              <span className="inline-flex items-center gap-1 rounded-full border border-white/20 bg-black/50 px-2.5 py-0.5 text-[10px] font-semibold text-white backdrop-blur-sm">
+              <span className="inline-flex items-center gap-1 rounded-full border border-white/20 bg-black/70 px-2.5 py-0.5 text-[10px] font-semibold text-white backdrop-blur-sm">
                 <Video className="size-3" />
                 360°
               </span>
@@ -85,31 +85,24 @@ export function VenueCard({ venue, className }: VenueCardProps) {
         {/* Body */}
         <div className="flex flex-col flex-1 p-4 gap-2">
           <div className="flex items-start justify-between gap-2">
-            <h3 className="line-clamp-1 text-sm font-semibold text-zinc-100 leading-tight">
+            <h3 className="line-clamp-1 text-sm font-semibold text-neutral-100 leading-tight">
               {venue.name}
             </h3>
-            {venue.rating > 0 && (
-              <div className="flex items-center gap-1 shrink-0">
-                <Star className="size-3 fill-amber-400 text-amber-400" />
-                <span className="text-xs font-semibold text-amber-400">{venue.rating}</span>
-              </div>
-            )}
           </div>
 
-          <div className="flex items-center gap-1.5 text-xs text-zinc-500">
+          <div className="flex items-center gap-1.5 text-xs text-neutral-500">
             <MapPin className="size-3 shrink-0" />
             <span className="line-clamp-1">{venue.city}</span>
           </div>
-
         </div>
 
         {/* Footer CTA */}
         <div className="px-4 pb-4">
-          <div className="flex items-center justify-between rounded-xl bg-zinc-800/60 px-3 py-2.5 group-hover:bg-amber-400/10 group-hover:border-amber-400/20 border border-transparent transition-all">
-            <span className="text-xs font-semibold text-zinc-400 group-hover:text-amber-400 transition-colors">
+          <div className="flex items-center justify-between rounded-xl bg-white/[0.04] px-3 py-2.5 group-hover:bg-amber-400/10 group-hover:border-amber-400/20 border border-white/[0.06] transition-all">
+            <span className="text-xs font-semibold text-neutral-400 group-hover:text-amber-300 transition-colors">
               Voir &amp; Réserver
             </span>
-            <ArrowUpRight className="size-3.5 text-zinc-600 group-hover:text-amber-400 transition-colors" />
+            <ArrowUpRight className="size-3.5 text-neutral-600 group-hover:text-amber-300 transition-colors" />
           </div>
         </div>
       </div>

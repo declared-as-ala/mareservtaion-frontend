@@ -242,24 +242,24 @@ export default function MatterportEngine({
 
   if (!sdkKey) {
     return (
-      <div className="absolute inset-0 flex flex-col items-center justify-center bg-zinc-950 text-zinc-400 p-6">
+      <div className="absolute inset-0 flex flex-col items-center justify-center bg-white text-gray-600 p-6">
         <div className="text-center space-y-3 max-w-md">
-          <div className="size-16 rounded-full bg-amber-500/10 flex items-center justify-center mx-auto">
-            <svg className="size-8 text-amber-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+          <div className="size-16 rounded-full bg-[#D4AF37]/10 flex items-center justify-center mx-auto">
+            <svg className="size-8 text-[#D4AF37]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
               <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v3.75m9-.75a9 9 0 1 1-18 0 9 9 0 0 1 18 0Zm-9 3.75h.008v.008H12v-.008Z" />
             </svg>
           </div>
-          <h3 className="text-sm font-semibold text-zinc-200">Clé SDK Matterport requise</h3>
-          <p className="text-xs text-zinc-500 leading-relaxed">
+          <h3 className="text-sm font-semibold text-[#111111]">Clé SDK Matterport requise</h3>
+          <p className="text-xs text-gray-500 leading-relaxed">
             Pour placer des marqueurs 3D ancrés dans la visite Matterport, une clé SDK est nécessaire.
-            Ajoutez <code className="text-amber-400 bg-zinc-800 px-1 rounded">NEXT_PUBLIC_MATTERPORT_SDK_KEY</code> dans
-            votre fichier <code className="text-amber-400 bg-zinc-800 px-1 rounded">.env.local</code>.
+            Ajoutez <code className="text-[#D4AF37] bg-gray-100 px-1 rounded">NEXT_PUBLIC_MATTERPORT_SDK_KEY</code> dans
+            votre fichier <code className="text-[#D4AF37] bg-gray-100 px-1 rounded">.env.local</code>.
           </p>
           <a
             href="https://developer.matterport.com"
             target="_blank"
             rel="noopener noreferrer"
-            className="inline-block text-xs text-amber-400 underline hover:text-amber-300"
+            className="inline-block text-xs text-[#D4AF37] underline hover:text-[#C4A030]"
           >
             Obtenir une clé gratuite sur developer.matterport.com
           </a>
@@ -298,8 +298,8 @@ export default function MatterportEngine({
       )}
 
       {connecting && (
-        <div className="absolute top-3 left-1/2 -translate-x-1/2 z-20 bg-zinc-800/90 text-zinc-300 text-xs font-semibold px-3 py-1.5 rounded-full shadow-lg pointer-events-none flex items-center gap-2">
-          <div className="size-3 border-2 border-amber-400 border-t-transparent rounded-full animate-spin" />
+        <div className="absolute top-3 left-1/2 -translate-x-1/2 z-20 bg-white/90 text-gray-700 text-xs font-semibold px-3 py-1.5 rounded-full shadow-lg pointer-events-none flex items-center gap-2">
+          <div className="size-3 border-2 border-gray-300 border-t-[#D4AF37] rounded-full animate-spin" />
           Connexion au SDK Matterport...
         </div>
       )}

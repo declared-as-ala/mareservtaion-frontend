@@ -84,22 +84,29 @@ export default function AdminSettingsPage() {
   if (isLoading) {
     return (
       <div className="flex items-center justify-center h-64">
-        <Loader2 className="size-6 animate-spin text-muted-foreground" />
+        <div className="flex flex-col items-center gap-3">
+          <Loader2 className="size-8 animate-spin text-zinc-500" />
+          <p className="text-sm text-zinc-400">Chargement des paramètres...</p>
+        </div>
       </div>
     );
   }
 
   return (
-    <div className="max-w-3xl space-y-6">
+    <div className="max-w-4xl space-y-6">
+      {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold">Paramètres</h1>
-          <p className="text-sm text-muted-foreground mt-0.5">Configuration générale du site</p>
+          <div className="flex items-center gap-2">
+            <h1 className="text-2xl font-bold text-white">Paramètres</h1>
+            <Settings className="size-5 text-zinc-400" />
+          </div>
+          <p className="mt-1 text-sm text-zinc-400">Configuration générale du site</p>
         </div>
         <Button
           onClick={() => saveMut.mutate()}
           disabled={saveMut.isPending}
-          className="gap-2 min-w-[130px]"
+          className="gap-2 min-w-[140px] bg-amber-500 text-black hover:bg-amber-400 transition-all duration-200"
         >
           {saveMut.isPending ? (
             <><Loader2 className="size-4 animate-spin" />Sauvegarde...</>
@@ -112,54 +119,74 @@ export default function AdminSettingsPage() {
       </div>
 
       {/* General */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2 text-base">
-            <Globe className="size-4 text-muted-foreground" />
+      <Card className="border-zinc-800 bg-zinc-900/50">
+        <CardHeader className="pb-3 border-b border-zinc-800">
+          <CardTitle className="flex items-center gap-2 text-base text-zinc-100">
+            <Globe className="size-4 text-amber-400" />
             Informations générales
           </CardTitle>
-          <CardDescription>Nom du site et paramètres de base</CardDescription>
+          <CardDescription className="text-zinc-400">Nom du site et paramètres de base</CardDescription>
         </CardHeader>
-        <CardContent className="space-y-4">
+        <CardContent className="pt-4">
           <div className="grid sm:grid-cols-2 gap-4">
-            <div className="space-y-1.5">
-              <Label htmlFor="siteName">Nom du site</Label>
-              <Input id="siteName" placeholder="MaTable" {...field('siteName')} />
+            <div className="space-y-2">
+              <Label htmlFor="siteName" className="text-zinc-300">Nom du site</Label>
+              <Input 
+                id="siteName" 
+                placeholder="MaTable" 
+                {...field('siteName')} 
+                className="border-zinc-700 bg-zinc-800/50 text-zinc-100 placeholder:text-zinc-500 focus:border-amber-500 focus:ring-amber-500/20"
+              />
             </div>
-            <div className="space-y-1.5">
-              <Label htmlFor="defaultLanguage">Langue par défaut</Label>
-              <Input id="defaultLanguage" placeholder="fr" {...field('defaultLanguage')} />
+            <div className="space-y-2">
+              <Label htmlFor="defaultLanguage" className="text-zinc-300">Langue par défaut</Label>
+              <Input 
+                id="defaultLanguage" 
+                placeholder="fr" 
+                {...field('defaultLanguage')} 
+                className="border-zinc-700 bg-zinc-800/50 text-zinc-100 placeholder:text-zinc-500 focus:border-amber-500 focus:ring-amber-500/20"
+              />
             </div>
           </div>
         </CardContent>
       </Card>
 
       {/* Logo */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2 text-base">
-            <ImageIcon className="size-4 text-muted-foreground" />
+      <Card className="border-zinc-800 bg-zinc-900/50">
+        <CardHeader className="pb-3 border-b border-zinc-800">
+          <CardTitle className="flex items-center gap-2 text-base text-zinc-100">
+            <ImageIcon className="size-4 text-amber-400" />
             Logos
           </CardTitle>
-          <CardDescription>URLs des logos light et dark mode</CardDescription>
+          <CardDescription className="text-zinc-400">URLs des logos light et dark mode</CardDescription>
         </CardHeader>
-        <CardContent className="space-y-4">
-          <div className="grid sm:grid-cols-2 gap-4">
-            <div className="space-y-1.5">
-              <Label htmlFor="logoLight">Logo (mode clair)</Label>
-              <Input id="logoLight" placeholder="https://..." {...field('logoUrlLight')} />
+        <CardContent className="pt-4">
+          <div className="grid sm:grid-cols-2 gap-6">
+            <div className="space-y-3">
+              <Label htmlFor="logoLight" className="text-zinc-300">Logo (mode clair)</Label>
+              <Input 
+                id="logoLight" 
+                placeholder="https://..." 
+                {...field('logoUrlLight')} 
+                className="border-zinc-700 bg-zinc-800/50 text-zinc-100 placeholder:text-zinc-500 focus:border-amber-500 focus:ring-amber-500/20"
+              />
               {form.logoUrlLight && (
-                <div className="mt-2 p-3 rounded-lg border bg-white flex items-center justify-center h-14 relative">
-                  <Image src={form.logoUrlLight} alt="Logo light" fill className="object-contain p-3" sizes="200px" />
+                <div className="mt-3 p-4 rounded-lg border border-zinc-700 bg-white flex items-center justify-center h-16 relative overflow-hidden">
+                  <Image src={form.logoUrlLight} alt="Logo light" fill className="object-contain p-2" sizes="200px" />
                 </div>
               )}
             </div>
-            <div className="space-y-1.5">
-              <Label htmlFor="logoDark">Logo (mode sombre)</Label>
-              <Input id="logoDark" placeholder="https://..." {...field('logoUrlDark')} />
+            <div className="space-y-3">
+              <Label htmlFor="logoDark" className="text-zinc-300">Logo (mode sombre)</Label>
+              <Input 
+                id="logoDark" 
+                placeholder="https://..." 
+                {...field('logoUrlDark')} 
+                className="border-zinc-700 bg-zinc-800/50 text-zinc-100 placeholder:text-zinc-500 focus:border-amber-500 focus:ring-amber-500/20"
+              />
               {form.logoUrlDark && (
-                <div className="mt-2 p-3 rounded-lg border bg-zinc-900 flex items-center justify-center h-14 relative">
-                  <Image src={form.logoUrlDark} alt="Logo dark" fill className="object-contain p-3" sizes="200px" />
+                <div className="mt-3 p-4 rounded-lg border border-zinc-700 bg-zinc-900 flex items-center justify-center h-16 relative overflow-hidden">
+                  <Image src={form.logoUrlDark} alt="Logo dark" fill className="object-contain p-2" sizes="200px" />
                 </div>
               )}
             </div>
@@ -168,48 +195,59 @@ export default function AdminSettingsPage() {
       </Card>
 
       {/* Support */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2 text-base">
-            <Phone className="size-4 text-muted-foreground" />
+      <Card className="border-zinc-800 bg-zinc-900/50">
+        <CardHeader className="pb-3 border-b border-zinc-800">
+          <CardTitle className="flex items-center gap-2 text-base text-zinc-100">
+            <Phone className="size-4 text-amber-400" />
             Contact support
           </CardTitle>
-          <CardDescription>Coordonnées affichées aux utilisateurs</CardDescription>
+          <CardDescription className="text-zinc-400">Coordonnées affichées aux utilisateurs</CardDescription>
         </CardHeader>
-        <CardContent className="space-y-4">
+        <CardContent className="pt-4">
           <div className="grid sm:grid-cols-2 gap-4">
-            <div className="space-y-1.5">
-              <Label htmlFor="supportPhone" className="flex items-center gap-1.5">
+            <div className="space-y-2">
+              <Label htmlFor="supportPhone" className="flex items-center gap-1.5 text-zinc-300">
                 <Phone className="size-3.5" /> Téléphone support
               </Label>
-              <Input id="supportPhone" placeholder="+216 XX XXX XXX" {...field('supportPhone')} />
+              <Input 
+                id="supportPhone" 
+                placeholder="+216 XX XXX XXX" 
+                {...field('supportPhone')} 
+                className="border-zinc-700 bg-zinc-800/50 text-zinc-100 placeholder:text-zinc-500 focus:border-amber-500 focus:ring-amber-500/20"
+              />
             </div>
-            <div className="space-y-1.5">
-              <Label htmlFor="supportEmail" className="flex items-center gap-1.5">
+            <div className="space-y-2">
+              <Label htmlFor="supportEmail" className="flex items-center gap-1.5 text-zinc-300">
                 <Mail className="size-3.5" /> Email support
               </Label>
-              <Input id="supportEmail" type="email" placeholder="support@matable.tn" {...field('supportEmail')} />
+              <Input 
+                id="supportEmail" 
+                type="email" 
+                placeholder="support@matable.tn" 
+                {...field('supportEmail')} 
+                className="border-zinc-700 bg-zinc-800/50 text-zinc-100 placeholder:text-zinc-500 focus:border-amber-500 focus:ring-amber-500/20"
+              />
             </div>
           </div>
         </CardContent>
       </Card>
 
       {/* Maintenance */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2 text-base">
-            <Settings className="size-4 text-muted-foreground" />
+      <Card className="border-zinc-800 bg-zinc-900/50">
+        <CardHeader className="pb-3 border-b border-zinc-800">
+          <CardTitle className="flex items-center gap-2 text-base text-zinc-100">
+            <Settings className="size-4 text-amber-400" />
             Mode maintenance
           </CardTitle>
-          <CardDescription>
+          <CardDescription className="text-zinc-400">
             En mode maintenance, seuls les admins peuvent accéder au site
           </CardDescription>
         </CardHeader>
-        <CardContent>
-          <div className="flex items-center justify-between rounded-lg border p-4">
+        <CardContent className="pt-4">
+          <div className="flex items-center justify-between rounded-lg border border-zinc-700 p-4 bg-zinc-800/30">
             <div>
-              <p className="text-sm font-medium">Activer le mode maintenance</p>
-              <p className="text-xs text-muted-foreground mt-0.5">
+              <p className="text-sm font-medium text-zinc-200">Activer le mode maintenance</p>
+              <p className="text-xs text-zinc-500 mt-0.5">
                 {form.maintenanceMode
                   ? 'Le site est actuellement en maintenance'
                   : 'Le site est accessible au public'}
@@ -218,21 +256,25 @@ export default function AdminSettingsPage() {
             <Switch
               checked={form.maintenanceMode}
               onCheckedChange={(v) => setForm((f) => ({ ...f, maintenanceMode: v }))}
+              className="data-[state=checked]:bg-amber-500"
             />
           </div>
         </CardContent>
       </Card>
 
-      <Separator />
+      <Separator className="bg-zinc-800" />
 
+      {/* Bottom save */}
       <div className="flex justify-end">
         <Button
           onClick={() => saveMut.mutate()}
           disabled={saveMut.isPending}
-          className="gap-2"
+          className="gap-2 bg-amber-500 text-black hover:bg-amber-400 transition-all duration-200"
         >
           {saveMut.isPending ? (
             <><Loader2 className="size-4 animate-spin" />Sauvegarde...</>
+          ) : saved ? (
+            <><CheckCircle2 className="size-4" />Sauvegardé</>
           ) : (
             <><Save className="size-4" />Sauvegarder les paramètres</>
           )}

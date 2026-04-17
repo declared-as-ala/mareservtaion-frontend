@@ -1,5 +1,5 @@
 import { AppContainer } from '@/components/shared/AppContainer';
-import { Coffee, Wine, Utensils, Music2, Building2, Hotel, Waves, Flower2 } from 'lucide-react';
+import { Coffee, Wine, Utensils, Music2, Building2, Hotel, Waves, Flower2, ArrowRight } from 'lucide-react';
 import Link from 'next/link';
 
 const items = [
@@ -7,7 +7,7 @@ const items = [
   { icon: Wine, label: 'Bars & Rooftops', href: '/explorer?q=Bar' },
   { icon: Utensils, label: 'Restaurants Gastronomiques', href: '/explorer?type=RESTAURANT' },
   { icon: Music2, label: 'Clubs & Resto de Nuit', href: '/explorer?q=Club' },
-  { icon: Building2, label: 'Salles Privées & Événementiel', href: '/explorer?type=EVENT_SPACE' },
+  { icon: Building2, label: 'Salles & Événementiel', href: '/explorer?type=EVENT_SPACE' },
   { icon: Hotel, label: 'Hôtels & Resorts', href: '/explorer?type=HOTEL' },
   { icon: Waves, label: 'Beach Clubs', href: '/explorer?q=Beach' },
   { icon: Flower2, label: 'Spas & Bien-être', href: '/explorer?q=Spa' },
@@ -15,26 +15,52 @@ const items = [
 
 export function ExperienceCategoriesSection() {
   return (
-    <section className="bg-[#060708] py-16 text-center text-amber-50">
-      <AppContainer>
-        <h2 className="font-serif text-2xl italic text-amber-100 md:text-3xl">
-          Tous les lieux où l&apos;expérience compte
-        </h2>
-        <div className="mx-auto mt-3 h-px w-16 bg-amber-500/60" />
+    <section className="relative overflow-hidden bg-[#111113] py-24 text-white">
+      {/* Subtle top border */}
+      <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-white/[0.06] to-transparent" />
 
-        <div className="mt-10 flex flex-wrap items-start justify-center gap-x-10 gap-y-8">
+      {/* Ambient glow */}
+      <div className="absolute -top-32 left-1/2 -translate-x-1/2 h-[500px] w-[600px] rounded-full bg-amber-500/[0.02] blur-[120px]" />
+
+      <AppContainer>
+        {/* Header */}
+        <div className="mx-auto max-w-2xl text-center mb-16">
+          <div className="mx-auto mb-4 h-px w-12 bg-gradient-to-r from-amber-400/60 via-amber-400 to-amber-500/40" />
+          <h2 className="font-serif text-2xl font-semibold tracking-tight text-white/95 md:text-3xl">
+            Tous les lieux où l&apos;expérience compte
+          </h2>
+          <p className="mt-3 text-sm text-white/40">
+            Explorez par catégorie et trouvez exactement ce que vous cherchez
+          </p>
+        </div>
+
+        {/* Cards */}
+        <div className="grid grid-cols-2 gap-3 sm:gap-4 md:grid-cols-4">
           {items.map(({ icon: Icon, label, href }) => (
-            <Link 
-              key={label} 
+            <Link
+              key={label}
               href={href}
-              className="group flex w-[120px] flex-col items-center gap-3 transition-all duration-300"
+              className="group relative flex flex-col items-center gap-3 rounded-xl border border-white/[0.05] bg-[#161618]/60 p-5 text-center backdrop-blur-sm transition-all duration-300 hover:border-amber-400/20 hover:bg-[#161618] hover:-translate-y-0.5 hover:shadow-lg hover:shadow-amber-500/[0.03] md:p-6"
             >
-              <div className="flex size-14 items-center justify-center rounded-full border border-amber-500/30 bg-amber-500/10 transition-all duration-500 group-hover:scale-110 group-hover:bg-amber-500/25 group-hover:border-amber-500/60 group-hover:shadow-[0_0_20px_rgba(245,158,11,0.2)]">
-                <Icon className="size-6 text-amber-400 transition-colors group-hover:text-amber-300" strokeWidth={1.5} />
+              <div className="flex size-12 items-center justify-center rounded-lg border border-amber-400/10 bg-amber-400/[0.03] transition-all duration-300 group-hover:scale-110 group-hover:border-amber-400/25 group-hover:bg-amber-400/[0.06] md:size-14">
+                <Icon className="size-5 text-amber-400/80 transition-colors group-hover:text-amber-400 md:size-6" strokeWidth={1.5} />
               </div>
-              <p className="text-xs font-medium leading-snug text-amber-100/90 transition-colors group-hover:text-amber-50">{label}</p>
+              <p className="text-xs font-medium leading-snug text-white/55 transition-colors group-hover:text-white/85 md:text-sm">
+                {label}
+              </p>
             </Link>
           ))}
+        </div>
+
+        {/* See all */}
+        <div className="mt-12 text-center">
+          <Link
+            href="/explorer"
+            className="group inline-flex items-center gap-2 text-sm font-medium text-amber-400/70 transition-colors hover:text-amber-400"
+          >
+            Explorer toutes les catégories
+            <ArrowRight className="size-4 transition-transform group-hover:translate-x-1" />
+          </Link>
         </div>
       </AppContainer>
     </section>

@@ -1,29 +1,72 @@
 import Image from 'next/image';
 import { AppContainer } from '@/components/shared/AppContainer';
+import { Globe2 } from 'lucide-react';
 
 export function WorldPresenceSection() {
   return (
-    <section className="relative min-h-[420px] overflow-hidden bg-black py-20 text-amber-50 md:min-h-[500px]">
+    <section className="relative min-h-[520px] overflow-hidden bg-[#111113] text-white md:min-h-[600px]">
+      {/* Background image */}
       <div className="absolute inset-0">
         <Image
           src="https://images.unsplash.com/photo-1451187580459-43490279c0fa?w=1600&q=80&auto=format&fit=crop"
           alt=""
           fill
-          className="object-cover opacity-30"
+          className="object-cover opacity-15"
           sizes="100vw"
         />
-        <div className="absolute inset-0 bg-gradient-to-t from-black via-black/50 to-black/70" />
-        <div className="absolute inset-0 bg-amber-600/5" />
+        <div className="absolute inset-0 bg-gradient-to-t from-[#111113] via-[#111113]/85 to-[#111113]/95" />
       </div>
 
+      {/* Top border */}
+      <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-white/[0.06] to-transparent" />
+
+      {/* Ambient glows */}
+      <div className="absolute -top-20 left-1/4 h-72 w-72 rounded-full bg-amber-500/[0.02] blur-[100px]" />
+      <div className="absolute -bottom-20 right-1/4 h-72 w-72 rounded-full bg-amber-600/[0.02] blur-[100px]" />
+
       <AppContainer>
-        <div className="relative z-10 flex min-h-[340px] flex-col items-center justify-center text-center md:min-h-[400px]">
-          <h2 className="mx-auto max-w-3xl font-serif text-2xl leading-relaxed text-amber-100/90 md:text-3xl lg:text-4xl">
-            La plateforme de réservation immersive présente{' '}
-            <strong className="font-bold text-amber-300">bientôt</strong>{' '}
+        <div className="relative z-10 flex min-h-[440px] flex-col items-center justify-center text-center md:min-h-[520px]">
+          {/* Globe icon */}
+          <div className="mb-6 flex size-14 items-center justify-center rounded-full border border-amber-400/15 bg-amber-400/[0.04]">
+            <Globe2 className="size-6 text-amber-400/80" strokeWidth={1.5} />
+          </div>
+
+          {/* Badge */}
+          <div className="mb-4 inline-flex items-center gap-2 rounded-full border border-amber-400/15 bg-amber-400/[0.04] px-4 py-1.5 backdrop-blur-sm">
+            <span className="text-xs font-semibold uppercase tracking-wider text-amber-400/80">
+              Bientôt disponible
+            </span>
+          </div>
+
+          {/* Headline */}
+          <h2 className="mx-auto max-w-3xl font-serif text-2xl leading-relaxed text-white/90 md:text-3xl lg:text-4xl">
+            La plateforme de réservation immersive,{' '}
+            <strong className="font-bold text-amber-400/90">bientôt</strong>{' '}
             dans le monde entier
           </h2>
-          <div className="mx-auto mt-4 h-px w-20 bg-amber-500/40" />
+
+          <p className="mx-auto mt-4 max-w-lg text-sm text-white/35">
+            De Tunis à Paris, de Dubaï à Montréal — nous construisons le futur de la réservation d&apos;expériences.
+          </p>
+
+          {/* Gold divider */}
+          <div className="mx-auto mt-6 h-px w-16 bg-gradient-to-r from-amber-400/60 via-amber-400 to-amber-500/40" />
+
+          {/* Stats */}
+          <div className="mt-12 grid grid-cols-3 gap-8 md:gap-16">
+            <div className="text-center">
+              <div className="text-2xl font-bold text-amber-400/90 md:text-3xl">10+</div>
+              <div className="mt-1.5 text-xs text-white/30">Villes cibles</div>
+            </div>
+            <div className="text-center">
+              <div className="text-2xl font-bold text-amber-400/90 md:text-3xl">500+</div>
+              <div className="mt-1.5 text-xs text-white/30">Lieux visés</div>
+            </div>
+            <div className="text-center">
+              <div className="text-2xl font-bold text-amber-400/90 md:text-3xl">360°</div>
+              <div className="mt-1.5 text-xs text-white/30">Immersion totale</div>
+            </div>
+          </div>
         </div>
       </AppContainer>
     </section>

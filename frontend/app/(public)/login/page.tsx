@@ -1,15 +1,15 @@
 'use client';
 
-import { Suspense, useState } from 'react';
+import { Suspense, useState, useEffect } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { login } from '@/lib/api/auth';
 import { useAuthStore } from '@/stores/auth';
-import { setAccessToken } from '@/lib/api/client';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
+import { Eye, EyeOff, Mail, Lock, Sparkles, Loader2 } from 'lucide-react';
 
 function LoginForm() {
   const router = useRouter();
@@ -22,18 +22,23 @@ function LoginForm() {
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError(null);
     setLoading(true);
     try {
-      const { accessToken, user } = await login({ email, password });
-      setAccessToken(accessToken);
-      setAuth(
-        { id: user._id, fullName: user.fullName, email: user.email, role: user.role },
-        accessToken
-      );
+      const response = await login({ email, password });
+      const { user } = response as { user: typeof response.user };
+
+      // Set Zustand state — backend already set httpOnly cookies.
+      setAuth({ id: user._id, fullName: user.fullName, email: user.email, role: user.role });
+
       if (user.role === 'ADMIN') {
         router.push('/admin');
       } else {
@@ -47,75 +52,158 @@ function LoginForm() {
   };
 
   return (
-    <div className="container flex min-h-[80vh] items-center justify-center px-4 py-12">
-      <Card className="w-full max-w-md">
-        <CardHeader>
-          <CardTitle>Connexion</CardTitle>
-          <CardDescription>Accédez à votre compte Ma Reservation</CardDescription>
-        </CardHeader>
-        <form onSubmit={handleSubmit}>
-          <CardContent className="space-y-4">
-            {error && (
-              <p className="text-sm text-destructive" role="alert">
-                {error}
-              </p>
-            )}
-            <div className="space-y-2">
-              <Label htmlFor="email">Email</Label>
-              <Input
-                id="email"
-                type="email"
-                placeholder="vous@exemple.com"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                required
-                autoComplete="email"
-              />
+    <div className="relative flex min-h-screen items-center justify-center overflow-hidden">
+      {/* Premium Background Effects */}
+      <div className="absolute inset-0 bg-gradient-to-br from-black via-neutral-950 to-black" />
+
+      {/* Ambient gold glows */}
+      <div className="absolute -top-40 -left-40 h-96 w-96 rounded-full bg-amber-500/10 blur-[120px]" />
+      <div className="absolute -bottom-40 -right-40 h-96 w-96 rounded-full bg-amber-600/8 blur-[120px]" />
+      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 h-[600px] w-[600px] rounded-full bg-amber-400/5 blur-[160px]" />
+
+      {/* Subtle grid pattern overlay */}
+      <div
+        className="absolute inset-0 opacity-[0.03]"
+        style={{
+          backgroundImage: `linear-gradient(rgba(251, 191, 36, 0.3) 1px, transparent 1px),
+                           linear-gradient(90deg, rgba(251, 191, 36, 0.3) 1px, transparent 1px)`,
+          backgroundSize: '60px 60px'
+        }}
+      />
+
+      {/* Floating decorative elements */}
+      <div className="absolute top-20 right-20 hidden lg:block">
+        <Sparkles className="size-6 text-amber-400/20 animate-pulse" />
+      </div>
+      <div className="absolute bottom-32 left-24 hidden lg:block">
+        <Sparkles className="size-5 text-amber-500/15 animate-pulse" style={{ animationDelay: '1s' }} />
+      </div>
+
+      {/* Login Card */}
+      <div
+        className={`relative z-10 w-full max-w-md px-4 transition-all duration-700 ease-out ${mounted ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'
+          }`}
+      >
+        <Card className="border border-white/[0.08] bg-white/[0.03] backdrop-blur-xl shadow-2xl shadow-black/40 rounded-2xl overflow-hidden">
+          {/* Subtle top border glow */}
+          <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-amber-400/30 to-transparent" />
+
+          <CardHeader className="space-y-3 pb-6 pt-8 px-8">
+            <div className="mx-auto mb-2 flex h-14 w-14 items-center justify-center rounded-full bg-gradient-to-br from-amber-400/20 to-amber-600/10 border border-amber-400/20">
+              <Lock className="size-6 text-amber-400" />
             </div>
-            <div className="space-y-2">
-              <div className="flex items-center justify-between">
-                <Label htmlFor="password">Mot de passe</Label>
+            <CardTitle className="text-center text-2xl font-semibold tracking-tight text-white">
+              Connexion
+            </CardTitle>
+            <CardDescription className="text-center text-sm text-neutral-400 leading-relaxed">
+              Accédez à votre espace personnel Ma Reservation
+            </CardDescription>
+          </CardHeader>
+
+          <form onSubmit={handleSubmit}>
+            <CardContent className="space-y-5 px-8">
+              {error && (
+                <div className="rounded-lg border border-red-500/20 bg-red-500/5 px-4 py-3 text-sm text-red-400 text-center" role="alert">
+                  {error}
+                </div>
+              )}
+
+              {/* Email Field */}
+              <div className="space-y-2.5">
+                <Label htmlFor="email" className="text-sm font-medium text-neutral-300">
+                  Adresse email
+                </Label>
+                <div className="relative group">
+                  <Mail className="absolute left-3.5 top-1/2 -translate-y-1/2 size-4 text-neutral-500 transition-colors group-focus-within:text-amber-400" />
+                  <Input
+                    id="email"
+                    type="email"
+                    placeholder="vous@exemple.com"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    required
+                    autoComplete="email"
+                    className="h-12 pl-11 pr-4 rounded-xl border-white/[0.08] bg-white/[0.04] text-neutral-100 placeholder:text-neutral-600 focus-visible:border-amber-400/50 focus-visible:ring-2 focus-visible:ring-amber-400/20 focus-visible:ring-offset-0 transition-all duration-200"
+                  />
+                </div>
+              </div>
+
+              {/* Password Field */}
+              <div className="space-y-2.5">
+                <div className="flex items-center justify-between">
+                  <Label htmlFor="password" className="text-sm font-medium text-neutral-300">
+                    Mot de passe
+                  </Label>
+                  <Link
+                    href="/forgot-password"
+                    className="text-xs text-amber-400/80 hover:text-amber-400 transition-colors duration-200 font-medium"
+                  >
+                    Mot de passe oublié ?
+                  </Link>
+                </div>
+                <div className="relative group">
+                  <Lock className="absolute left-3.5 top-1/2 -translate-y-1/2 size-4 text-neutral-500 transition-colors group-focus-within:text-amber-400" />
+                  <Input
+                    id="password"
+                    type={showPassword ? 'text' : 'password'}
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    required
+                    autoComplete="current-password"
+                    className="h-12 pl-11 pr-14 rounded-xl border-white/[0.08] bg-white/[0.04] text-neutral-100 placeholder:text-neutral-600 focus-visible:border-amber-400/50 focus-visible:ring-2 focus-visible:ring-amber-400/20 focus-visible:ring-offset-0 transition-all duration-200"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword((p) => !p)}
+                    className="absolute right-3 top-1/2 -translate-y-1/2 flex items-center justify-center size-8 rounded-lg text-neutral-500 hover:text-neutral-300 hover:bg-white/5 transition-all duration-200"
+                    tabIndex={-1}
+                    aria-label={showPassword ? 'Masquer le mot de passe' : 'Afficher le mot de passe'}
+                  >
+                    {showPassword ? <EyeOff className="size-4" /> : <Eye className="size-4" />}
+                  </button>
+                </div>
+              </div>
+            </CardContent>
+
+            <CardFooter className="flex flex-col gap-4 px-8 pb-8 pt-2">
+              {/* Submit Button */}
+              <Button
+                type="submit"
+                className="w-full h-12 rounded-xl bg-gradient-to-r from-amber-400 via-amber-500 to-amber-400 text-black font-semibold text-base hover:from-amber-300 hover:via-amber-400 hover:to-amber-300 shadow-lg shadow-amber-500/25 hover:shadow-amber-500/40 transition-all duration-300 hover:-translate-y-0.5 active:translate-y-0 disabled:opacity-60 disabled:cursor-not-allowed disabled:hover:translate-y-0"
+                disabled={loading}
+              >
+                {loading ? (
+                  <>
+                    <Loader2 className="mr-2 size-4 animate-spin" />
+                    Connexion en cours...
+                  </>
+                ) : (
+                  'Se connecter'
+                )}
+              </Button>
+
+              {/* Register Link */}
+              <p className="text-center text-sm text-neutral-400">
+                Pas encore de compte ?{' '}
                 <Link
-                  href="/forgot-password"
-                  className="text-xs text-primary hover:underline"
+                  href="/register"
+                  className="text-amber-400 hover:text-amber-300 font-semibold transition-colors duration-200 hover:underline underline-offset-4"
                 >
-                  Mot de passe oublié ?
+                  Créer un compte
                 </Link>
-              </div>
-              <div className="relative">
-                <Input
-                  id="password"
-                  type={showPassword ? 'text' : 'password'}
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  required
-                  autoComplete="current-password"
-                  className="pr-10"
-                />
-                <button
-                  type="button"
-                  className="absolute right-2 top-1/2 -translate-y-1/2 text-xs text-muted-foreground hover:text-foreground"
-                  onClick={() => setShowPassword((p) => !p)}
-                  tabIndex={-1}
-                >
-                  {showPassword ? 'Masquer' : 'Afficher'}
-                </button>
-              </div>
-            </div>
-          </CardContent>
-          <CardFooter className="flex flex-col gap-4">
-            <Button type="submit" className="w-full" disabled={loading}>
-              {loading ? 'Connexion...' : 'Se connecter'}
-            </Button>
-            <p className="text-center text-sm text-muted-foreground">
-              Pas encore de compte ?{' '}
-              <Link href="/register" className="text-primary hover:underline">
-                S&apos;inscrire
-              </Link>
-            </p>
-          </CardFooter>
-        </form>
-      </Card>
+              </p>
+            </CardFooter>
+          </form>
+        </Card>
+
+        {/* Subtle bottom text */}
+        <p className="mt-6 text-center text-xs text-neutral-600">
+          En vous connectant, vous acceptez nos{' '}
+          <Link href="/terms" className="text-neutral-500 hover:text-neutral-400 underline transition-colors">
+            conditions d&apos;utilisation
+          </Link>
+        </p>
+      </div>
     </div>
   );
 }
@@ -123,16 +211,29 @@ function LoginForm() {
 export default function LoginPage() {
   return (
     <Suspense fallback={
-      <div className="container flex min-h-[80vh] items-center justify-center px-4 py-12">
-        <Card className="w-full max-w-md">
-          <CardHeader>
-            <CardTitle>Connexion</CardTitle>
-            <CardDescription>Chargement...</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="h-10 w-full animate-pulse rounded-md bg-muted" />
-          </CardContent>
-        </Card>
+      <div className="relative flex min-h-screen items-center justify-center overflow-hidden bg-black">
+        <div className="absolute inset-0 bg-gradient-to-br from-black via-neutral-950 to-black" />
+        <div className="absolute -top-40 -left-40 h-96 w-96 rounded-full bg-amber-500/10 blur-[120px]" />
+        <div className="absolute -bottom-40 -right-40 h-96 w-96 rounded-full bg-amber-600/8 blur-[120px]" />
+
+        <div className="relative z-10 w-full max-w-md px-4">
+          <Card className="border border-white/[0.08] bg-white/[0.03] backdrop-blur-xl shadow-2xl shadow-black/40 rounded-2xl">
+            <CardHeader className="space-y-3 pb-6 pt-8 px-8">
+              <div className="mx-auto mb-2 flex h-14 w-14 items-center justify-center rounded-full bg-gradient-to-br from-amber-400/20 to-amber-600/10 border border-amber-400/20">
+                <Lock className="size-6 text-amber-400" />
+              </div>
+              <CardTitle className="text-center text-2xl font-semibold tracking-tight text-white">
+                Connexion
+              </CardTitle>
+              <CardDescription className="text-center text-sm text-neutral-400">
+                Chargement...
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="px-8">
+              <div className="h-12 w-full animate-pulse rounded-xl bg-white/5" />
+            </CardContent>
+          </Card>
+        </div>
       </div>
     }>
       <LoginForm />

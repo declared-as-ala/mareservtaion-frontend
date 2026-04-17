@@ -1,7 +1,8 @@
 'use client';
 
-import { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
+import { useEffect } from 'react';
+import { useAuth } from '@/components/auth/AuthProvider';
 import { useAuthStore } from '@/stores/auth';
 import { Navbar } from '@/components/layout/Navbar';
 import { Footer } from '@/components/layout/Footer';
@@ -11,26 +12,31 @@ export default function DashboardLayout({
 }: {
   children: React.ReactNode;
 }) {
-  const { user, accessToken, fetchMe } = useAuthStore();
+  const { user, isLoading } = useAuth();
   const router = useRouter();
 
+  // Redirect ADMIN to /admin once auth is resolved.
   useEffect(() => {
-    if (accessToken && !user) {
-      fetchMe();
-    } else if (!accessToken) {
-      router.replace('/login');
-    } else if (user?.role === 'ADMIN') {
+    if (!isLoading && user && user.role === 'ADMIN') {
       router.replace('/admin');
     }
-  }, [accessToken, user, fetchMe, router]);
+  }, [isLoading, user, router]);
 
-  if (!accessToken) {
+  // Show skeleton while AuthProvider is validating the session.
+  if (isLoading) {
     return (
-      <div className="flex min-h-screen items-center justify-center">
-        <p className="text-muted-foreground">Chargement...</p>
+      <div className="flex min-h-screen items-center justify-center bg-white">
+        <div className="flex flex-col items-center gap-3">
+          <div className="size-8 animate-spin rounded-full border-4 border-[#D4AF37] border-t-transparent" />
+          <p className="text-sm text-gray-500">Chargement…</p>
+        </div>
       </div>
     );
   }
+
+  // If no user after resolution, the middleware should have already
+  // redirected to /login.  Render nothing as a safety net.
+  if (!user) return null;
 
   return (
     <div className="flex min-h-screen flex-col">
@@ -40,4 +46,3 @@ export default function DashboardLayout({
     </div>
   );
 }
-

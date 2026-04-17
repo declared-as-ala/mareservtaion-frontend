@@ -50,18 +50,18 @@ export function ReservationCard({
   const canCancel = status === 'PENDING' || status === 'CONFIRMED';
 
   return (
-    <Card className={cn(className)}>
+    <Card className={cn('bg-white border-gray-200 shadow-md', className)}>
       <CardHeader className="flex flex-row items-start justify-between gap-4 pb-2">
         <div>
-          <h3 className="font-semibold">{venueName}</h3>
-          <p className="text-sm text-muted-foreground">
+          <h3 className="font-semibold text-[#111111]">{venueName}</h3>
+          <p className="text-sm text-gray-600">
             {reservation.confirmationCode && `#${reservation.confirmationCode}`}
           </p>
         </div>
         <Badge variant={STATUS_VARIANT[status] ?? 'secondary'}>{STATUS_LABEL[status] ?? status}</Badge>
       </CardHeader>
       <CardContent className="space-y-2">
-        <div className="flex items-center gap-2 text-sm text-muted-foreground">
+        <div className="flex items-center gap-2 text-sm text-gray-600">
           <Calendar className="size-4 shrink-0" />
           <span>
             {start.toLocaleDateString('fr-FR', { weekday: 'short', day: 'numeric', month: 'short' })}{' '}
@@ -70,10 +70,7 @@ export function ReservationCard({
           </span>
         </div>
         {reservation.partySize != null && (
-          <p className="text-sm text-muted-foreground">{reservation.partySize} personne(s)</p>
-        )}
-        {reservation.totalPrice != null && (
-          <p className="text-sm font-medium">{reservation.totalPrice} TND</p>
+          <p className="text-sm text-gray-600">{reservation.partySize} personne(s)</p>
         )}
         <div className="mt-4 flex flex-wrap gap-2">
           <Button variant="outline" size="sm" asChild>
@@ -83,7 +80,7 @@ export function ReservationCard({
             <Button
               variant="ghost"
               size="sm"
-              className="text-destructive hover:text-destructive"
+              className="text-red-600 hover:text-red-700"
               onClick={() => onCancel(reservation._id)}
               disabled={cancelLoading}
             >

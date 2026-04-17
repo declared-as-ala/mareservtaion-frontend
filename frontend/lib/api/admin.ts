@@ -62,8 +62,8 @@ export type AdminVenuePayload = {
   gallery?: string[];
   isPublished?: boolean;
   isFeatured?: boolean;
-  isSponsored?: boolean;
-  sponsoredOrder?: number;
+  isVedette?: boolean;
+  vedetteOrder?: number;
   bannerImage?: string | null;
   startingPrice?: number;
   phone?: string;
@@ -114,7 +114,7 @@ export type AdminEventPayload = {
   coverImage?: string;
   afficheImageUrl?: string;
   isPublished?: boolean;
-  isSponsored?: boolean;
+  isVedette?: boolean;
 };
 
 export async function updateAdminEvent(id: string, payload: AdminEventPayload) {

@@ -26,14 +26,14 @@ function CartLine({ item }: { item: CartItem }) {
   const removeItem = useCartStore((s) => s.removeItem);
 
   return (
-    <div className="group flex gap-3 py-4 border-b border-zinc-800/60 last:border-0">
+    <div className="group flex gap-3 py-4 border-b border-gray-200 last:border-0">
       {/* Image */}
-      <div className="relative size-16 shrink-0 overflow-hidden rounded-xl bg-zinc-800">
+      <div className="relative size-16 shrink-0 overflow-hidden rounded-xl bg-gray-100">
         {item.imageUrl ? (
           <Image src={item.imageUrl} alt="" fill className="object-cover" sizes="64px" />
         ) : (
           <div className="size-full flex items-center justify-center">
-            <ShoppingBag className="size-5 text-zinc-600" />
+            <ShoppingBag className="size-5 text-gray-400" />
           </div>
         )}
       </div>
@@ -41,21 +41,21 @@ function CartLine({ item }: { item: CartItem }) {
       {/* Info */}
       <div className="flex-1 min-w-0">
         <div className="flex items-start justify-between gap-1 mb-0.5">
-          <p className="font-semibold text-zinc-100 text-sm leading-tight truncate pr-1">
+          <p className="font-semibold text-[#111111] text-sm leading-tight truncate pr-1">
             {item.title}
           </p>
           <button
             onClick={() => removeItem(item.id)}
-            className="shrink-0 size-5 rounded-full flex items-center justify-center text-zinc-600 hover:text-red-400 hover:bg-red-400/10 transition-colors mt-0.5"
+            className="shrink-0 size-5 rounded-full flex items-center justify-center text-gray-400 hover:text-red-600 hover:bg-red-50 transition-colors mt-0.5"
             aria-label="Supprimer"
           >
             <X className="size-3" />
           </button>
         </div>
 
-        <p className="text-amber-400/80 text-xs mb-1.5">{item.unitLabel}</p>
+        <p className="text-[#D4AF37] text-xs mb-1.5">{item.unitLabel}</p>
 
-        <p className="flex items-center gap-1 text-zinc-500 text-xs mb-3">
+        <p className="flex items-center gap-1 text-gray-500 text-xs mb-3">
           <Clock className="size-3" />
           {new Date(item.dateTime).toLocaleString('fr-FR', {
             day: '2-digit',
@@ -67,30 +67,30 @@ function CartLine({ item }: { item: CartItem }) {
 
         {/* Qty + price */}
         <div className="flex items-center justify-between">
-          <div className="flex items-center gap-0 rounded-lg border border-zinc-700 bg-zinc-800/60 overflow-hidden h-7">
+          <div className="flex items-center gap-0 rounded-lg border border-gray-200 bg-gray-50 overflow-hidden h-7">
             <button
               type="button"
-              className="size-7 flex items-center justify-center text-zinc-400 hover:text-zinc-100 hover:bg-zinc-700/60 transition-colors"
+              className="size-7 flex items-center justify-center text-gray-500 hover:text-[#111111] hover:bg-gray-100 transition-colors"
               onClick={() => updateQuantity(item.id, Math.max(0, item.quantity - 1))}
               aria-label="Diminuer"
             >
               <Minus className="size-3" />
             </button>
-            <span className="w-7 text-center text-sm text-zinc-100 font-medium">
+            <span className="w-7 text-center text-sm text-[#111111] font-medium">
               {item.quantity}
             </span>
             <button
               type="button"
-              className="size-7 flex items-center justify-center text-zinc-400 hover:text-zinc-100 hover:bg-zinc-700/60 transition-colors"
+              className="size-7 flex items-center justify-center text-gray-500 hover:text-[#111111] hover:bg-gray-100 transition-colors"
               onClick={() => updateQuantity(item.id, item.quantity + 1)}
               aria-label="Augmenter"
             >
               <Plus className="size-3" />
             </button>
           </div>
-          <span className="font-bold text-zinc-100 text-sm">
+          <span className="font-bold text-[#111111] text-sm">
             {item.price * item.quantity}{' '}
-            <span className="text-zinc-500 font-normal text-xs">TND</span>
+            <span className="text-gray-500 font-normal text-xs">TND</span>
           </span>
         </div>
       </div>
@@ -110,16 +110,16 @@ export function CartDrawer({ open, onOpenChange }: CartDrawerProps) {
     <Sheet open={open} onOpenChange={onOpenChange}>
       <SheetContent
         side="right"
-        className="flex w-full flex-col sm:max-w-md bg-zinc-950 border-zinc-800 p-0 gap-0"
+        className="flex w-full flex-col sm:max-w-md bg-white border-gray-200 p-0 gap-0"
       >
         {/* Header */}
-        <SheetHeader className="px-5 py-4 border-b border-zinc-800 bg-zinc-950">
+        <SheetHeader className="px-5 py-4 border-b border-gray-200 bg-white">
           <div className="flex items-center justify-between">
-            <SheetTitle className="flex items-center gap-2 text-zinc-100 font-semibold">
-              <ShoppingBag className="size-5 text-amber-400" />
+            <SheetTitle className="flex items-center gap-2 text-[#111111] font-semibold">
+              <ShoppingBag className="size-5 text-[#D4AF37]" />
               Mon panier
               {totalQuantity > 0 && (
-                <span className="ml-1 size-5 rounded-full bg-amber-400 text-zinc-950 text-xs font-bold flex items-center justify-center">
+                <span className="ml-1 size-5 rounded-full bg-[#D4AF37] text-white text-xs font-bold flex items-center justify-center">
                   {totalQuantity}
                 </span>
               )}
@@ -136,11 +136,11 @@ export function CartDrawer({ open, onOpenChange }: CartDrawerProps) {
         >
           {items.length === 0 ? (
             <div className="text-center py-12">
-              <div className="mx-auto size-16 rounded-full bg-zinc-800/60 border border-zinc-700 flex items-center justify-center mb-4">
-                <ShoppingBag className="size-7 text-zinc-600" />
+              <div className="mx-auto size-16 rounded-full bg-gray-50 border border-gray-200 flex items-center justify-center mb-4">
+                <ShoppingBag className="size-7 text-gray-400" />
               </div>
-              <p className="text-zinc-400 font-medium mb-1">Votre panier est vide</p>
-              <p className="text-zinc-600 text-sm">Ajoutez des tables ou chambres pour commencer.</p>
+              <p className="text-[#111111] font-medium mb-1">Votre panier est vide</p>
+              <p className="text-gray-500 text-sm">Ajoutez des tables ou chambres pour commencer.</p>
             </div>
           ) : (
             <div>
@@ -153,13 +153,13 @@ export function CartDrawer({ open, onOpenChange }: CartDrawerProps) {
 
         {/* Footer */}
         {items.length > 0 && (
-          <div className="border-t border-zinc-800 bg-zinc-950 px-5 py-5 space-y-4">
+          <div className="border-t border-gray-200 bg-white px-5 py-5 space-y-4">
             {/* Total */}
             <div className="flex items-center justify-between">
-              <span className="text-zinc-400 text-sm">Total</span>
+              <span className="text-gray-600 text-sm">Total</span>
               <div className="text-right">
-                <span className="text-2xl font-bold text-amber-400">{totalAmount}</span>
-                <span className="text-zinc-500 text-sm ml-1">TND</span>
+                <span className="text-2xl font-bold text-[#D4AF37]">{totalAmount}</span>
+                <span className="text-gray-500 text-sm ml-1">TND</span>
               </div>
             </div>
 
@@ -167,7 +167,7 @@ export function CartDrawer({ open, onOpenChange }: CartDrawerProps) {
             <Button
               asChild
               size="lg"
-              className="w-full rounded-full bg-amber-400 hover:bg-amber-300 text-zinc-950 font-bold h-12 gap-2 shadow-lg shadow-amber-400/20"
+              className="w-full rounded-full bg-[#D4AF37] hover:bg-[#B8962E] text-white font-bold h-12 gap-2 shadow-lg"
               onClick={() => onOpenChange(false)}
             >
               <Link href="/checkout">
@@ -180,7 +180,7 @@ export function CartDrawer({ open, onOpenChange }: CartDrawerProps) {
               asChild
               variant="ghost"
               size="sm"
-              className="w-full text-zinc-500 hover:text-zinc-300 hover:bg-zinc-800/60"
+              className="w-full text-gray-500 hover:text-[#111111] hover:bg-gray-50"
               onClick={() => onOpenChange(false)}
             >
               <Link href="/panier">Voir le panier complet</Link>
@@ -189,11 +189,11 @@ export function CartDrawer({ open, onOpenChange }: CartDrawerProps) {
         )}
 
         {items.length === 0 && (
-          <div className="border-t border-zinc-800 px-5 py-4">
+          <div className="border-t border-gray-200 px-5 py-4">
             <Button
               asChild
               variant="outline"
-              className="w-full border-zinc-700 bg-zinc-900 text-zinc-300 hover:bg-zinc-800 hover:text-zinc-100"
+              className="w-full border-gray-200 bg-white text-[#111111] hover:bg-gray-50"
               onClick={() => onOpenChange(false)}
             >
               <Link href="/explorer">Explorer les lieux</Link>

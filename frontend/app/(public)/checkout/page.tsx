@@ -32,7 +32,10 @@ import { cn } from '@/lib/utils';
 const schema = z.object({
   firstName: z.string().min(2, 'Prénom requis'),
   lastName: z.string().min(2, 'Nom requis'),
-  phone: z.string().min(8, 'Numéro de téléphone invalide'),
+  phone: z.string().min(8, 'Numéro de téléphone invalide').refine(
+    (val) => /^(\+216|216)?[0-9]{8}$/.test(val.replace(/\s/g, '')),
+    'Format téléphone invalide (ex: 12345678 ou +21612345678)'
+  ),
   email: z.string().email('Email invalide'),
 });
 type FormData = z.infer<typeof schema>;

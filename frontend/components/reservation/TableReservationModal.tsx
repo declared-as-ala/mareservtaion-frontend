@@ -163,44 +163,44 @@ export function TableReservationModal({
   // ── Render ─────────────────────────────────────────────────────────────────
   return (
     <Sheet open={open} onOpenChange={onOpenChange}>
-      <SheetContent side="bottom" className="bg-zinc-950 border-t border-zinc-800 rounded-t-3xl p-0 max-h-[92vh] overflow-y-auto">
+      <SheetContent side="bottom" className="bg-white border-t border-gray-200 rounded-t-3xl p-0 max-h-[92vh] overflow-y-auto">
 
         {/* Handle */}
         <div className="flex justify-center pt-3 pb-1">
-          <div className="w-10 h-1 rounded-full bg-zinc-700" />
+          <div className="w-10 h-1 rounded-full bg-gray-300" />
         </div>
 
         <SheetHeader className="px-5 pt-2 pb-0">
-          <SheetTitle className="text-zinc-100 text-base font-semibold">Réserver une table</SheetTitle>
+          <SheetTitle className="text-[#111111] text-base font-semibold">Réserver une table</SheetTitle>
         </SheetHeader>
 
         <div className="px-5 py-4 space-y-5 pb-8">
 
           {/* ── Table info card ── */}
-          <div className={`rounded-2xl border p-4 flex items-center gap-4 ${isAvailable ? 'border-emerald-800/50 bg-emerald-950/30' : 'border-zinc-800 bg-zinc-900/40'}`}>
-            <div className={`size-14 rounded-2xl flex-shrink-0 flex items-center justify-center text-xl font-black ${isAvailable ? 'bg-amber-400/15 text-amber-400' : 'bg-zinc-800 text-zinc-500'}`}>
+          <div className={`rounded-2xl border p-4 flex items-center gap-4 ${isAvailable ? 'border-emerald-200 bg-emerald-50' : 'border-gray-200 bg-gray-50'}`}>
+            <div className={`size-14 rounded-2xl flex-shrink-0 flex items-center justify-center text-xl font-black ${isAvailable ? 'bg-[#D4AF37]/15 text-[#D4AF37]' : 'bg-gray-200 text-gray-400'}`}>
               {placement.table.tableNumber ?? '?'}
             </div>
             <div className="flex-1 min-w-0">
               <div className="flex items-center gap-2">
-                <h3 className="font-bold text-zinc-100 text-sm">{tableLabel}</h3>
-                {placement.table.isVip && <Crown className="size-3.5 text-amber-400" />}
+                <h3 className="font-bold text-[#111111] text-sm">{tableLabel}</h3>
+                {placement.table.isVip && <Crown className="size-3.5 text-[#D4AF37]" />}
               </div>
-              <p className="text-xs text-zinc-500 mt-0.5">{venue.name}</p>
+              <p className="text-xs text-gray-500 mt-0.5">{venue.name}</p>
               <div className="flex items-center gap-3 mt-2 text-xs">
-                <span className="flex items-center gap-1 text-zinc-400"><Users className="size-3" />{placement.table.capacity} pers. max</span>
-                {tablePrice > 0 && <span className="font-semibold text-amber-400">{tablePrice} TND min.</span>}
+                <span className="flex items-center gap-1 text-gray-500"><Users className="size-3" />{placement.table.capacity} pers. max</span>
+                {tablePrice > 0 && <span className="font-semibold text-[#D4AF37]">{tablePrice} TND min.</span>}
               </div>
             </div>
-            <div className={`flex-shrink-0 flex items-center gap-1.5 rounded-full px-3 py-1.5 text-[11px] font-bold ${isAvailable ? 'bg-emerald-500/15 text-emerald-400' : 'bg-red-500/15 text-red-400'}`}>
-              <span className={`size-1.5 rounded-full ${isAvailable ? 'bg-emerald-400 animate-pulse' : 'bg-red-400'}`} />
+            <div className={`flex-shrink-0 flex items-center gap-1.5 rounded-full px-3 py-1.5 text-[11px] font-bold ${isAvailable ? 'bg-emerald-100 text-emerald-700' : 'bg-red-100 text-red-700'}`}>
+              <span className={`size-1.5 rounded-full ${isAvailable ? 'bg-emerald-500 animate-pulse' : 'bg-red-500'}`} />
               {isAvailable ? 'Disponible' : 'Réservée'}
             </div>
           </div>
 
           {!isAvailable && (
-            <div className="rounded-xl border border-red-900/50 bg-red-950/20 px-4 py-3 text-sm text-red-300 flex items-center gap-2">
-              <span className="size-2 rounded-full bg-red-400 flex-shrink-0" />
+            <div className="rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700 flex items-center gap-2">
+              <span className="size-2 rounded-full bg-red-500 flex-shrink-0" />
               Cette table n&apos;est pas disponible pour le moment.
             </div>
           )}
@@ -209,7 +209,7 @@ export function TableReservationModal({
 
             {/* ── Date + Time ── */}
             <div className="space-y-2">
-              <label className="flex items-center gap-2 text-[11px] font-bold uppercase tracking-widest text-zinc-500">
+              <label className="flex items-center gap-2 text-[11px] font-bold uppercase tracking-widest text-gray-500">
                 <Calendar className="size-3.5" /> Date &amp; Horaire
               </label>
               <input
@@ -217,29 +217,29 @@ export function TableReservationModal({
                 value={selectedDate}
                 min={todayStr()}
                 onChange={(e) => setSelectedDate(e.target.value)}
-                className="w-full rounded-xl border border-zinc-700 bg-zinc-900 px-4 py-3 text-sm text-zinc-100 focus:outline-none focus:border-amber-400/60 transition-colors"
+                className="w-full rounded-xl border border-gray-200 bg-gray-50 px-4 py-3 text-sm text-[#111111] focus:outline-none focus:border-[#D4AF37] transition-colors"
               />
               <div className="grid grid-cols-2 gap-3">
                 <div className="space-y-1">
-                  <label className="flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-widest text-zinc-600">
+                  <label className="flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-widest text-gray-500">
                     <Clock className="size-3" /> Arrivée
                   </label>
                   <input
                     type="time"
                     value={startTime}
                     onChange={(e) => setStartTime(e.target.value)}
-                    className="w-full rounded-xl border border-zinc-700 bg-zinc-900 px-4 py-3 text-sm text-zinc-100 focus:outline-none focus:border-amber-400/60 transition-colors"
+                    className="w-full rounded-xl border border-gray-200 bg-gray-50 px-4 py-3 text-sm text-[#111111] focus:outline-none focus:border-[#D4AF37] transition-colors"
                   />
                 </div>
                 <div className="space-y-1">
-                  <label className="flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-widest text-zinc-600">
+                  <label className="flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-widest text-gray-500">
                     <Clock className="size-3" /> Départ
                   </label>
                   <input
                     type="time"
                     value={endTime}
                     onChange={(e) => setEndTime(e.target.value)}
-                    className="w-full rounded-xl border border-zinc-700 bg-zinc-900 px-4 py-3 text-sm text-zinc-100 focus:outline-none focus:border-amber-400/60 transition-colors"
+                    className="w-full rounded-xl border border-gray-200 bg-gray-50 px-4 py-3 text-sm text-[#111111] focus:outline-none focus:border-[#D4AF37] transition-colors"
                   />
                 </div>
               </div>
@@ -247,20 +247,20 @@ export function TableReservationModal({
 
             {/* ── Party size ── */}
             <div className="space-y-2">
-              <label className="flex items-center gap-2 text-[11px] font-bold uppercase tracking-widest text-zinc-500">
+              <label className="flex items-center gap-2 text-[11px] font-bold uppercase tracking-widest text-gray-500">
                 <Users className="size-3.5" /> Personnes
               </label>
               <div className="flex items-center gap-4">
                 <button type="button" onClick={() => setPartySize((n) => Math.max(1, n - 1))}
-                  className="size-10 rounded-xl border border-zinc-700 bg-zinc-900 flex items-center justify-center text-zinc-300 hover:bg-zinc-800 transition-all">
+                  className="size-10 rounded-xl border border-gray-200 bg-white flex items-center justify-center text-gray-600 hover:bg-gray-50 transition-all">
                   <Minus className="size-4" />
                 </button>
                 <div className="flex-1 text-center">
-                  <span className="text-3xl font-black text-zinc-100 tabular-nums">{partySize}</span>
-                  <span className="text-xs text-zinc-600 ml-2">/ {maxCapacity} max</span>
+                  <span className="text-3xl font-black text-[#111111] tabular-nums">{partySize}</span>
+                  <span className="text-xs text-gray-500 ml-2">/ {maxCapacity} max</span>
                 </div>
                 <button type="button" onClick={() => setPartySize((n) => Math.min(maxCapacity, n + 1))}
-                  className="size-10 rounded-xl border border-zinc-700 bg-zinc-900 flex items-center justify-center text-zinc-300 hover:bg-zinc-800 transition-all">
+                  className="size-10 rounded-xl border border-gray-200 bg-white flex items-center justify-center text-gray-600 hover:bg-gray-50 transition-all">
                   <Plus className="size-4" />
                 </button>
               </div>
@@ -268,23 +268,23 @@ export function TableReservationModal({
 
             {/* ── Mode selector ── */}
             <div className="space-y-2">
-              <label className="text-[11px] font-bold uppercase tracking-widest text-zinc-500">Mode de réservation</label>
+              <label className="text-[11px] font-bold uppercase tracking-widest text-gray-500">Mode de réservation</label>
               <div className="grid grid-cols-2 gap-3">
                 <button type="button" onClick={() => setOrderMode('table_only')}
-                  className={`rounded-2xl border p-4 text-left transition-all ${orderMode === 'table_only' ? 'border-amber-400/60 bg-amber-400/10' : 'border-zinc-800 bg-zinc-900 hover:border-zinc-700'}`}>
+                  className={`rounded-2xl border p-4 text-left transition-all ${orderMode === 'table_only' ? 'border-[#D4AF37] bg-[#D4AF37]/10' : 'border-gray-200 bg-white hover:border-gray-300'}`}>
                   <div className="text-xl mb-1.5">🪑</div>
-                  <div className="text-xs font-bold text-zinc-100">Réservation simple</div>
-                  <div className="text-[10px] text-zinc-500 mt-1">Commandez sur place</div>
-                  {tablePrice > 0 && <div className="text-[10px] font-semibold text-amber-400 mt-2">Min. {tablePrice} TND</div>}
+                  <div className="text-xs font-bold text-[#111111]">Réservation simple</div>
+                  <div className="text-[10px] text-gray-500 mt-1">Commandez sur place</div>
+                  {tablePrice > 0 && <div className="text-[10px] font-semibold text-[#D4AF37] mt-2">Min. {tablePrice} TND</div>}
                 </button>
                 <button type="button" onClick={() => setOrderMode('with_menu')}
-                  className={`rounded-2xl border p-4 text-left transition-all ${orderMode === 'with_menu' ? 'border-amber-400/60 bg-amber-400/10' : 'border-zinc-800 bg-zinc-900 hover:border-zinc-700'}`}>
+                  className={`rounded-2xl border p-4 text-left transition-all ${orderMode === 'with_menu' ? 'border-[#D4AF37] bg-[#D4AF37]/10' : 'border-gray-200 bg-white hover:border-gray-300'}`}>
                   <div className="text-xl mb-1.5">🍽️</div>
-                  <div className="text-xs font-bold text-zinc-100">Commander le menu</div>
-                  <div className="text-[10px] text-zinc-500 mt-1">Choisissez vos plats</div>
+                  <div className="text-xs font-bold text-[#111111]">Commander le menu</div>
+                  <div className="text-[10px] text-gray-500 mt-1">Choisissez vos plats</div>
                   {menuTotal > 0
-                    ? <div className={`text-[10px] font-semibold mt-2 ${menuMeetsMinimum ? 'text-emerald-400' : 'text-amber-400'}`}>Total : {menuTotal.toFixed(2)} TND</div>
-                    : minimumSpend > 0 && <div className="text-[10px] font-semibold text-zinc-500 mt-2">Min. {minimumSpend} TND</div>}
+                    ? <div className={`text-[10px] font-semibold mt-2 ${menuMeetsMinimum ? 'text-emerald-600' : 'text-[#D4AF37]'}`}>Total : {menuTotal.toFixed(2)} TND</div>
+                    : minimumSpend > 0 && <div className="text-[10px] font-semibold text-gray-500 mt-2">Min. {minimumSpend} TND</div>}
                 </button>
               </div>
             </div>
@@ -295,49 +295,49 @@ export function TableReservationModal({
                 {minimumSpend > 0 && (
                   <div className="space-y-1.5">
                     <div className="flex justify-between text-[11px]">
-                      <span className="text-zinc-500">Total sélectionné</span>
-                      <span className={menuMeetsMinimum ? 'text-emerald-400 font-bold' : 'text-amber-400 font-bold'}>
+                      <span className="text-gray-500">Total sélectionné</span>
+                      <span className={menuMeetsMinimum ? 'text-emerald-600 font-bold' : 'text-[#D4AF37] font-bold'}>
                         {menuTotal.toFixed(2)} / {minimumSpend} TND
                       </span>
                     </div>
-                    <div className="h-1.5 rounded-full bg-zinc-800 overflow-hidden">
-                      <div className={`h-full rounded-full transition-all duration-300 ${menuMeetsMinimum ? 'bg-emerald-500' : 'bg-amber-400'}`}
+                    <div className="h-1.5 rounded-full bg-gray-100 overflow-hidden">
+                      <div className={`h-full rounded-full transition-all duration-300 ${menuMeetsMinimum ? 'bg-emerald-500' : 'bg-[#D4AF37]'}`}
                         style={{ width: `${Math.min(100, (menuTotal / minimumSpend) * 100)}%` }} />
                     </div>
                     {!menuMeetsMinimum && (
-                      <p className="text-[10px] text-amber-400">Encore {(minimumSpend - menuTotal).toFixed(2)} TND pour atteindre le minimum.</p>
+                      <p className="text-[10px] text-[#D4AF37]">Encore {(minimumSpend - menuTotal).toFixed(2)} TND pour atteindre le minimum.</p>
                     )}
                   </div>
                 )}
                 {menuData.length === 0 ? (
-                  <div className="flex items-center justify-center rounded-xl border border-zinc-800 py-8 text-sm text-zinc-500 gap-2">
+                  <div className="flex items-center justify-center rounded-xl border border-gray-200 py-8 text-sm text-gray-500 gap-2">
                     <UtensilsCrossed className="size-4" /> Aucun article disponible.
                   </div>
                 ) : (
                   CATEGORY_ORDER.filter((cat) => menuData.some((i) => i.category === cat)).map((cat) => (
                     <div key={cat}>
-                      <p className="text-[10px] font-bold uppercase tracking-widest text-zinc-500 mb-2">{CATEGORY_LABELS[cat]}</p>
+                      <p className="text-[10px] font-bold uppercase tracking-widest text-gray-500 mb-2">{CATEGORY_LABELS[cat]}</p>
                       <div className="space-y-2">
                         {menuData.filter((i) => i.category === cat).map((item: MenuItem) => {
                           const qty = menuQty[item._id] ?? 0;
                           return (
-                            <div key={item._id} className="rounded-xl border border-zinc-800 bg-zinc-900 p-3 flex items-center gap-3">
+                            <div key={item._id} className="rounded-xl border border-gray-200 bg-white p-3 flex items-center gap-3">
                               <div className="flex-1 min-w-0">
                                 <div className="flex items-center gap-1.5">
-                                  <span className="text-sm font-semibold text-zinc-100 truncate">{item.name}</span>
-                                  {item.isPopular && <span className="text-[9px] bg-amber-400/15 text-amber-400 rounded-full px-1.5 py-0.5 font-bold flex-shrink-0">★</span>}
+                                  <span className="text-sm font-semibold text-[#111111] truncate">{item.name}</span>
+                                  {item.isPopular && <span className="text-[9px] bg-[#D4AF37]/15 text-[#D4AF37] rounded-full px-1.5 py-0.5 font-bold flex-shrink-0">★</span>}
                                 </div>
-                                {item.description && <p className="text-[11px] text-zinc-500 mt-0.5 truncate">{item.description}</p>}
-                                <span className="text-xs font-bold text-amber-400 mt-0.5 block">{item.price.toFixed(2)} TND</span>
+                                {item.description && <p className="text-[11px] text-gray-500 mt-0.5 truncate">{item.description}</p>}
+                                <span className="text-xs font-bold text-[#D4AF37] mt-0.5 block">{item.price.toFixed(2)} TND</span>
                               </div>
                               <div className="flex items-center gap-2 flex-shrink-0">
                                 <button type="button" onClick={() => changeQty(item._id, -1)} disabled={qty === 0}
-                                  className="size-7 rounded-lg border border-zinc-700 bg-zinc-800 flex items-center justify-center text-zinc-300 hover:bg-zinc-700 disabled:opacity-30 transition-all">
+                                  className="size-7 rounded-lg border border-gray-200 bg-gray-50 flex items-center justify-center text-gray-600 hover:bg-gray-100 disabled:opacity-30 transition-all">
                                   <Minus className="size-3" />
                                 </button>
-                                <span className="text-sm font-bold text-zinc-100 tabular-nums min-w-[16px] text-center">{qty}</span>
+                                <span className="text-sm font-bold text-[#111111] tabular-nums min-w-[16px] text-center">{qty}</span>
                                 <button type="button" onClick={() => changeQty(item._id, 1)}
-                                  className="size-7 rounded-lg border border-zinc-700 bg-zinc-800 flex items-center justify-center text-zinc-300 hover:bg-zinc-700 transition-all">
+                                  className="size-7 rounded-lg border border-gray-200 bg-gray-50 flex items-center justify-center text-gray-600 hover:bg-gray-100 transition-all">
                                   <Plus className="size-3" />
                                 </button>
                               </div>
@@ -354,17 +354,17 @@ export function TableReservationModal({
             {/* ── Phone (progressive) ── */}
             {showPhone && (
               <div className="space-y-2">
-                <label className="flex items-center gap-2 text-[11px] font-bold uppercase tracking-widest text-zinc-500">
+                <label className="flex items-center gap-2 text-[11px] font-bold uppercase tracking-widest text-gray-500">
                   <Phone className="size-3.5" /> Téléphone
                 </label>
                 <input type="tel" value={guestPhone} onChange={(e) => setGuestPhone(e.target.value)}
                   placeholder="ex: 12 345 678" autoFocus
-                  className="w-full rounded-xl border border-zinc-700 bg-zinc-900 px-4 py-3 text-sm text-zinc-100 placeholder:text-zinc-600 focus:outline-none focus:border-amber-400/60 transition-colors" />
+                  className="w-full rounded-xl border border-gray-200 bg-gray-50 px-4 py-3 text-sm text-[#111111] placeholder:text-gray-400 focus:outline-none focus:border-[#D4AF37] transition-colors" />
               </div>
             )}
 
             {/* ── Summary ── */}
-            <div className="rounded-xl bg-zinc-900 border border-zinc-800 px-4 py-3 flex items-center justify-between text-xs text-zinc-500">
+            <div className="rounded-xl bg-gray-50 border border-gray-200 px-4 py-3 flex items-center justify-between text-xs text-gray-500">
               <span>📅 {selectedDate} · {startTime} → {endTime}</span>
               <span>{partySize} pers.{orderMode === 'with_menu' && menuTotal > 0 ? ` · ${menuTotal.toFixed(2)} TND` : tablePrice > 0 ? ` · ${tablePrice} TND min.` : ''}</span>
             </div>
@@ -372,11 +372,11 @@ export function TableReservationModal({
             {/* ── CTAs ── */}
             <div className="flex gap-3">
               <button type="button" onClick={handleAddToCart}
-                className="flex-1 flex items-center justify-center gap-2 rounded-xl bg-amber-400 hover:bg-amber-300 text-black font-bold py-3.5 text-sm transition-all shadow-lg shadow-amber-400/20 active:scale-[0.98]">
+                className="flex-1 flex items-center justify-center gap-2 rounded-xl bg-[#D4AF37] hover:bg-[#C4A030] text-white font-bold py-3.5 text-sm transition-all shadow-lg shadow-[#D4AF37]/20 active:scale-[0.98]">
                 <ShoppingCart className="size-4" /> Ajouter au panier
               </button>
               <button type="button" onClick={handleReserve} disabled={loading}
-                className="flex-1 flex items-center justify-center gap-2 rounded-xl border border-emerald-700 bg-emerald-950/40 hover:bg-emerald-900/40 text-emerald-400 font-bold py-3.5 text-sm transition-all active:scale-[0.98] disabled:opacity-60">
+                className="flex-1 flex items-center justify-center gap-2 rounded-xl border border-emerald-300 bg-emerald-50 hover:bg-emerald-100 text-emerald-700 font-bold py-3.5 text-sm transition-all active:scale-[0.98] disabled:opacity-60">
                 {loading ? <Loader2 className="size-4 animate-spin" /> : <CreditCard className="size-4" />}
                 {showPhone ? 'Confirmer' : 'Réserver'}
               </button>
@@ -386,7 +386,7 @@ export function TableReservationModal({
 
           {!isAvailable && (
             <button type="button" onClick={() => onOpenChange(false)}
-              className="w-full rounded-xl border border-zinc-700 py-3 text-sm text-zinc-400 hover:bg-zinc-900 transition-colors">
+              className="w-full rounded-xl border border-gray-200 py-3 text-sm text-gray-500 hover:bg-gray-50 transition-colors">
               Fermer
             </button>
           )}
