@@ -10,6 +10,7 @@ import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { cn } from '@/lib/utils';
 
 const OCCASIONS = [
   { value: 'birthday', label: 'Anniversaire' },
@@ -22,20 +23,14 @@ const OCCASIONS = [
   { value: 'other', label: 'Autre' },
 ];
 
-const AGE_RANGES = ['18-20', '20-30', '30-40', '40-50', '50-60', '+60'];
+const AGE_RANGES = ['18-20', '20-30', '30-40', '40-50', '50-60', '+60'] as const;
+
 const CATEGORIES = [
   { value: 'cafe', label: 'Café' },
   { value: 'restaurant', label: 'Restaurant' },
   { value: 'hotel', label: 'Hôtel' },
   { value: 'cinema', label: 'Cinéma' },
   { value: 'event_space', label: 'Espace événementiel' },
-];
-const BUDGETS = [
-  { value: 'moins_100', label: 'Moins de 100 TND' },
-  { value: '100_300', label: '100 – 300 TND' },
-  { value: '300_600', label: '300 – 600 TND' },
-  { value: '600_1000', label: '600 – 1 000 TND' },
-  { value: 'plus_1000', label: 'Plus de 1 000 TND' },
 ];
 
 type FormData = {
@@ -44,10 +39,9 @@ type FormData = {
   email: string;
   occasionType: string;
   participantsCount: string;
-  averageAgeRange: string;
+  averageAgeRanges: string[];
   preferredRegion: string;
   preferredCategory: string;
-  budgetRange: string;
   preferredDate: string;
   preferredTime: string;
   details: string;
@@ -59,10 +53,9 @@ const INITIAL: FormData = {
   email: '',
   occasionType: '',
   participantsCount: '',
-  averageAgeRange: '',
+  averageAgeRanges: [],
   preferredRegion: '',
   preferredCategory: '',
-  budgetRange: '',
   preferredDate: '',
   preferredTime: '',
   details: '',
@@ -73,17 +66,29 @@ export default function SOSConseilPage() {
   const [submitting, setSubmitting] = useState(false);
   const [submitted, setSubmitted] = useState(false);
 
-  const setField = (key: keyof FormData, value: string) => setForm((prev) => ({ ...prev, [key]: value }));
+  const setField = (key: keyof FormData, value: string | string[]) =>
+    setForm((prev) => ({ ...prev, [key]: value }));
+
+  const toggleAgeRange = (range: string) => {
+    setForm((prev) => {
+      const has = prev.averageAgeRanges.includes(range);
+      return {
+        ...prev,
+        averageAgeRanges: has
+          ? prev.averageAgeRanges.filter((r) => r !== range)
+          : [...prev.averageAgeRanges, range],
+      };
+    });
+  };
 
   const validate = () => {
     if (!form.fullName.trim()) return 'Nom complet requis.';
     if (!form.phone.trim()) return 'Téléphone requis.';
     if (!form.occasionType) return "Type d'événement requis.";
     if (!form.participantsCount || Number(form.participantsCount) <= 0) return 'Nombre de participants invalide.';
-    if (!form.averageAgeRange) return "Tranche d'âge requise.";
+    if (form.averageAgeRanges.length < 1) return "Sélectionnez au moins une tranche d'âge.";
     if (!form.preferredRegion.trim()) return 'Région requise.';
     if (!form.preferredCategory) return 'Type de lieu requis.';
-    if (!form.budgetRange) return 'Budget requis.';
     if (form.email && !/\S+@\S+\.\S+/.test(form.email)) return 'Adresse email invalide.';
     return null;
   };
@@ -105,10 +110,9 @@ export default function SOSConseilPage() {
         email: form.email.trim() || undefined,
         occasionType: form.occasionType,
         participantsCount: Number(form.participantsCount),
-        averageAgeRange: form.averageAgeRange,
+        averageAgeRanges: [...new Set(form.averageAgeRanges)],
         preferredRegion: form.preferredRegion.trim(),
         preferredCategory: form.preferredCategory,
-        budgetRange: form.budgetRange,
         preferredDate: form.preferredDate || undefined,
         preferredTime: form.preferredTime || undefined,
         details: form.details.trim() || undefined,
@@ -189,14 +193,29 @@ export default function SOSConseilPage() {
                   <Label className="mb-2 block">Participants *</Label>
                   <Input type="number" min={1} value={form.participantsCount} onChange={(e) => setField('participantsCount', e.target.value)} className="bg-zinc-900/70 border-zinc-700" />
                 </div>
-                <div>
-                  <Label className="mb-2 block">Tranche d&apos;âge *</Label>
-                  <Select value={form.averageAgeRange} onValueChange={(v) => setField('averageAgeRange', v)}>
-                    <SelectTrigger className="w-full bg-zinc-900/70 border-zinc-700"><SelectValue placeholder="Sélectionner" /></SelectTrigger>
-                    <SelectContent className="bg-zinc-900 border-zinc-700 text-zinc-100">
-                      {AGE_RANGES.map((range) => <SelectItem key={range} value={range}>{range} ans</SelectItem>)}
-                    </SelectContent>
-                  </Select>
+                <div className="sm:col-span-2">
+                  <Label className="mb-2 block">Tranches d&apos;âge * (choix multiples)</Label>
+                  <p className="text-[11px] text-zinc-500 mb-2">Sélectionnez toutes les tranches qui correspondent à votre groupe.</p>
+                  <div className="flex flex-wrap gap-2">
+                    {AGE_RANGES.map((range) => {
+                      const selected = form.averageAgeRanges.includes(range);
+                      return (
+                        <button
+                          key={range}
+                          type="button"
+                          onClick={() => toggleAgeRange(range)}
+                          className={cn(
+                            'px-3 py-2 rounded-lg border text-xs font-medium transition-colors',
+                            selected
+                              ? 'border-amber-400 bg-amber-400/15 text-amber-300'
+                              : 'border-zinc-700 text-zinc-400 hover:text-zinc-200 hover:border-zinc-600'
+                          )}
+                        >
+                          {range} ans
+                        </button>
+                      );
+                    })}
+                  </div>
                 </div>
                 <div>
                   <Label className="mb-2 block">Région *</Label>
@@ -210,21 +229,6 @@ export default function SOSConseilPage() {
                       {CATEGORIES.map((c) => <SelectItem key={c.value} value={c.value}>{c.label}</SelectItem>)}
                     </SelectContent>
                   </Select>
-                </div>
-                <div className="sm:col-span-2">
-                  <Label className="mb-2 block">Budget *</Label>
-                  <div className="grid grid-cols-2 sm:grid-cols-5 gap-2">
-                    {BUDGETS.map((b) => (
-                      <button
-                        key={b.value}
-                        type="button"
-                        onClick={() => setField('budgetRange', b.value)}
-                        className={`px-3 py-2 rounded-lg border text-xs ${form.budgetRange === b.value ? 'border-amber-400 bg-amber-400/10 text-amber-300' : 'border-zinc-700 text-zinc-400 hover:text-zinc-200'}`}
-                      >
-                        {b.label}
-                      </button>
-                    ))}
-                  </div>
                 </div>
                 <div>
                   <Label className="mb-2 block">Date (optionnel)</Label>

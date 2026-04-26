@@ -6,10 +6,10 @@ export interface SOSConseilPayload {
   email?: string;
   occasionType: string;
   participantsCount: number;
-  averageAgeRange: string;
+  /** One or more age brackets (e.g. 20-30, 40-50). */
+  averageAgeRanges: string[];
   preferredRegion: string;
   preferredCategory: string;
-  budgetRange: string;
   preferredDate?: string;
   preferredTime?: string;
   details?: string;
@@ -20,6 +20,9 @@ export interface SOSConseilRecord extends SOSConseilPayload {
   status: 'new' | 'in_review' | 'contacted' | 'closed';
   createdAt: string;
   updatedAt: string;
+  /** Legacy API field from older backend rows */
+  averageAgeRange?: string;
+  budgetRange?: string;
 }
 
 export interface SOSConseilListResponse {

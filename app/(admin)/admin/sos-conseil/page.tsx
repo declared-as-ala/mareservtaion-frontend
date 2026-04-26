@@ -24,6 +24,12 @@ import {
 } from '@/components/ui/dialog';
 import { toast } from 'sonner';
 
+function formatAgeRanges(r: SOSConseilRecord): string {
+  if (r.averageAgeRanges?.length) return r.averageAgeRanges.map((x) => `${x} ans`).join(', ');
+  if (r.averageAgeRange) return `${r.averageAgeRange} ans`;
+  return '—';
+}
+
 const STATUS_LABEL: Record<string, string> = {
   new: 'Nouveau',
   in_review: 'En revue',
@@ -135,8 +141,8 @@ function DetailModal({ req, onClose }: { req: SOSConseilRecord; onClose: () => v
               <p className="text-sm font-medium text-zinc-100">{current.participantsCount} personnes</p>
             </div>
             <div className="space-y-2">
-              <p className="text-xs text-zinc-500">Tranche d'âge</p>
-              <p className="text-sm font-medium text-zinc-100">{current.averageAgeRange}</p>
+              <p className="text-xs text-zinc-500">Tranches d&apos;âge</p>
+              <p className="text-sm font-medium text-zinc-100">{formatAgeRanges(current)}</p>
             </div>
             <div className="space-y-2">
               <p className="text-xs text-zinc-500">Région</p>
@@ -149,10 +155,12 @@ function DetailModal({ req, onClose }: { req: SOSConseilRecord; onClose: () => v
               <p className="text-xs text-zinc-500">Catégorie</p>
               <p className="text-sm font-medium text-zinc-100 capitalize">{current.preferredCategory.replace('_', ' ')}</p>
             </div>
-            <div className="space-y-2">
-              <p className="text-xs text-zinc-500">Budget</p>
-              <p className="text-sm font-medium text-zinc-100">{current.budgetRange.replace('_', ' ')}</p>
-            </div>
+            {current.budgetRange ? (
+              <div className="space-y-2">
+                <p className="text-xs text-zinc-500">Budget (ancien formulaire)</p>
+                <p className="text-sm font-medium text-zinc-100">{current.budgetRange.replace(/_/g, ' ')}</p>
+              </div>
+            ) : null}
             {current.preferredTime && (
               <div className="space-y-2">
                 <p className="text-xs text-zinc-500">Heure souhaitée</p>
