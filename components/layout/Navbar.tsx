@@ -110,6 +110,18 @@ export function Navbar() {
           {/* Theme toggle */}
           <ThemeToggle />
 
+          {/* Mobile: Se connecter — visible in bar (xl+ uses desktop block below) */}
+          {!authLoading && !isAuthenticated && (
+            <Button
+              variant="outline"
+              size="sm"
+              asChild
+              className="xl:hidden h-9 shrink-0 border-zinc-600 bg-zinc-900/50 px-2.5 text-xs font-semibold text-zinc-100 hover:border-amber-400/60 hover:bg-amber-400/10 hover:text-amber-300"
+            >
+              <Link href="/login">Se connecter</Link>
+            </Button>
+          )}
+
           {/* Auth — desktop (xl+) */}
           <div className="hidden xl:flex items-center gap-2 ml-1 pl-2 border-l border-zinc-800">
             {authLoading ? (

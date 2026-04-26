@@ -174,6 +174,16 @@ export function HomeNavbar() {
 
             <CartDrawer open={cartOpen} onOpenChange={setCartOpen} />
 
+            {/* Mobile: Se connecter — in header bar (guests only) */}
+            {!authLoading && !user && (
+              <Link
+                href="/login"
+                className="xl:hidden shrink-0 rounded-xl border border-white/[0.14] bg-white/[0.04] px-2.5 py-2 sm:px-3 sm:py-2.5 text-[11px] sm:text-xs font-semibold text-neutral-100 hover:border-amber-400/45 hover:bg-amber-400/10 hover:text-amber-200 transition-all duration-200 whitespace-nowrap"
+              >
+                Se connecter
+              </Link>
+            )}
+
             {/* Auth — desktop only (xl+) */}
             <div className="hidden xl:flex items-center gap-2 ml-1 pl-2 border-l border-white/[0.08]">
               {authLoading ? (
