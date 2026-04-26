@@ -18,15 +18,20 @@ export function ErrorState({
   return (
     <div
       className={cn(
-        'flex flex-col items-center justify-center rounded-lg border border-red-200 bg-red-50 px-6 py-12 text-center',
+        'flex flex-col items-center justify-center rounded-xl border border-red-500/20 bg-red-500/5 px-6 py-12 text-center',
         className
       )}
     >
-      <AlertCircle className="size-12 text-red-500 mb-4" />
-      <h3 className="font-semibold text-[#111111]">{title}</h3>
-      <p className="mt-1 max-w-sm text-sm text-[#666666]">{message}</p>
+      <AlertCircle className="size-12 text-red-400 mb-4" />
+      <h3 className="font-semibold text-zinc-200">{title}</h3>
+      <p className="mt-2 max-w-sm text-sm text-zinc-500 leading-relaxed">{message}</p>
       {onRetry && (
-        <Button variant="outline" size="sm" className="mt-6" onClick={onRetry}>
+        <Button
+          variant="outline"
+          size="sm"
+          className="mt-6 border-zinc-700 text-zinc-300 hover:bg-zinc-800 hover:text-white"
+          onClick={onRetry}
+        >
           Réessayer
         </Button>
       )}

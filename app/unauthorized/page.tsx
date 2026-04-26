@@ -11,7 +11,7 @@ export default function UnauthorizedPage() {
           <Link href="/">Accueil</Link>
         </Button>
         <Button variant="outline" asChild>
-          <Link href="/dashboard">Mon compte</Link>
+          <Link href="/mes-reservations">Mon compte</Link>
         </Button>
       </div>
     </div>

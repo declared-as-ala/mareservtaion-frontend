@@ -23,13 +23,13 @@ function FavoriteVenueCard({ venue }: { venue: Venue }) {
   const href = `/lieu/${venue.slug ?? venue._id}`;
 
   return (
-    <div className="group rounded-2xl border border-gray-200 bg-white overflow-hidden hover:border-[#D4AF37]/50 transition-all duration-200 shadow-sm">
-      <div className="relative aspect-[16/9] overflow-hidden bg-gray-100">
+    <div className="group rounded-2xl border border-zinc-800 bg-zinc-900/60 overflow-hidden hover:border-amber-400/40 transition-all duration-200 shadow-sm">
+      <div className="relative aspect-[16/9] overflow-hidden bg-zinc-800">
         {img ? (
           <Image src={img} alt={venue.name} fill className="object-cover transition-transform duration-500 group-hover:scale-105" sizes="(max-width: 640px) 100vw, 50vw" />
         ) : (
           <div className="size-full flex items-center justify-center">
-            <MapPin className="size-10 text-gray-400" />
+            <MapPin className="size-10 text-zinc-600" />
           </div>
         )}
         <button

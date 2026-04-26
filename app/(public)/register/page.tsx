@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { register } from '@/lib/api/auth';
 import { useAuthStore } from '@/stores/auth';
+import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -94,9 +95,16 @@ export default function RegisterPage() {
       const { user } = response;
 
       // Set Zustand state — backend already set httpOnly cookies.
-      setAuth({ id: user._id, fullName: user.fullName, email: user.email, role: user.role });
+      setAuth({
+        id: user._id,
+        fullName: user.fullName,
+        email: user.email,
+        role: user.role,
+        emailVerified: user.emailVerified,
+      });
 
-      router.push('/dashboard');
+      toast.success('Compte créé ! Vérifiez votre email pour activer votre compte.', { duration: 6000 });
+      router.push('/');
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Inscription échouée');
     } finally {

@@ -286,9 +286,9 @@ export default function PanoramaEngine({
     <div style={{ position: 'absolute', inset: 0 }}>
       <div ref={containerRef} style={{ width: '100%', height: '100%' }} />
       {!loaded && (
-        <div className="absolute inset-0 flex items-center justify-center bg-white/80 z-10">
-          <div className="flex flex-col items-center gap-2 text-gray-500">
-            <div className="size-8 border-2 border-gray-300 border-t-[#D4AF37] rounded-full animate-spin" />
+        <div className="absolute inset-0 flex items-center justify-center bg-zinc-950/80 z-10">
+          <div className="flex flex-col items-center gap-2 text-zinc-400">
+            <div className="size-8 border-2 border-zinc-700 border-t-amber-400 rounded-full animate-spin" />
             <span className="text-sm">Chargement de la vue 360...</span>
           </div>
         </div>
@@ -300,7 +300,7 @@ export default function PanoramaEngine({
       )}
       {/* Scene navigation strip */}
       {hasScenes && loaded && (
-        <div className="absolute bottom-3 left-1/2 -translate-x-1/2 z-20 flex gap-1.5 bg-white/90 backdrop-blur-sm rounded-full px-3 py-1.5 shadow-lg border border-gray-200">
+        <div className="absolute bottom-3 left-1/2 -translate-x-1/2 z-20 flex gap-1.5 bg-zinc-950/90 backdrop-blur-sm rounded-full px-3 py-1.5 shadow-lg border border-zinc-800">
           {scenes!.map((scene) => {
             const isActive = scene._id === activeSceneId;
             return (
@@ -311,12 +311,12 @@ export default function PanoramaEngine({
                 className={cn(
                   'flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold transition-all duration-200',
                   isActive
-                    ? 'bg-[#D4AF37] text-white'
-                    : 'text-gray-600 hover:text-[#111111] hover:bg-gray-100'
+                    ? 'bg-amber-400 text-zinc-950'
+                    : 'text-zinc-400 hover:text-zinc-100 hover:bg-zinc-800'
                 )}
                 title={scene.name}
               >
-                <span className={cn('size-1.5 rounded-full shrink-0', isActive ? 'bg-white' : 'bg-gray-400')} />
+                <span className={cn('size-1.5 rounded-full shrink-0', isActive ? 'bg-zinc-950' : 'bg-zinc-600')} />
                 {scene.name}
               </button>
             );

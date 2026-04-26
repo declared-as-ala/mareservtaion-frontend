@@ -22,18 +22,39 @@ function SlideImage({
   priority: boolean;
 }) {
   const [errored, setErrored] = useState(false);
+  const [shouldContainOnMobile, setShouldContainOnMobile] = useState(false);
   const finalSrc = errored ? FALLBACK_IMAGE : src;
 
   return (
     <div className="absolute inset-0">
+      {shouldContainOnMobile && (
+        <Image
+          src={finalSrc}
+          alt=""
+          fill
+          aria-hidden
+          className="object-cover object-center opacity-35 blur-xl scale-110 md:hidden"
+          sizes="100vw"
+          priority={priority}
+          quality={60}
+        />
+      )}
       <Image
         src={finalSrc}
         alt={alt}
         fill
-        className="object-cover"
+        className={cn(
+          'object-cover object-[center_34%] md:object-[center_40%] lg:object-[center_42%]',
+          shouldContainOnMobile && 'object-contain object-center md:object-cover md:object-[center_40%] lg:object-[center_42%]'
+        )}
         sizes="100vw"
         priority={priority}
         onError={() => setErrored(true)}
+        onLoadingComplete={(img) => {
+          const ratio = img.naturalWidth / Math.max(1, img.naturalHeight);
+          // Narrow images crop too aggressively in hero; keep full image on mobile.
+          setShouldContainOnMobile(ratio < 1.55);
+        }}
         quality={85}
       />
     </div>
@@ -43,9 +64,8 @@ function SlideImage({
 function SlideOverlay() {
   return (
     <>
-      <div className="absolute inset-0 bg-[#0B0B0C]/65" />
-      <div className="absolute inset-0 bg-gradient-to-r from-[#0B0B0C]/85 via-[#0B0B0C]/55 to-[#0B0B0C]/25" />
-      <div className="absolute inset-x-0 bottom-0 h-40 bg-gradient-to-t from-[#111113]/30 to-transparent" />
+      <div className="absolute inset-0 bg-gradient-to-r from-[#0B0B0C]/70 via-[#0B0B0C]/35 to-[#0B0B0C]/10" />
+      <div className="absolute inset-x-0 bottom-0 h-48 bg-gradient-to-t from-[#0B0B0C]/45 to-transparent" />
     </>
   );
 }
@@ -66,7 +86,7 @@ function SlideContent({
   const ctaUrl = slide.ctaUrl ?? '/explorer';
 
   return (
-    <div className="relative flex min-h-[600px] w-full flex-col justify-center overflow-hidden bg-[#0B0B0C] md:min-h-[720px] lg:min-h-[820px]">
+    <div className="relative flex min-h-[440px] w-full flex-col justify-center overflow-hidden bg-[#0B0B0C] md:min-h-[560px] lg:min-h-[700px] xl:min-h-[740px]">
       {img ? (
         <SlideImage src={img} alt={title || 'Banner'} priority={isActive} />
       ) : (
@@ -120,7 +140,7 @@ function SlideContent({
 
 function FallbackHero() {
   return (
-    <div className="relative flex min-h-[600px] w-full flex-col justify-center overflow-hidden bg-[#0B0B0C] md:min-h-[720px] lg:min-h-[820px]">
+    <div className="relative flex min-h-[440px] w-full flex-col justify-center overflow-hidden bg-[#0B0B0C] md:min-h-[560px] lg:min-h-[700px] xl:min-h-[740px]">
       <SlideImage src={FALLBACK_IMAGE} alt="" priority />
       <SlideOverlay />
       <div className="absolute -top-40 -left-40 h-[500px] w-[500px] rounded-full bg-amber-500/[0.03] blur-[140px]" />

@@ -1,6 +1,8 @@
 import { apiGetRaw, apiPostRaw, api } from './client';
 import type { Venue, TablePlacement } from './types';
 
+const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'https://mareservtaion-backend.vercel.app';
+
 export interface VenuesQuery {
   type?: string;
   city?: string;
@@ -73,6 +75,10 @@ export async function fetchVenueTablePlacements(
   } catch {
     return [];
   }
+}
+
+export function getVenueAvailabilityStreamUrl(idOrSlug: string): string {
+  return `${API_BASE}/api/v1/venues/${encodeURIComponent(idOrSlug)}/availability-stream`;
 }
 
 /** Venue with optional startAt/endAt for table/room/seat availability status (available | reserved). */

@@ -26,12 +26,12 @@ export function EventCard({ event, className }: EventCardProps) {
 
   return (
     <Link href={href} className={cn('group block', className)}>
-      <BaseCard className="flex h-full flex-col overflow-hidden bg-white border-gray-200 shadow-md hover:border-[#D4AF37]/40 hover:shadow-lg">
-        <div className="relative aspect-[4/3] w-full overflow-hidden bg-gray-100">
+      <BaseCard className="flex h-full flex-col overflow-hidden bg-zinc-900/60 border-zinc-800 shadow-md hover:border-amber-400/30 hover:shadow-lg">
+        <div className="relative aspect-[4/3] w-full overflow-hidden bg-zinc-800">
           {event.imageUrl ? (
             <Image src={event.imageUrl} alt={event.title} fill className="object-cover transition-transform duration-500 group-hover:scale-105" sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 320px" />
           ) : (
-            <div className="flex h-full items-center justify-center bg-gray-100 text-gray-400">
+            <div className="flex h-full items-center justify-center bg-zinc-800 text-zinc-600">
               <Music className="size-12 opacity-40" />
             </div>
           )}
@@ -46,10 +46,10 @@ export function EventCard({ event, className }: EventCardProps) {
         </div>
 
         <CardHeader className="flex-1 space-y-1.5 pb-2">
-          <h3 className="line-clamp-1 text-base font-semibold text-[#111111] leading-tight tracking-tight">
+          <h3 className="line-clamp-1 text-base font-semibold text-zinc-100 leading-tight tracking-tight">
             {event.title}
           </h3>
-          <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-sm text-gray-600">
+          <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-sm text-zinc-400">
             <span className="flex items-center gap-1.5">
               <Calendar className="size-3.5" />
               {start.toLocaleDateString('fr-FR', { day: 'numeric', month: 'short', year: 'numeric' })}
@@ -64,7 +64,7 @@ export function EventCard({ event, className }: EventCardProps) {
         </CardHeader>
 
         <CardFooter className="pt-0">
-          <span className="inline-flex items-center gap-1.5 text-sm font-medium text-[#D4AF37] transition-colors group-hover:text-[#B8962E]">
+          <span className="inline-flex items-center gap-1.5 text-sm font-medium text-amber-400 transition-colors group-hover:text-amber-300">
             Voir l&apos;événement
             <ArrowRight className="size-3.5 transition-transform group-hover:translate-x-0.5" />
           </span>

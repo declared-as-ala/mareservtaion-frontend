@@ -92,14 +92,14 @@ function SidebarContent({
   return (
     <div className="flex h-full flex-col">
       {/* Brand */}
-      <div className="flex items-center gap-3 px-4 py-4 border-b border-gray-200">
+      <div className="flex items-center gap-3 px-4 py-4 border-b border-zinc-800/60">
         <div className="flex-1 min-w-0">
           <Image
             src="/logo.png"
             alt="Ma Table"
             width={400}
             height={110}
-            className="h-14 w-auto object-contain"
+            className="h-16 w-auto object-contain"
             priority
           />
         </div>
@@ -113,7 +113,7 @@ function SidebarContent({
       <nav className="flex-1 overflow-y-auto px-2.5 py-4 space-y-5">
         {navGroups.map((group) => (
           <div key={group.label}>
-            <p className="px-3 mb-1.5 text-[10px] font-semibold uppercase tracking-widest text-gray-400">
+            <p className="px-3 mb-1.5 text-[10px] font-semibold uppercase tracking-widest text-zinc-500">
               {group.label}
             </p>
             <div className="space-y-0.5">
@@ -130,13 +130,13 @@ function SidebarContent({
                     className={cn(
                       'flex items-center gap-3 rounded-lg px-3 py-2 text-[13px] font-medium transition-all duration-150 group',
                       isActive
-                        ? 'bg-[#D4AF37]/10 text-[#B8962E]'
-                        : 'text-gray-600 hover:text-[#111111] hover:bg-gray-50'
+                        ? 'bg-amber-400/10 text-amber-400'
+                        : 'text-zinc-400 hover:text-zinc-100 hover:bg-zinc-800'
                     )}
                   >
                     <Icon className={cn(
                       'size-4 shrink-0 transition-colors duration-150',
-                      isActive ? 'text-[#D4AF37]' : 'text-gray-400 group-hover:text-gray-600'
+                      isActive ? 'text-amber-400' : 'text-zinc-500 group-hover:text-zinc-300'
                     )} />
                     <span className="truncate">{item.label}</span>
                     {isActive && (
@@ -151,29 +151,29 @@ function SidebarContent({
       </nav>
 
       {/* Bottom user panel */}
-      <div className="border-t border-gray-200 p-3 space-y-1">
+      <div className="border-t border-zinc-800 p-3 space-y-1">
         <Link
           href="/"
           target="_blank"
           onClick={onNavigate}
-          className="flex items-center gap-2 px-3 py-2 rounded-lg text-xs text-gray-500 hover:text-[#D4AF37] hover:bg-[#D4AF37]/5 transition-all duration-150"
+          className="flex items-center gap-2 px-3 py-2 rounded-lg text-xs text-zinc-500 hover:text-amber-400 hover:bg-amber-400/5 transition-all duration-150"
         >
           <ExternalLink className="size-3.5" />
           Voir le site
         </Link>
         {user && (
-          <div className="flex items-center gap-3 px-3 py-2.5 rounded-lg bg-gray-50 border border-gray-200">
-            <div className="size-8 rounded-full bg-gradient-to-br from-[#D4AF37] to-[#B8962E] flex items-center justify-center text-[11px] font-bold text-white shrink-0">
+          <div className="flex items-center gap-3 px-3 py-2.5 rounded-lg bg-zinc-900 border border-zinc-700/60">
+            <div className="size-8 rounded-full bg-gradient-to-br from-amber-400 to-amber-600 flex items-center justify-center text-[11px] font-bold text-black shrink-0">
               {(user.fullName ?? user.email ?? 'A').charAt(0).toUpperCase()}
             </div>
             <div className="flex-1 min-w-0">
-              <p className="text-xs font-medium text-[#111111] truncate">{user.fullName ?? user.email}</p>
-              <p className="text-[10px] text-gray-500">Administrateur</p>
+              <p className="text-xs font-medium text-zinc-100 truncate">{user.fullName ?? user.email}</p>
+              <p className="text-[10px] text-zinc-500">Administrateur</p>
             </div>
             <button
               type="button"
               onClick={() => logout()}
-              className="text-gray-400 hover:text-red-500 transition-colors p-1 rounded"
+              className="text-zinc-500 hover:text-red-400 transition-colors p-1 rounded"
               title="Déconnexion"
               aria-label="Déconnexion"
             >
@@ -208,10 +208,10 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
   // Show loading while AuthProvider is validating.
   if (isLoading) {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-white">
+      <div className="flex min-h-screen items-center justify-center bg-zinc-950">
         <div className="flex flex-col items-center gap-3">
           <Image src="/logo.png" alt="Ma Table" width={400} height={110} className="h-16 w-auto object-contain" />
-          <p className="text-sm text-gray-500">Vérification des droits...</p>
+          <p className="text-sm text-zinc-500">Vérification des droits...</p>
         </div>
       </div>
     );
@@ -227,9 +227,9 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
   const pageTitle = currentItem?.label ?? 'Administration';
 
   return (
-    <div className="flex h-screen overflow-hidden bg-gray-50">
+    <div className="flex h-screen overflow-hidden bg-zinc-950">
       {/* Desktop sidebar */}
-      <aside className="hidden lg:flex w-[220px] shrink-0 flex-col bg-white border-r border-gray-200">
+      <aside className="hidden lg:flex w-[220px] shrink-0 flex-col bg-zinc-950 border-r border-zinc-800">
         <SidebarContent pathname={pathname} />
       </aside>
 
@@ -240,7 +240,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
             className="fixed inset-0 z-40 bg-black/40 backdrop-blur-sm lg:hidden"
             onClick={() => setMobileOpen(false)}
           />
-          <aside className="fixed inset-y-0 left-0 z-50 w-[220px] flex flex-col bg-white border-r border-gray-200 lg:hidden">
+          <aside className="fixed inset-y-0 left-0 z-50 w-[220px] flex flex-col bg-zinc-950 border-r border-zinc-800 lg:hidden">
             <SidebarContent pathname={pathname} onNavigate={() => setMobileOpen(false)} />
           </aside>
         </>
@@ -249,59 +249,59 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
       {/* Main content area */}
       <div className="flex flex-col flex-1 overflow-hidden">
         {/* Top bar */}
-        <header className="h-14 shrink-0 flex items-center justify-between px-4 sm:px-6 bg-white/80 backdrop-blur-xl border-b border-gray-200">
+        <header className="h-14 shrink-0 flex items-center justify-between px-4 sm:px-6 bg-zinc-950/90 backdrop-blur-xl border-b border-zinc-800">
           <div className="flex items-center gap-4">
             <button
               type="button"
               onClick={() => setMobileOpen((o) => !o)}
-              className="lg:hidden size-8 flex items-center justify-center rounded-lg text-gray-500 hover:text-[#111111] hover:bg-gray-100 transition-all duration-150"
+              className="lg:hidden size-8 flex items-center justify-center rounded-lg text-zinc-400 hover:text-zinc-100 hover:bg-zinc-800 transition-all duration-150"
               aria-label="Ouvrir le menu"
             >
               {mobileOpen ? <X className="size-4" /> : <Menu className="size-4" />}
             </button>
             {/* Breadcrumb */}
             <nav className="flex items-center gap-2 text-sm" aria-label="Breadcrumb">
-              <span className="text-gray-400 hidden sm:inline text-xs font-medium tracking-wide">Admin</span>
-              <ChevronRight className="size-3.5 text-gray-300 hidden sm:inline" />
-              <span className="font-semibold text-[#111111] text-sm">{pageTitle}</span>
+              <span className="text-zinc-500 hidden sm:inline text-xs font-medium tracking-wide">Admin</span>
+              <ChevronRight className="size-3.5 text-zinc-700 hidden sm:inline" />
+              <span className="font-semibold text-zinc-100 text-sm">{pageTitle}</span>
             </nav>
           </div>
 
           <div className="flex items-center gap-2">
             <button
               type="button"
-              className="relative size-8 flex items-center justify-center rounded-lg text-gray-500 hover:text-[#111111] hover:bg-gray-100 transition-all duration-150"
+              className="relative size-8 flex items-center justify-center rounded-lg text-zinc-400 hover:text-zinc-100 hover:bg-zinc-800 transition-all duration-150"
               aria-label="Notifications"
             >
               <Bell className="size-4" />
               <span className="absolute top-1.5 right-1.5 size-1.5 bg-[#D4AF37] rounded-full" />
             </button>
-            <div className="hidden sm:block h-5 w-px bg-gray-200" />
+            <div className="hidden sm:block h-5 w-px bg-zinc-800" />
             <Link
               href="/"
               target="_blank"
-              className="hidden sm:flex items-center gap-1.5 text-xs text-gray-500 hover:text-[#D4AF37] transition-colors px-2.5 py-1.5 rounded-lg hover:bg-[#D4AF37]/5"
+              className="hidden sm:flex items-center gap-1.5 text-xs text-zinc-400 hover:text-amber-400 transition-colors px-2.5 py-1.5 rounded-lg hover:bg-amber-400/5"
             >
               <ExternalLink className="size-3.5" />
               Voir le site
             </Link>
-            <div className="hidden sm:block h-5 w-px bg-gray-200" />
+            <div className="hidden sm:block h-5 w-px bg-zinc-800" />
             <div className="flex items-center gap-2.5">
-              <div className="size-7 rounded-full bg-gradient-to-br from-[#D4AF37] to-[#B8962E] flex items-center justify-center text-[10px] font-bold text-white">
+              <div className="size-7 rounded-full bg-gradient-to-br from-amber-400 to-amber-600 flex items-center justify-center text-[10px] font-bold text-black">
                 {(user.fullName ?? user.email ?? 'A').charAt(0).toUpperCase()}
               </div>
               <div className="hidden md:block">
-                <span className="text-xs font-medium text-[#111111] block truncate max-w-[120px]">
+                <span className="text-xs font-medium text-zinc-100 block truncate max-w-[120px]">
                   {user.fullName ?? user.email}
                 </span>
-                <span className="text-[10px] text-gray-500">Administrateur</span>
+                <span className="text-[10px] text-zinc-500">Administrateur</span>
               </div>
             </div>
           </div>
         </header>
 
         {/* Page content */}
-        <main className="flex-1 overflow-auto bg-gray-50 p-4 sm:p-6 lg:p-8">
+        <main className="flex-1 overflow-auto bg-zinc-950 p-4 sm:p-6 lg:p-8">
           {children}
         </main>
       </div>

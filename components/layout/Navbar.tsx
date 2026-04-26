@@ -5,8 +5,8 @@ import Image from 'next/image';
 import { usePathname } from 'next/navigation';
 import { Menu, Search, ShoppingBag, Sparkles } from 'lucide-react';
 import { useState } from 'react';
-import { useAuthStore } from '@/stores/auth';
 import { useCartStore } from '@/stores/cart';
+import { useAuth } from '@/components/auth/AuthProvider';
 import { GlobalSearchBar } from './GlobalSearchBar';
 import { ThemeToggle } from './ThemeToggle';
 import { UserMenuDropdown } from './UserMenuDropdown';
@@ -17,12 +17,14 @@ import { cn } from '@/lib/utils';
 
 const categories = [
   { name: 'Explorer les lieux', href: '/explorer' },
+  { name: 'Carte', href: '/carte' },
   { name: 'Événements', href: '/evenements' },
 ];
 
 export function Navbar() {
-  const { user } = useAuthStore();
+  const { user, isLoading: authLoading, isAuthenticated } = useAuth();
   const isAdmin = user?.role === 'ADMIN';
+  const isOwner = user?.role === 'VENUE_OWNER' || user?.role === 'ORGANIZER';
   const totalQuantity = useCartStore((s) => s.totalQuantity());
   const pathname = usePathname();
   const cartOpen = useCartStore((s) => s.drawerOpen);
@@ -32,16 +34,16 @@ export function Navbar() {
   const [searchOpen, setSearchOpen] = useState(false);
 
   return (
-    <header className="sticky top-0 z-50 w-full border-b border-gray-200 bg-white/95 backdrop-blur supports-[backdrop-filter]:bg-white/60">
-      <div className="container flex h-16 sm:h-[72px] items-center justify-between gap-2 sm:gap-4 px-3 sm:px-4">
+    <header className="sticky top-0 z-50 w-full border-b border-zinc-800/60 bg-zinc-950/95 backdrop-blur supports-[backdrop-filter]:bg-zinc-950/90">
+      <div className="container flex h-[80px] sm:h-[90px] items-center justify-between gap-2 sm:gap-4 px-3 sm:px-4">
         {/* Logo */}
-        <Link href="/" className="flex items-center shrink-0">
+        <Link href="/" className="flex items-center shrink-0 rounded-xl bg-white/[0.06] px-2.5 py-1.5 ring-1 ring-white/[0.12]">
           <Image
             src="/logo.png"
             alt="Ma Table"
-            width={400}
-            height={110}
-            style={{ height: '80px', width: 'auto', objectFit: 'contain' }}
+            width={520}
+            height={150}
+            className="h-[42px] w-auto object-contain sm:h-[50px] lg:h-[56px] drop-shadow-[0_6px_20px_rgba(212,175,55,0.32)]"
             priority
           />
         </Link>
@@ -53,8 +55,8 @@ export function Navbar() {
               key={cat.href}
               href={cat.href}
               className={cn(
-                'px-3 lg:px-4 py-2 text-sm font-medium transition-colors hover:text-[#D4AF37] whitespace-nowrap',
-                pathname === cat.href ? 'text-[#D4AF37]' : 'text-gray-600'
+                'px-3 lg:px-4 py-2 text-sm font-medium transition-colors hover:text-amber-400 whitespace-nowrap',
+                pathname === cat.href ? 'text-amber-400' : 'text-zinc-400'
               )}
             >
               {cat.name}
@@ -109,8 +111,13 @@ export function Navbar() {
           <ThemeToggle />
 
           {/* Auth — desktop (xl+) */}
-          <div className="hidden xl:flex items-center gap-2 ml-1 pl-2 border-l border-gray-200">
-            {user ? (
+          <div className="hidden xl:flex items-center gap-2 ml-1 pl-2 border-l border-zinc-800">
+            {authLoading ? (
+              <>
+                <div className="h-9 w-24 animate-pulse rounded-md bg-zinc-800/70" />
+                <div className="h-9 w-28 animate-pulse rounded-md bg-zinc-800/70" />
+              </>
+            ) : isAuthenticated && user ? (
               <UserMenuDropdown />
             ) : (
               <>
@@ -131,16 +138,16 @@ export function Navbar() {
                 <Menu className="size-4 sm:size-5" />
               </Button>
             </SheetTrigger>
-            <SheetContent side="right" className="w-[300px] sm:w-[400px] p-0 flex flex-col">
-              <SheetHeader className="px-5 pt-5 pb-4 border-b border-gray-200">
+            <SheetContent side="right" className="w-[300px] sm:w-[400px] p-0 flex flex-col bg-zinc-950 border-zinc-800">
+              <SheetHeader className="px-5 pt-5 pb-4 border-b border-zinc-800">
                 <SheetTitle className="sr-only">Menu de navigation</SheetTitle>
-                <Link href="/" onClick={() => setMobileOpen(false)} className="inline-block">
+                <Link href="/" onClick={() => setMobileOpen(false)} className="inline-block rounded-xl bg-white/[0.04] px-2 py-1 ring-1 ring-white/[0.08]">
                   <Image
                     src="/logo.png"
                     alt="Ma Table"
-                    width={280}
-                    height={70}
-                    className="h-20 w-auto object-contain drop-shadow-[0_4px_12px_rgba(0,0,0,0.3)]"
+                    width={420}
+                    height={120}
+                    className="h-[42px] w-auto object-contain sm:h-[46px] drop-shadow-[0_6px_18px_rgba(212,175,55,0.3)]"
                   />
                 </Link>
               </SheetHeader>
@@ -160,8 +167,8 @@ export function Navbar() {
                         className={cn(
                           'rounded-lg px-3 py-2.5 text-sm font-medium transition-colors',
                           pathname === cat.href
-                            ? 'bg-[#D4AF37]/10 text-[#B8962E]'
-                            : 'text-gray-600 hover:bg-gray-50 hover:text-[#111111]'
+                            ? 'bg-amber-400/10 text-amber-400'
+                            : 'text-zinc-400 hover:bg-zinc-800 hover:text-zinc-100'
                         )}
                       >
                         {cat.name}
@@ -188,21 +195,46 @@ export function Navbar() {
               </div>
 
               {/* Auth — bottom of sheet */}
-              <div className="border-t border-gray-200 px-5 py-4">
-                {user ? (
+              <div className="border-t border-zinc-800 px-5 py-4">
+                {authLoading ? (
+                  <div className="space-y-2">
+                    <div className="h-10 w-full animate-pulse rounded-lg bg-zinc-800/70" />
+                    <div className="h-10 w-full animate-pulse rounded-lg bg-zinc-800/70" />
+                  </div>
+                ) : isAuthenticated && user ? (
                   <div className="flex flex-col gap-2">
+                    {isAdmin ? (
+                      <SheetClose asChild>
+                        <Link
+                          href="/admin/dashboard"
+                          className="rounded-lg px-3 py-2.5 text-sm font-medium text-zinc-300 hover:bg-zinc-800 hover:text-zinc-100 transition-colors"
+                        >
+                          Tableau de bord
+                        </Link>
+                      </SheetClose>
+                    ) : isOwner ? (
+                      <SheetClose asChild>
+                        <Link
+                          href="/owner"
+                          className="rounded-lg px-3 py-2.5 text-sm font-medium text-zinc-300 hover:bg-zinc-800 hover:text-zinc-100 transition-colors"
+                        >
+                          Espace proprietaire
+                        </Link>
+                      </SheetClose>
+                    ) : (
+                      <SheetClose asChild>
+                        <Link
+                          href="/mes-reservations"
+                          className="rounded-lg px-3 py-2.5 text-sm font-medium text-zinc-300 hover:bg-zinc-800 hover:text-zinc-100 transition-colors"
+                        >
+                          Mes réservations
+                        </Link>
+                      </SheetClose>
+                    )}
                     <SheetClose asChild>
                       <Link
-                        href={isAdmin ? '/admin' : '/dashboard'}
-                        className="rounded-lg px-3 py-2.5 text-sm font-medium hover:bg-gray-50 transition-colors"
-                      >
-                        Tableau de bord
-                      </Link>
-                    </SheetClose>
-                    <SheetClose asChild>
-                      <Link
-                        href={isAdmin ? '/admin/settings' : '/dashboard/profile'}
-                        className="rounded-lg px-3 py-2.5 text-sm font-medium hover:bg-gray-50 transition-colors"
+                        href={isAdmin ? '/admin/settings' : '/profile'}
+                        className="rounded-lg px-3 py-2.5 text-sm font-medium text-zinc-300 hover:bg-zinc-800 hover:text-zinc-100 transition-colors"
                       >
                         Mon profil
                       </Link>
@@ -213,7 +245,7 @@ export function Navbar() {
                     <SheetClose asChild>
                       <Link
                         href="/login"
-                        className="block text-center rounded-lg px-3 py-2.5 text-sm font-medium hover:bg-gray-50 transition-colors border border-gray-200"
+                        className="block text-center rounded-lg px-3 py-2.5 text-sm font-medium text-zinc-300 hover:bg-zinc-800 hover:text-zinc-100 transition-colors border border-zinc-700"
                       >
                         Connexion
                       </Link>
@@ -221,7 +253,7 @@ export function Navbar() {
                     <SheetClose asChild>
                       <Link
                         href="/register"
-                        className="block text-center rounded-lg px-3 py-2.5 text-sm font-medium bg-[#D4AF37] text-white hover:bg-[#B8962E]"
+                        className="block text-center rounded-lg px-3 py-2.5 text-sm font-medium bg-amber-400 text-zinc-950 hover:bg-amber-300"
                       >
                         Inscription
                       </Link>
@@ -236,7 +268,7 @@ export function Navbar() {
 
       {/* Expandable search bar below header */}
       {searchOpen && (
-        <div className="border-t border-gray-200 px-3 sm:px-4 py-3">
+        <div className="border-t border-zinc-800 px-3 sm:px-4 py-3">
           <GlobalSearchBar />
         </div>
       )}

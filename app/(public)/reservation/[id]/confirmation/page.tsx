@@ -49,7 +49,7 @@ export default function ReservationConfirmationPage() {
       <div className="container px-4 py-12 text-center">
         <p className="text-zinc-400">Réservation introuvable.</p>
         <Button variant="outline" className="mt-4" asChild>
-          <Link href="/dashboard">Mon tableau de bord</Link>
+          <Link href="/mes-reservations">Mes réservations</Link>
         </Button>
       </div>
     );
@@ -64,7 +64,7 @@ export default function ReservationConfirmationPage() {
       <div className="container px-4 py-12">
         <ErrorState title="Réservation introuvable" onRetry={() => refetch()} />
         <Button variant="outline" className="mt-4" asChild>
-          <Link href="/dashboard">Mon tableau de bord</Link>
+          <Link href="/mes-reservations">Mes réservations</Link>
         </Button>
       </div>
     );
@@ -159,7 +159,7 @@ export default function ReservationConfirmationPage() {
         {/* Actions */}
         <div className="flex flex-col sm:flex-row gap-3">
           <Button asChild className="flex-1 rounded-full bg-amber-400 hover:bg-amber-300 text-zinc-950 font-bold">
-            <Link href="/dashboard/reservations">Voir mes réservations</Link>
+            <Link href="/mes-reservations">Voir mes réservations</Link>
           </Button>
           <Button asChild variant="outline" className="flex-1 rounded-full border-zinc-700 text-zinc-300 hover:bg-zinc-800">
             <Link href="/explorer">Explorer les lieux</Link>

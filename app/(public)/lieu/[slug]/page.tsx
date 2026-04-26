@@ -1,12 +1,13 @@
 'use client';
 
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useParams } from 'next/navigation';
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import Link from 'next/link';
 import dynamic from 'next/dynamic';
 import {
   fetchVenueByIdOrSlug,
+  getVenueAvailabilityStreamUrl,
   fetchVenueTablePlacements,
   type PublicTablePlacement,
 } from '@/lib/api/venues';
@@ -70,6 +71,7 @@ function getAllImages(venue: Venue): string[] {
 }
 
 export default function VenueDetailPage() {
+  const queryClient = useQueryClient();
   const params = useParams();
   const slug = params.slug as string;
   const addItem = useCartStore((s) => s.addItem);
@@ -121,6 +123,16 @@ export default function VenueDetailPage() {
     scenes.length > 0 && effectiveSceneId
       ? allPlacements.filter((p) => !p.sceneId || p.sceneId === effectiveSceneId)
       : allPlacements;
+
+  useEffect(() => {
+    if (!venue?._id) return;
+    const source = new EventSource(getVenueAvailabilityStreamUrl(venue._id));
+    source.onmessage = () => {
+      queryClient.invalidateQueries({ queryKey: ['venue-placements', venue._id] });
+    };
+    source.onerror = () => source.close();
+    return () => source.close();
+  }, [venue?._id, queryClient]);
 
   if (!slug) {
     return (

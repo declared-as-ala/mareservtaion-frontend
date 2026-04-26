@@ -1,30 +1,8 @@
 import type { Metadata } from "next";
-import { Inter, Fira_Code, Playfair_Display } from "next/font/google";
+import type { CSSProperties } from "react";
 import { Toaster } from "sonner";
 import "./globals.css";
 import { Providers } from "./providers";
-
-const inter = Inter({
-  variable: "--font-inter",
-  subsets: ["latin"],
-  weight: ["300", "400", "500", "600", "700"],
-  display: "swap",
-});
-
-const firaCode = Fira_Code({
-  variable: "--font-fira-code",
-  subsets: ["latin"],
-  weight: ["400", "500", "600"],
-  display: "swap",
-});
-
-const playfair = Playfair_Display({
-  variable: "--font-playfair",
-  subsets: ["latin"],
-  weight: ["400", "500", "600", "700"],
-  style: ["normal", "italic"],
-  display: "swap",
-});
 
 export const metadata: Metadata = {
   title: "Ma Reservation – Réservez en quelques clics",
@@ -40,9 +18,15 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const fontVars = {
+    "--font-inter": "Inter, ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif",
+    "--font-fira-code": "Fira Code, ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, Liberation Mono, monospace",
+    "--font-playfair": "Playfair Display, Georgia, Cambria, Times New Roman, Times, serif",
+  } as CSSProperties;
+
   return (
-    <html lang="fr" suppressHydrationWarning>
-      <body className={`${inter.variable} ${firaCode.variable} ${playfair.variable} antialiased`}>
+    <html lang="fr" className="dark" suppressHydrationWarning>
+      <body className="antialiased" style={fontVars}>
         <Providers>{children}</Providers>
         <Toaster position="top-center" richColors />
       </body>

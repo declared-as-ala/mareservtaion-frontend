@@ -20,8 +20,12 @@ interface VenueCardProps {
 }
 
 export function VenueCard({ venue, className }: VenueCardProps) {
+  if (!venue?._id) return null;
+
   const href = `/lieu/${venue.slug || venue._id}`;
   const img = getVenueImage(venue);
+  const venueName = venue.name || 'Lieu';
+  const venueCity = venue.city || 'Tunisie';
 
   return (
     <Link href={href} className={cn('group block', className)}>
@@ -32,7 +36,7 @@ export function VenueCard({ venue, className }: VenueCardProps) {
           {img ? (
             <Image
               src={img}
-              alt={venue.name}
+              alt={venueName}
               fill
               className="object-cover transition-transform duration-500 group-hover:scale-105"
               sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 320px"
@@ -86,13 +90,13 @@ export function VenueCard({ venue, className }: VenueCardProps) {
         <div className="flex flex-col flex-1 p-4 gap-2">
           <div className="flex items-start justify-between gap-2">
             <h3 className="line-clamp-1 text-sm font-semibold text-neutral-100 leading-tight">
-              {venue.name}
+              {venueName}
             </h3>
           </div>
 
           <div className="flex items-center gap-1.5 text-xs text-neutral-500">
             <MapPin className="size-3 shrink-0" />
-            <span className="line-clamp-1">{venue.city}</span>
+            <span className="line-clamp-1">{venueCity}</span>
           </div>
         </div>
 

@@ -12,8 +12,9 @@
  */
 
 import { useAuthStore } from '@/stores/auth';
+import { isProtectedPath } from '@/lib/auth/redirect';
 
-const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
+const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'https://mareservtaion-backend.vercel.app';
 
 export type ApiResponse<T = unknown> = {
   success: boolean;
@@ -76,7 +77,10 @@ async function apiFetchInternal<T = unknown>(
       const store = useAuthStore.getState();
       store.clearAll();
       if (typeof window !== 'undefined') {
-        window.location.href = '/login';
+        const currentPath = window.location.pathname || '/';
+        if (isProtectedPath(currentPath)) {
+          window.location.href = `/login?returnTo=${encodeURIComponent(currentPath)}`;
+        }
       }
       throw new Error('Session expirée. Veuillez vous reconnecter.');
     }
@@ -85,7 +89,10 @@ async function apiFetchInternal<T = unknown>(
     const store = useAuthStore.getState();
     store.clearAll();
     if (typeof window !== 'undefined') {
-      window.location.href = '/login';
+      const currentPath = window.location.pathname || '/';
+      if (isProtectedPath(currentPath)) {
+        window.location.href = `/login?returnTo=${encodeURIComponent(currentPath)}`;
+      }
     }
     throw new Error('Session expirée. Veuillez vous reconnecter.');
   }

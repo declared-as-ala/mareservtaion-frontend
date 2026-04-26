@@ -181,7 +181,7 @@ export default function EmbedEngine({
         </div>
       )}
       <div className="absolute bottom-2 left-2 right-2 z-20 pointer-events-none">
-        <div className="bg-white/90 backdrop-blur-sm text-gray-600 text-[11px] leading-tight px-3 py-2 rounded-lg border border-gray-200 shadow-md">
+        <div className="bg-zinc-950/90 backdrop-blur-sm text-zinc-400 text-[11px] leading-tight px-3 py-2 rounded-lg border border-zinc-800 shadow-md">
           <strong>Note :</strong> Les marqueurs sur une visite virtuelle embarquee (iframe) sont positionnes de maniere approximative.
           Pour un ancrage precis, utilisez une image 360° uploadee ou un modele Matterport avec SDK.
         </div>

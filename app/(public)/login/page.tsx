@@ -4,17 +4,21 @@ import { Suspense, useState, useEffect } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { login } from '@/lib/api/auth';
+import { resendVerificationPublic } from '@/lib/api/auth';
 import { useAuthStore } from '@/stores/auth';
+import { useAuth } from '@/components/auth/AuthProvider';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Eye, EyeOff, Mail, Lock, Sparkles, Loader2 } from 'lucide-react';
+import { resolvePostLoginRedirect } from '@/lib/auth/redirect';
 
 function LoginForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const returnTo = searchParams.get('returnTo') ?? '/dashboard';
+  const returnTo = searchParams.get('returnTo');
+  const { isLoading: authLoading, isAuthenticated, role } = useAuth();
   const { setAuth } = useAuthStore();
 
   const [email, setEmail] = useState('');
@@ -23,35 +27,87 @@ function LoginForm() {
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [mounted, setMounted] = useState(false);
+  const [showResend, setShowResend] = useState(false);
+  const [resendLoading, setResendLoading] = useState(false);
+  const [resendMessage, setResendMessage] = useState<string | null>(null);
 
   useEffect(() => {
     setMounted(true);
   }, []);
 
+  useEffect(() => {
+    if (authLoading || !isAuthenticated) return;
+    router.replace(resolvePostLoginRedirect(role, returnTo));
+  }, [authLoading, isAuthenticated, role, returnTo, router]);
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError(null);
+    setShowResend(false);
+    setResendMessage(null);
     setLoading(true);
     try {
       const response = await login({ email, password });
       const { user } = response as { user: typeof response.user };
 
       // Set Zustand state — backend already set httpOnly cookies.
-      setAuth({ id: user._id, fullName: user.fullName, email: user.email, role: user.role });
+      setAuth({
+        id: user._id,
+        fullName: user.fullName,
+        email: user.email,
+        role: user.role,
+        emailVerified: user.emailVerified,
+      });
 
       if (user.role === 'ADMIN') {
-        router.push('/admin');
+        router.replace(resolvePostLoginRedirect(user.role, returnTo));
       } else {
-        router.push(returnTo);
+        router.replace(resolvePostLoginRedirect(user.role, returnTo));
       }
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Connexion échouée');
+      const msg = err instanceof Error ? err.message : 'Connexion échouée';
+      setError(msg);
+      if (msg.toLowerCase().includes('verify') || msg.toLowerCase().includes('verif')) {
+        setShowResend(true);
+      }
     } finally {
       setLoading(false);
     }
   };
 
+  const handleResendVerification = async () => {
+    if (!email.trim()) {
+      setResendMessage("Saisissez d'abord votre email.");
+      return;
+    }
+    setResendLoading(true);
+    setResendMessage(null);
+    try {
+      await resendVerificationPublic(email.trim().toLowerCase());
+      setResendMessage('Email de vérification renvoyé. Vérifiez votre boîte mail.');
+    } catch (err) {
+      setResendMessage(err instanceof Error ? err.message : "Impossible d'envoyer l'email.");
+    } finally {
+      setResendLoading(false);
+    }
+  };
+
   return (
+    authLoading ? (
+      <div className="relative flex min-h-screen items-center justify-center overflow-hidden bg-black">
+        <div className="absolute inset-0 bg-gradient-to-br from-black via-neutral-950 to-black" />
+        <div className="absolute -top-40 -left-40 h-96 w-96 rounded-full bg-amber-500/10 blur-[120px]" />
+        <div className="absolute -bottom-40 -right-40 h-96 w-96 rounded-full bg-amber-600/8 blur-[120px]" />
+        <div className="relative z-10 flex flex-col items-center gap-3">
+          <Loader2 className="size-7 animate-spin text-amber-400" />
+          <p className="text-sm text-zinc-400">Vérification de la session...</p>
+        </div>
+      </div>
+    ) : isAuthenticated ? (
+      <div className="relative flex min-h-screen items-center justify-center overflow-hidden bg-black">
+        <div className="absolute inset-0 bg-gradient-to-br from-black via-neutral-950 to-black" />
+      </div>
+    ) : (
     <div className="relative flex min-h-screen items-center justify-center overflow-hidden">
       {/* Premium Background Effects */}
       <div className="absolute inset-0 bg-gradient-to-br from-black via-neutral-950 to-black" />
@@ -105,6 +161,20 @@ function LoginForm() {
               {error && (
                 <div className="rounded-lg border border-red-500/20 bg-red-500/5 px-4 py-3 text-sm text-red-400 text-center" role="alert">
                   {error}
+                </div>
+              )}
+              {showResend && (
+                <div className="rounded-lg border border-amber-400/20 bg-amber-400/5 px-4 py-3 text-sm text-amber-300">
+                  <p className="mb-2 text-center">Veuillez vérifier votre email avant de vous connecter.</p>
+                  <button
+                    type="button"
+                    onClick={handleResendVerification}
+                    disabled={resendLoading}
+                    className="w-full rounded-lg border border-amber-400/30 bg-amber-400/10 px-3 py-2 text-xs font-semibold text-amber-300 hover:bg-amber-400/15 disabled:opacity-60"
+                  >
+                    {resendLoading ? 'Envoi...' : 'Renvoyer l’email de vérification'}
+                  </button>
+                  {resendMessage && <p className="mt-2 text-center text-xs text-neutral-300">{resendMessage}</p>}
                 </div>
               )}
 
@@ -205,6 +275,7 @@ function LoginForm() {
         </p>
       </div>
     </div>
+    )
   );
 }
 

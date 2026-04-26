@@ -9,7 +9,8 @@ import {
   Settings, 
   Shield, 
   ChevronRight,
-  Crown
+  Crown,
+  CalendarClock
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import {
@@ -40,6 +41,7 @@ export function UserMenuDropdown() {
   const [showConfirm, setShowConfirm] = useState(false);
   if (!user) return null;
   const isAdmin = user.role === 'ADMIN';
+  const isOwner = user.role === 'VENUE_OWNER' || user.role === 'ORGANIZER';
 
   const initials = user.fullName
     .split(/\s+/)
@@ -63,6 +65,14 @@ export function UserMenuDropdown() {
         <Badge className="bg-amber-500/10 text-amber-400 border-amber-500/20 hover:bg-amber-500/20 text-[10px] px-1.5 py-0 font-medium">
           <Shield className="size-2.5 mr-1" />
           Admin
+        </Badge>
+      );
+    }
+    if (isOwner) {
+      return (
+        <Badge className="bg-blue-500/10 text-blue-300 border-blue-500/20 hover:bg-blue-500/20 text-[10px] px-1.5 py-0 font-medium">
+          <Crown className="size-2.5 mr-1" />
+          Proprietaire
         </Badge>
       );
     }
@@ -117,29 +127,72 @@ export function UserMenuDropdown() {
 
           {/* Navigation Links */}
           <DropdownMenuGroup className="p-2">
-            <DropdownMenuItem asChild className="p-0">
-              <Link
-                href={isAdmin ? '/admin' : '/dashboard'}
-                className="flex items-center gap-3 px-3 py-2.5 rounded-lg cursor-pointer transition-all duration-200 group"
-              >
-                <div className="flex items-center justify-center size-9 rounded-lg bg-zinc-800/80 group-hover:bg-amber-500/10 transition-colors duration-200">
-                  <LayoutDashboard className="size-4 text-zinc-400 group-hover:text-amber-400 transition-colors duration-200" />
-                </div>
-                <div className="flex-1">
-                  <p className="text-sm font-medium text-zinc-200 group-hover:text-white transition-colors duration-200">
-                    Tableau de bord
-                  </p>
-                  <p className="text-[10px] text-zinc-500">
-                    {isAdmin ? 'Administration' : 'Mon espace personnel'}
-                  </p>
-                </div>
-                <ChevronRight className="size-4 text-zinc-600 group-hover:text-amber-400 transition-all duration-200 group-hover:translate-x-0.5" />
-              </Link>
-            </DropdownMenuItem>
+            {isAdmin && (
+              <DropdownMenuItem asChild className="p-0">
+                <Link
+                  href="/admin/dashboard"
+                  className="flex items-center gap-3 px-3 py-2.5 rounded-lg cursor-pointer transition-all duration-200 group"
+                >
+                  <div className="flex items-center justify-center size-9 rounded-lg bg-zinc-800/80 group-hover:bg-amber-500/10 transition-colors duration-200">
+                    <LayoutDashboard className="size-4 text-zinc-400 group-hover:text-amber-400 transition-colors duration-200" />
+                  </div>
+                  <div className="flex-1">
+                    <p className="text-sm font-medium text-zinc-200 group-hover:text-white transition-colors duration-200">
+                      Tableau de bord
+                    </p>
+                    <p className="text-[10px] text-zinc-500">Administration</p>
+                  </div>
+                  <ChevronRight className="size-4 text-zinc-600 group-hover:text-amber-400 transition-all duration-200 group-hover:translate-x-0.5" />
+                </Link>
+              </DropdownMenuItem>
+            )}
+            {!isAdmin && (
+              <DropdownMenuItem asChild className="p-0">
+                <Link
+                  href="/mes-reservations"
+                  className="flex items-center gap-3 px-3 py-2.5 rounded-lg cursor-pointer transition-all duration-200 group"
+                >
+                  <div className="flex items-center justify-center size-9 rounded-lg bg-zinc-800/80 group-hover:bg-amber-500/10 transition-colors duration-200">
+                    <CalendarClock className="size-4 text-zinc-400 group-hover:text-amber-400 transition-colors duration-200" />
+                  </div>
+                  <div className="flex-1">
+                    <p className="text-sm font-medium text-zinc-200 group-hover:text-white transition-colors duration-200">
+                      Mes réservations
+                    </p>
+                    <p className="text-[10px] text-zinc-500">
+                      Historique et prochaines réservations
+                    </p>
+                  </div>
+                  <ChevronRight className="size-4 text-zinc-600 group-hover:text-amber-400 transition-all duration-200 group-hover:translate-x-0.5" />
+                </Link>
+              </DropdownMenuItem>
+            )}
+
+            {isOwner && (
+              <DropdownMenuItem asChild className="p-0">
+                <Link
+                  href="/owner"
+                  className="flex items-center gap-3 px-3 py-2.5 rounded-lg cursor-pointer transition-all duration-200 group"
+                >
+                  <div className="flex items-center justify-center size-9 rounded-lg bg-zinc-800/80 group-hover:bg-blue-500/10 transition-colors duration-200">
+                    <LayoutDashboard className="size-4 text-zinc-400 group-hover:text-blue-300 transition-colors duration-200" />
+                  </div>
+                  <div className="flex-1">
+                    <p className="text-sm font-medium text-zinc-200 group-hover:text-white transition-colors duration-200">
+                      Espace proprietaire
+                    </p>
+                    <p className="text-[10px] text-zinc-500">
+                      Mes lieux et reservations
+                    </p>
+                  </div>
+                  <ChevronRight className="size-4 text-zinc-600 group-hover:text-blue-300 transition-all duration-200 group-hover:translate-x-0.5" />
+                </Link>
+              </DropdownMenuItem>
+            )}
 
             <DropdownMenuItem asChild className="p-0">
               <Link
-                href={isAdmin ? '/admin/settings' : '/dashboard/profile'}
+                href={isAdmin ? '/admin/settings' : '/profile'}
                 className="flex items-center gap-3 px-3 py-2.5 rounded-lg cursor-pointer transition-all duration-200 group"
               >
                 <div className="flex items-center justify-center size-9 rounded-lg bg-zinc-800/80 group-hover:bg-amber-500/10 transition-colors duration-200">

@@ -28,18 +28,18 @@ interface StatCardProps {
 function StatCard({ title, value, icon: Icon, href, description, accent }: StatCardProps) {
   return (
     <Link href={href} className="block group">
-      <div className="relative rounded-xl border border-gray-200 bg-white p-5 transition-all duration-200 hover:border-gray-300 hover:bg-gray-50 shadow-sm">
+      <div className="relative rounded-xl border border-zinc-800 bg-zinc-900/60 p-5 transition-all duration-200 hover:border-zinc-700 hover:bg-zinc-900 shadow-sm">
         <div className="flex items-start justify-between mb-4">
           <div className={`flex items-center justify-center size-9 rounded-lg ${accent}`}>
-            <Icon className="size-4 text-white" />
+            <Icon className="size-4" />
           </div>
-          <ArrowUpRight className="size-4 text-gray-300 group-hover:text-gray-500 transition-colors duration-200" />
+          <ArrowUpRight className="size-4 text-zinc-700 group-hover:text-zinc-400 transition-colors duration-200" />
         </div>
-        <p className="text-2xl font-semibold text-[#111111] tracking-tight tabular-nums">
+        <p className="text-2xl font-semibold text-zinc-100 tracking-tight tabular-nums">
           {value.toLocaleString('fr-FR')}
         </p>
-        <p className="mt-1 text-sm font-medium text-gray-600">{title}</p>
-        <p className="mt-0.5 text-xs text-gray-400">{description}</p>
+        <p className="mt-1 text-sm font-medium text-zinc-400">{title}</p>
+        <p className="mt-0.5 text-xs text-zinc-500">{description}</p>
       </div>
     </Link>
   );
@@ -69,8 +69,8 @@ export default function AdminDashboardPage() {
     <div className="space-y-8 max-w-6xl">
       {/* Header */}
       <div>
-        <h1 className="text-xl font-semibold text-[#111111] tracking-tight">Tableau de bord</h1>
-        <p className="mt-1 text-sm text-gray-500">
+        <h1 className="text-xl font-semibold text-zinc-100 tracking-tight">Tableau de bord</h1>
+        <p className="mt-1 text-sm text-zinc-400">
           Vue d&apos;ensemble de la plateforme Ma Reservation
         </p>
       </div>

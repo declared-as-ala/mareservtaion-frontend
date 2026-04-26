@@ -5,6 +5,10 @@ import { useAuthStore, type User } from '@/stores/auth';
 
 type AuthContextValue = {
   user: User | null;
+  authStatus: 'checking' | 'authenticated' | 'guest';
+  isAuthenticated: boolean;
+  role: string | null;
+  isVerified: boolean;
   /** True while the initial session validation is in progress. */
   isLoading: boolean;
   /** True when the store has finished hydrating from localStorage. */
@@ -13,6 +17,10 @@ type AuthContextValue = {
 
 const AuthContext = createContext<AuthContextValue>({
   user: null,
+  authStatus: 'checking',
+  isAuthenticated: false,
+  role: null,
+  isVerified: false,
   isLoading: true,
   hasHydrated: false,
 });
@@ -32,7 +40,7 @@ export function useAuth(): AuthContextValue {
  * and make routing / UI decisions based on the single source of truth.
  */
 export function AuthProvider({ children }: { children: ReactNode }) {
-  const { user, isResolving, hasHydrated, fetchMe } = useAuthStore();
+  const { user, isResolving, hasHydrated, fetchMe, authStatus, isAuthenticated, role, isVerified } = useAuthStore();
   const bootstrapped = useRef(false);
   const [ready, setReady] = useState(false);
 
@@ -61,7 +69,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const isLoading = !ready || isResolving;
 
   return (
-    <AuthContext.Provider value={{ user, isLoading, hasHydrated }}>
+    <AuthContext.Provider
+      value={{ user, authStatus, isAuthenticated, role, isVerified, isLoading, hasHydrated }}
+    >
       {children}
     </AuthContext.Provider>
   );

@@ -56,6 +56,7 @@ export interface Venue {
   governorate?: string;
   address: string;
   phone?: string;
+  coordinates?: { lat?: number; lng?: number };
   coverImage?: string;
   gallery?: string[];
   startingPrice?: number;

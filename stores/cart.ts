@@ -34,10 +34,22 @@ export interface CartItem {
   orderType?: 'table_only' | 'with_menu';
   menuItems?: CartOrderMenuItem[];
   menuTotal?: number;
+  holdId?: string;
+  holdExpiresAt?: string;
 }
 
 /** Cart items expire after 24 hours (in milliseconds). */
 const CART_EXPIRY_MS = 24 * 60 * 60 * 1000;
+const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'https://mareservtaion-backend.vercel.app';
+
+function releaseHold(holdId?: string) {
+  if (!holdId) return;
+  void fetch(`${API_BASE}/api/v1/reservations/holds/${holdId}`, {
+    method: 'DELETE',
+    credentials: 'include',
+    headers: { 'Content-Type': 'application/json' },
+  }).catch(() => undefined);
+}
 
 type CartState = {
   items: CartItem[];
@@ -68,6 +80,7 @@ export const useCartStore = create<CartState>()(
         const now = Date.now();
         const state = get();
         if (state.lastModified && now - state.lastModified > CART_EXPIRY_MS) {
+          state.items.forEach((item) => releaseHold(item.holdId));
           set({ items: [], lastModified: now });
         }
         const quantity = payload.quantity ?? 1;
@@ -83,9 +96,15 @@ export const useCartStore = create<CartState>()(
           set({ items: [...get().items, { ...payload, quantity }], lastModified: now });
         }
       },
-      removeItem: (id) => set({ items: get().items.filter((i) => i.id !== id), lastModified: Date.now() }),
+      removeItem: (id) => {
+        const existing = get().items.find((i) => i.id === id);
+        releaseHold(existing?.holdId);
+        set({ items: get().items.filter((i) => i.id !== id), lastModified: Date.now() });
+      },
       updateQuantity: (id, quantity) => {
         if (quantity <= 0) {
+          const existing = get().items.find((i) => i.id === id);
+          releaseHold(existing?.holdId);
           set({ items: get().items.filter((i) => i.id !== id), lastModified: Date.now() });
           return;
         }
@@ -94,7 +113,10 @@ export const useCartStore = create<CartState>()(
           lastModified: Date.now(),
         });
       },
-      clearCart: () => set({ items: [], lastModified: Date.now() }),
+      clearCart: () => {
+        get().items.forEach((item) => releaseHold(item.holdId));
+        set({ items: [], lastModified: Date.now() });
+      },
       totalQuantity: () => get().items.reduce((acc, i) => acc + i.quantity, 0),
       totalAmount: () =>
         get().items.reduce((acc, i) => acc + i.price * i.quantity + (i.menuTotal ?? 0), 0),

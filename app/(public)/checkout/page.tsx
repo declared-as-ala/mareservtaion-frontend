@@ -95,7 +95,7 @@ function SuccessScreen({ ids }: { ids: string[] }) {
 
         <div className="flex flex-col gap-3">
           <Button
-            onClick={() => router.push('/dashboard/reservations')}
+            onClick={() => router.push('/mes-reservations')}
             className="w-full bg-amber-400 hover:bg-amber-300 text-zinc-950 font-semibold rounded-full h-12"
           >
             Voir mes réservations
@@ -125,6 +125,12 @@ export default function CheckoutPage() {
 
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [confirmedIds, setConfirmedIds] = useState<string[] | null>(null);
+  const [holdTick, setHoldTick] = useState(Date.now());
+
+  useEffect(() => {
+    const timer = window.setInterval(() => setHoldTick(Date.now()), 1000);
+    return () => window.clearInterval(timer);
+  }, []);
 
   // Auth guard
   useEffect(() => {
@@ -141,6 +147,13 @@ export default function CheckoutPage() {
   }, [items, confirmedIds, router]);
 
   const { firstName: defaultFirst, lastName: defaultLast } = splitFullName(user?.fullName);
+  const holdExpiries = items
+    .map((item) => item.holdExpiresAt)
+    .filter((value): value is string => Boolean(value))
+    .map((value) => new Date(value).getTime());
+  const earliestHoldExpiry = holdExpiries.length > 0 ? Math.min(...holdExpiries) : null;
+  const holdSecondsLeft = earliestHoldExpiry ? Math.max(0, Math.floor((earliestHoldExpiry - holdTick) / 1000)) : null;
+  const hasExpiredHold = holdSecondsLeft !== null && holdSecondsLeft <= 0;
 
   const {
     register,
@@ -157,6 +170,10 @@ export default function CheckoutPage() {
   });
 
   const onSubmit = async (data: FormData) => {
+    if (hasExpiredHold) {
+      toast.error('Le delai de maintien a expire pour au moins une reservation.');
+      return;
+    }
     setIsSubmitting(true);
     const ids: string[] = [];
     try {
@@ -218,6 +235,22 @@ export default function CheckoutPage() {
             {items.length} article{items.length > 1 ? 's' : ''} · {totalAmount} TND
           </p>
         </div>
+
+        {holdSecondsLeft !== null && (
+          <div
+            className={cn(
+              'mb-6 inline-flex items-center rounded-full border px-4 py-2 text-sm font-medium',
+              hasExpiredHold
+                ? 'border-red-500/30 bg-red-500/10 text-red-300'
+                : 'border-amber-400/30 bg-amber-400/10 text-amber-300'
+            )}
+          >
+            <Clock className="mr-2 size-4" />
+            {hasExpiredHold
+              ? 'Le maintien de votre table a expire.'
+              : `Table maintenue pendant ${Math.floor(holdSecondsLeft / 60).toString().padStart(2, '0')}:${String(holdSecondsLeft % 60).padStart(2, '0')}`}
+          </div>
+        )}
 
         <form onSubmit={handleSubmit(onSubmit)}>
           <div className="grid lg:grid-cols-5 gap-8">
@@ -396,7 +429,7 @@ export default function CheckoutPage() {
                 <Button
                   type="submit"
                   size="lg"
-                  disabled={isSubmitting}
+                  disabled={isSubmitting || hasExpiredHold}
                   className="w-full h-13 rounded-full bg-amber-400 hover:bg-amber-300 text-zinc-950 font-bold text-base gap-2 shadow-lg shadow-amber-400/20 transition-all disabled:opacity-60"
                 >
                   {isSubmitting ? (

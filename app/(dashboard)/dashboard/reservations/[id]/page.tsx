@@ -44,7 +44,7 @@ export default function ReservationDetailPage() {
     return (
       <div className="space-y-4">
         <p className="text-muted-foreground">Réservation introuvable.</p>
-        <Button asChild><Link href="/dashboard/reservations">Retour</Link></Button>
+        <Button asChild><Link href="/mes-reservations">Retour</Link></Button>
       </div>
     );
   }
@@ -54,7 +54,7 @@ export default function ReservationDetailPage() {
     return (
       <div className="space-y-4">
         <ErrorState onRetry={() => refetch()} />
-        <Button variant="outline" asChild><Link href="/dashboard/reservations">Mes réservations</Link></Button>
+        <Button variant="outline" asChild><Link href="/mes-reservations">Mes réservations</Link></Button>
       </div>
     );
   }
@@ -65,7 +65,7 @@ export default function ReservationDetailPage() {
   return (
     <div className="space-y-6">
       <Button variant="ghost" size="sm" asChild>
-        <Link href="/dashboard/reservations" className="gap-2">
+        <Link href="/mes-reservations" className="gap-2">
           <ArrowLeft className="size-4" /> Mes réservations
         </Link>
       </Button>

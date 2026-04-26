@@ -16,6 +16,7 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server';
+import { getDefaultRedirectForRole, isOwnerRole, resolvePostLoginRedirect, sanitizeReturnTo } from '@/lib/auth/redirect';
 
 // ── Cookie-based JWT decode (no secret needed for expiry check) ──
 
@@ -50,7 +51,9 @@ function isTokenValid(cookieValue: string | undefined): boolean {
 
 const DASHBOARD_PATTERN = /^\/dashboard($|\/)/;
 const ADMIN_PATTERN = /^\/admin($|\/)/;
+const OWNER_PATTERN = /^\/owner($|\/)/;
 const LOGIN_PATTERN = /^\/login($|\/)/;
+const USER_ACCOUNT_PATTERN = /^\/(mes-reservations|profile)($|\/)/;
 
 // Public routes that should never go through auth checks
 const PUBLIC_PATTERNS = [
@@ -74,7 +77,7 @@ export function middleware(request: NextRequest) {
   const accessTokenCookie = request.cookies.get('accessToken')?.value;
   const hasValidToken = isTokenValid(accessTokenCookie);
 
-  // ── Dashboard routes ─────────────────────────────────────────
+  // ── Dashboard routes — redirect to appropriate home ─────────
   if (DASHBOARD_PATTERN.test(pathname)) {
     if (!hasValidToken) {
       const url = new URL('/login', request.url);
@@ -82,11 +85,21 @@ export function middleware(request: NextRequest) {
       return NextResponse.redirect(url);
     }
 
-    // Check role — redirect admins to /admin
     const payload = decodeJwtPayload(accessTokenCookie!);
-    if (payload && payload.role === 'ADMIN') {
-      return NextResponse.redirect(new URL('/admin', request.url));
+    if (payload?.role === 'ADMIN') {
+      // Keep admin dashboard namespace strictly under /admin.
+      return NextResponse.redirect(new URL('/admin/dashboard', request.url));
     }
+
+    // Keep old user dashboard links functional through redirects.
+    if (pathname === '/dashboard/reservations' || pathname.startsWith('/dashboard/reservations/')) {
+      return NextResponse.redirect(new URL('/mes-reservations', request.url));
+    }
+    if (pathname === '/dashboard/profile') {
+      return NextResponse.redirect(new URL('/profile', request.url));
+    }
+
+    return NextResponse.redirect(new URL('/', request.url));
   }
 
   // ── Admin routes ─────────────────────────────────────────────
@@ -103,11 +116,46 @@ export function middleware(request: NextRequest) {
     }
   }
 
+  if (OWNER_PATTERN.test(pathname)) {
+    if (!hasValidToken) {
+      const url = new URL('/login', request.url);
+      url.searchParams.set('returnTo', pathname);
+      return NextResponse.redirect(url);
+    }
+
+    const payload = decodeJwtPayload(accessTokenCookie!);
+    const role = typeof payload?.role === 'string' ? payload.role : null;
+    if (role === 'ADMIN') {
+      return NextResponse.redirect(new URL('/admin/dashboard', request.url));
+    }
+    if (!isOwnerRole(role)) {
+      return NextResponse.redirect(new URL('/unauthorized', request.url));
+    }
+  }
+
+  // ── User account pages (/mes-reservations, /profile) ─────────
+  if (USER_ACCOUNT_PATTERN.test(pathname)) {
+    if (!hasValidToken) {
+      const url = new URL('/login', request.url);
+      url.searchParams.set('returnTo', pathname);
+      return NextResponse.redirect(url);
+    }
+
+    const payload = decodeJwtPayload(accessTokenCookie!);
+    if (payload?.role === 'ADMIN') {
+      // Admins have a dedicated admin console.
+      return NextResponse.redirect(new URL('/admin/dashboard', request.url));
+    }
+  }
+
   // ── Logged-in users should not see login page ────────────────
   if (LOGIN_PATTERN.test(pathname) && hasValidToken) {
     const payload = decodeJwtPayload(accessTokenCookie!);
-    const redirectUrl =
-      payload?.role === 'ADMIN' ? '/admin' : '/dashboard';
+    const role = typeof payload?.role === 'string' ? payload.role : null;
+    const requestedReturnTo = sanitizeReturnTo(request.nextUrl.searchParams.get('returnTo'));
+    const redirectUrl = requestedReturnTo
+      ? resolvePostLoginRedirect(role, requestedReturnTo)
+      : getDefaultRedirectForRole(role);
     return NextResponse.redirect(new URL(redirectUrl, request.url));
   }
 
@@ -119,6 +167,9 @@ export const config = {
   matcher: [
     '/dashboard/:path*',
     '/admin/:path*',
+    '/owner/:path*',
+    '/mes-reservations/:path*',
+    '/profile',
     '/login',
   ],
 };

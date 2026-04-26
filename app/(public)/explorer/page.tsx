@@ -22,6 +22,17 @@ import {
   Compass,
 } from 'lucide-react';
 
+function isValidVenueItem(value: unknown): value is {
+  _id: string;
+  slug?: string;
+  name?: string;
+  city?: string;
+  isFeatured?: boolean;
+  isVedette?: boolean;
+} {
+  return !!value && typeof value === 'object' && typeof (value as { _id?: unknown })._id === 'string';
+}
+
 const VENUE_TYPES = [
   { value: '', label: 'Tous les lieux', icon: LayoutGrid },
   { value: 'CAFE', label: 'Cafés', icon: Coffee },
@@ -78,7 +89,8 @@ function ExplorerContent() {
       }),
   });
 
-  const venues = [...rawVenues].sort((a, b) => {
+  const safeVenues = Array.isArray(rawVenues) ? rawVenues.filter(isValidVenueItem) : [];
+  const venues = [...safeVenues].sort((a, b) => {
     if (a.isVedette && !b.isVedette) return -1;
     if (!a.isVedette && b.isVedette) return 1;
     if (a.isFeatured && !b.isFeatured) return -1;

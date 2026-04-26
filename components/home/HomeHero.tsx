@@ -73,7 +73,9 @@ export function HomeHero() {
             </Button>
             {user ? (
               <Button variant="outline" size="lg" asChild className="border-white/60 text-white hover:bg-white/20">
-                <Link href="/dashboard">Tableau de bord</Link>
+                <Link href={user.role === 'ADMIN' ? '/admin' : '/mes-reservations'}>
+                  {user.role === 'ADMIN' ? 'Tableau de bord' : 'Mes réservations'}
+                </Link>
               </Button>
             ) : (
               <Button variant="outline" size="lg" asChild className="border-white/60 text-white hover:bg-white/20">

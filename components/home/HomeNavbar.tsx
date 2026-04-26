@@ -85,16 +85,15 @@ export function HomeNavbar() {
           bgClass
         )}
       >
-        <div className="mx-auto flex h-16 sm:h-[72px] lg:h-24 max-w-[1440px] items-center justify-between gap-2 sm:gap-4 px-3 sm:px-4 lg:px-8">
+        <div className="mx-auto flex h-[82px] sm:h-[92px] lg:h-[106px] max-w-[1440px] items-center justify-between gap-2 sm:gap-4 px-3 sm:px-4 lg:px-8">
           {/* Logo */}
-          <Link href="/" className="flex items-center shrink-0">
+          <Link href="/" className="flex items-center shrink-0 rounded-xl bg-white/[0.06] px-2.5 py-1.5 ring-1 ring-white/[0.12]">
             <Image
               src="/logo.png"
               alt="Ma Reservation"
-              width={400}
-              height={110}
-              style={{ height: '48px', width: 'auto', objectFit: 'contain' }}
-              className="drop-shadow-[0_4px_16px_rgba(0,0,0,0.4)] transition-transform duration-300 hover:scale-[1.02] sm:[height:60px] lg:[height:72px]"
+              width={540}
+              height={152}
+              className="h-[42px] w-auto object-contain drop-shadow-[0_6px_20px_rgba(212,175,55,0.32)] transition-transform duration-300 hover:scale-[1.02] sm:h-[50px] lg:h-[58px]"
               priority
             />
           </Link>
@@ -214,13 +213,13 @@ export function HomeNavbar() {
               <SheetContent side="right" className="w-[300px] sm:w-[400px] bg-black border-white/[0.08] p-0 flex flex-col">
                 <SheetHeader className="px-5 pt-5 pb-4 border-b border-white/[0.06]">
                   <SheetTitle className="sr-only">Menu de navigation</SheetTitle>
-                  <Link href="/" onClick={() => setMobileOpen(false)} className="inline-block">
+                  <Link href="/" onClick={() => setMobileOpen(false)} className="inline-block rounded-xl bg-white/[0.04] px-2 py-1 ring-1 ring-white/[0.08]">
                     <Image
                       src="/logo.png"
                       alt="Ma Reservation"
-                      width={280}
-                      height={70}
-                      className="h-14 w-auto object-contain drop-shadow-[0_4px_12px_rgba(0,0,0,0.4)]"
+                      width={420}
+                      height={120}
+                      className="h-[40px] w-auto object-contain sm:h-[45px] drop-shadow-[0_6px_20px_rgba(212,175,55,0.3)]"
                     />
                   </Link>
                 </SheetHeader>
@@ -315,7 +314,7 @@ export function HomeNavbar() {
       </header>
 
       {/* Spacer for fixed header on non-home pages */}
-      {!isHome && <div className="h-16 sm:h-[72px] xl:h-24" />}
+      {!isHome && <div className="h-[82px] sm:h-[92px] xl:h-[106px]" />}
 
     </>
   );

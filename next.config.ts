@@ -1,6 +1,8 @@
 import type { NextConfig } from "next";
 import path from "path";
 
+const isDev = process.env.NODE_ENV !== "production";
+
 const nextConfig: NextConfig = {
   transpilePackages: [
     '@photo-sphere-viewer/core',
@@ -14,6 +16,9 @@ const nextConfig: NextConfig = {
       { protocol: 'http', hostname: 'localhost' },
       { protocol: 'http', hostname: '127.0.0.1' },
     ],
+    qualities: [75, 85],
+    // In offline/local environments, avoid optimizer fetch timeouts for remote images.
+    unoptimized: isDev,
   },
   turbopack: {
     resolveAlias: {

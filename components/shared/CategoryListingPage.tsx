@@ -46,6 +46,10 @@ interface CategoryListingPageProps {
   venueType?: string;
 }
 
+function isValidVenueItem(value: unknown): value is Venue {
+  return !!value && typeof value === 'object' && typeof (value as { _id?: unknown })._id === 'string';
+}
+
 function RegionSelect({
   value,
   onChange,
@@ -107,7 +111,10 @@ export function CategoryListingPage({
   const error = mode === 'venue' ? venueQuery.error : eventQuery.error;
   const refetch = mode === 'venue' ? venueQuery.refetch : eventQuery.refetch;
 
-  const venues: Venue[] = mode === 'venue' ? (venueQuery.data ?? []) : [];
+  const venues: Venue[] =
+    mode === 'venue'
+      ? (Array.isArray(venueQuery.data) ? venueQuery.data.filter(isValidVenueItem) : [])
+      : [];
   let events: Event[] = mode === 'event' ? (eventQuery.data ?? []) : [];
 
   if (mode === 'event' && governorate) {
@@ -159,16 +166,16 @@ export function CategoryListingPage({
   );
 
   return (
-    <div className="min-h-screen">
+    <div className="min-h-screen bg-zinc-950 text-zinc-100">
       {/* Hero header */}
-      <div className="relative overflow-hidden bg-gradient-to-br from-gray-50 via-white to-gray-50 py-16 sm:py-20">
-        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,rgba(212,175,55,0.06),transparent_70%)]" />
+      <div className="relative overflow-hidden bg-gradient-to-b from-zinc-900 to-zinc-950 border-b border-zinc-800/60 py-14 sm:py-18">
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,rgba(251,191,36,0.06),transparent_60%)]" />
         <div className="relative mx-auto max-w-7xl px-4 text-center">
-          <h1 className="font-serif text-3xl font-bold tracking-tight text-[#111111] sm:text-4xl lg:text-5xl">
+          <h1 className="font-serif text-3xl font-bold tracking-tight text-white sm:text-4xl lg:text-5xl">
             {title}
           </h1>
-          <div className="mx-auto mt-3 h-px w-16 bg-[#D4AF37]/60" />
-          <p className="mx-auto mt-4 max-w-lg text-base text-[#666666]">
+          <div className="mx-auto mt-3 h-px w-16 bg-amber-400/60" />
+          <p className="mx-auto mt-4 max-w-lg text-base text-zinc-400">
             {subtitle}
           </p>
         </div>
@@ -253,7 +260,7 @@ export function CategoryListingPage({
           />
         ) : (
           <>
-            <p className="mb-4 text-sm text-[#666666]">
+            <p className="mb-4 text-sm text-zinc-400">
               {itemCount} résultat{itemCount !== 1 ? 's' : ''}
             </p>
             <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">

@@ -1,71 +1,69 @@
-import { Card, CardContent, CardHeader } from '@/components/ui/card';
-import { Skeleton } from '@/components/ui/skeleton';
+import { cn } from '@/lib/utils';
 
-const skeletonBase = 'bg-gray-200 animate-shimmer';
+const skeletonBase = 'animate-pulse rounded-md bg-zinc-800/80';
+
+function Sk({ className }: { className?: string }) {
+  return <div className={cn(skeletonBase, className)} />;
+}
 
 export function VenueCardSkeleton() {
   return (
-    <Card className="overflow-hidden border-gray-200 bg-white">
-      <Skeleton className={`${skeletonBase} aspect-[16/10] w-full rounded-none`} />
-      <CardHeader className="space-y-2 pb-2">
-        <Skeleton className={`${skeletonBase} h-5 w-3/4`} />
-        <Skeleton className={`${skeletonBase} h-4 w-1/2`} />
-      </CardHeader>
-      <CardContent className="space-y-2 pt-0">
-        <Skeleton className={`${skeletonBase} h-4 w-full`} />
-        <Skeleton className={`${skeletonBase} h-4 w-2/3`} />
-      </CardContent>
-    </Card>
+    <div className="overflow-hidden rounded-2xl border border-white/[0.06] bg-white/[0.03]">
+      <Sk className="aspect-[4/3] w-full rounded-none" />
+      <div className="p-4 space-y-2.5">
+        <Sk className="h-4 w-3/4" />
+        <Sk className="h-3 w-1/2" />
+        <Sk className="h-9 w-full mt-2 rounded-xl" />
+      </div>
+    </div>
   );
 }
 
 export function EventCardSkeleton() {
   return (
-    <Card className="overflow-hidden border-gray-200 bg-white">
-      <Skeleton className={`${skeletonBase} aspect-[16/10] w-full rounded-none`} />
-      <CardHeader className="space-y-2 pb-2">
-        <Skeleton className={`${skeletonBase} h-5 w-2/3`} />
-        <Skeleton className={`${skeletonBase} h-4 w-1/2`} />
-      </CardHeader>
-      <CardContent className="pt-0">
-        <Skeleton className={`${skeletonBase} h-4 w-full`} />
-      </CardContent>
-    </Card>
+    <div className="overflow-hidden rounded-2xl border border-white/[0.06] bg-white/[0.03]">
+      <Sk className="aspect-[4/3] w-full rounded-none" />
+      <div className="p-4 space-y-2.5">
+        <Sk className="h-4 w-2/3" />
+        <Sk className="h-3 w-1/2" />
+        <Sk className="h-3 w-full" />
+      </div>
+    </div>
   );
 }
 
 export function ReservationCardSkeleton() {
   return (
-    <Card className="border-gray-200 bg-white">
-      <CardHeader className="flex flex-row items-center gap-4 space-y-0 pb-2">
-        <Skeleton className={`${skeletonBase} h-16 w-24 rounded-md`} />
+    <div className="rounded-2xl border border-white/[0.06] bg-white/[0.03] p-4">
+      <div className="flex items-center gap-4">
+        <Sk className="h-16 w-24 rounded-xl flex-shrink-0" />
         <div className="flex-1 space-y-2">
-          <Skeleton className={`${skeletonBase} h-5 w-48`} />
-          <Skeleton className={`${skeletonBase} h-4 w-32`} />
+          <Sk className="h-4 w-48" />
+          <Sk className="h-3 w-32" />
         </div>
-      </CardHeader>
-      <CardContent className="space-y-2">
-        <Skeleton className={`${skeletonBase} h-4 w-full`} />
-        <Skeleton className={`${skeletonBase} h-4 w-3/4`} />
-      </CardContent>
-    </Card>
+      </div>
+      <div className="mt-3 space-y-2">
+        <Sk className="h-3 w-full" />
+        <Sk className="h-3 w-3/4" />
+      </div>
+    </div>
   );
 }
 
 export function DetailPageSkeleton() {
   return (
-    <div className="space-y-6">
-      <Skeleton className={`${skeletonBase} aspect-[21/9] w-full rounded-xl`} />
+    <div className="space-y-6 bg-zinc-950 min-h-screen p-6">
+      <Sk className="aspect-[21/9] w-full rounded-2xl" />
       <div className="space-y-2">
-        <Skeleton className={`${skeletonBase} h-9 w-2/3`} />
-        <Skeleton className={`${skeletonBase} h-5 w-1/3`} />
+        <Sk className="h-9 w-2/3" />
+        <Sk className="h-5 w-1/3" />
       </div>
       <div className="grid gap-4 md:grid-cols-3">
-        <Skeleton className={`${skeletonBase} h-32 rounded-lg`} />
-        <Skeleton className={`${skeletonBase} h-32 rounded-lg`} />
-        <Skeleton className={`${skeletonBase} h-32 rounded-lg`} />
+        <Sk className="h-32 rounded-xl" />
+        <Sk className="h-32 rounded-xl" />
+        <Sk className="h-32 rounded-xl" />
       </div>
-      <Skeleton className={`${skeletonBase} h-48 w-full rounded-lg`} />
+      <Sk className="h-48 w-full rounded-xl" />
     </div>
   );
 }
@@ -75,22 +73,9 @@ export function TableRowSkeleton({ cols = 5 }: { cols?: number }) {
     <tr>
       {Array.from({ length: cols }).map((_, i) => (
         <td key={i} className="p-4">
-          <Skeleton className={`${skeletonBase} h-5 w-full`} />
+          <Sk className="h-4 w-full" />
         </td>
       ))}
     </tr>
-  );
-}
-
-/** For section carousel rails on home */
-export function CarouselRailSkeleton({ count = 4 }: { count?: number }) {
-  return (
-    <div className="flex gap-4 overflow-hidden">
-      {Array.from({ length: count }).map((_, i) => (
-        <div key={i} className="min-w-[85%] flex-shrink-0 sm:min-w-[45%] lg:min-w-[30%]">
-          <VenueCardSkeleton />
-        </div>
-      ))}
-    </div>
   );
 }
