@@ -1,10 +1,11 @@
 'use client';
 
 import { useEffect, useMemo, useState } from 'react';
-import { useParams } from 'next/navigation';
+import { useParams, useRouter } from 'next/navigation';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import Link from 'next/link';
 import dynamic from 'next/dynamic';
+import { ArrowLeft } from 'lucide-react';
 import {
   fetchVenueByIdOrSlug,
   getVenueAvailabilityStreamUrl,
@@ -72,6 +73,7 @@ function getAllImages(venue: Venue): string[] {
 }
 
 export default function VenueDetailPage() {
+  const router = useRouter();
   const queryClient = useQueryClient();
   const params = useParams();
   const slug = params.slug as string;
@@ -216,6 +218,17 @@ export default function VenueDetailPage() {
 
   return (
     <div className="min-h-screen">
+      {/* Back button */}
+      <div className="mx-auto max-w-5xl px-4 pt-4">
+        <button
+          onClick={() => router.back()}
+          className="group inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/[0.04] px-4 py-2 text-sm font-medium text-white/80 backdrop-blur-sm transition-all duration-200 hover:border-amber-400/40 hover:bg-amber-400/[0.08] hover:text-amber-400 hover:shadow-lg hover:shadow-amber-400/10"
+        >
+          <ArrowLeft className="size-4 transition-transform group-hover:-translate-x-0.5" />
+          Retour
+        </button>
+      </div>
+
       {/* Hero header */}
       <div className="relative">
         <DetailHeader
