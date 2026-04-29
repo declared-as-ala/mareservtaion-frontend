@@ -50,6 +50,15 @@ export default function OwnerPage() {
         </div>
 
         <section className="rounded-[28px] border border-zinc-800/80 bg-zinc-900/70 p-6">
+          <div className="mb-5 flex flex-wrap gap-2">
+            <Button asChild variant="outline" className="border-zinc-700 bg-zinc-950/60"><Link href="/owner/reservations">Reservations</Link></Button>
+            <Button asChild variant="outline" className="border-zinc-700 bg-zinc-950/60"><Link href="/owner/scanner">QR Scanner</Link></Button>
+            <Button asChild variant="outline" className="border-zinc-700 bg-zinc-950/60"><Link href="/owner/my-establishment">Mon etablissement</Link></Button>
+            <Button asChild variant="outline" className="border-zinc-700 bg-zinc-950/60"><Link href="/owner/resources">Ressources</Link></Button>
+            <Button asChild variant="outline" className="border-zinc-700 bg-zinc-950/60"><Link href="/owner/payments">Paiements</Link></Button>
+            <Button asChild variant="outline" className="border-zinc-700 bg-zinc-950/60"><Link href="/owner/clients">Clients</Link></Button>
+            <Button asChild variant="outline" className="border-zinc-700 bg-zinc-950/60"><Link href="/owner/settings">Settings</Link></Button>
+          </div>
           <div className="mb-5 flex items-center justify-between">
             <h2 className="text-xl font-semibold">Mes lieux</h2>
             <Button asChild variant="outline" className="border-zinc-700 bg-zinc-950/60">

@@ -23,6 +23,7 @@ import {
   Minus, Plus, ShoppingCart, CreditCard,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { getReservableLabel, getReservationCTA } from '@/lib/reservation-labels';
 
 // ─── Helpers ────────────────────────────────────────────────────────────────
 const CATEGORY_LABELS: Record<MenuCategory, string> = {
@@ -179,6 +180,7 @@ export function StepReservationModal({
   const { addItem, openDrawer } = useCartStore();
 
   const isAvailable = placement.table.status === 'available';
+  const reservableLabel = getReservableLabel(venue.type);
   const tableLabel = placement.table.name || `Table ${placement.table.tableNumber}`;
   const tablePrice = placement.table.price ?? venue.startingPrice ?? 0;
   const minimumSpend = (placement.table as { minimumSpend?: number }).minimumSpend ?? tablePrice;
@@ -299,7 +301,7 @@ export function StepReservationModal({
         if (!cancelled) {
           setHoldId(null);
           setHoldExpiresAt(null);
-          setHoldError(error instanceof Error ? error.message : 'Impossible de maintenir cette table.');
+      setHoldError(error instanceof Error ? error.message : `Impossible de maintenir cette ${reservableLabel}.`);
         }
       }
     }
@@ -404,12 +406,12 @@ export function StepReservationModal({
 
   const renderStep = () => {
     switch (step) {
-      // ── STEP 0: Table confirmation ──
+      // ── STEP 0: Reservable confirmation ──
       case 0:
         return (
           <div className="space-y-5">
             <div className="text-center">
-              <h3 className="text-base font-bold text-white">Votre table</h3>
+              <h3 className="text-base font-bold text-white">Votre {reservableLabel}</h3>
               <p className="text-xs text-zinc-500 mt-1">Verifiez les details avant de continuer</p>
             </div>
 
@@ -447,7 +449,7 @@ export function StepReservationModal({
             {!isAvailable && (
               <div className="rounded-xl border border-red-500/20 bg-red-500/5 px-4 py-3 text-sm text-red-400 flex items-center gap-2">
                 <span className="size-2 rounded-full bg-red-500 flex-shrink-0" />
-                Cette table n&apos;est pas disponible pour le moment.
+                Cette {reservableLabel} n&apos;est pas disponible pour le moment.
               </div>
             )}
 
@@ -467,7 +469,7 @@ export function StepReservationModal({
             <div className="rounded-2xl border border-zinc-700/60 bg-zinc-900/60 p-4 space-y-3">
               <div className="flex flex-col gap-0.5 sm:flex-row sm:items-center sm:justify-between">
                 <h4 className="text-xs font-bold uppercase tracking-widest text-zinc-400">
-                  Heures de cette table
+                  Heures de cette {reservableLabel}
                 </h4>
                 <span className="text-[11px] text-zinc-500">
                   Jour: <span className="font-semibold text-zinc-300">{selectedDate}</span>
@@ -778,7 +780,7 @@ export function StepReservationModal({
         </div>
 
         <SheetHeader className="px-5 pt-2 pb-0">
-          <SheetTitle className="text-white text-base font-semibold">Reserver une table</SheetTitle>
+          <SheetTitle className="text-white text-base font-semibold">{getReservationCTA(venue.type)}</SheetTitle>
           <SheetDescription className="sr-only">Flow de reservation en etapes</SheetDescription>
         </SheetHeader>
 

@@ -8,6 +8,7 @@ import type { Venue } from '@/lib/api/types';
 import { StepReservationModal } from './StepReservationModal';
 import { Users, Calendar, Clock, Crown, Loader2, CheckCircle2, XCircle, MapPin } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { getReservableLabel } from '@/lib/reservation-labels';
 
 function todayStr() { return new Date().toISOString().slice(0, 10); }
 function buildIso(date: string, time: string) { return new Date(`${date}T${time}:00`).toISOString(); }
@@ -33,6 +34,7 @@ interface TablePickerSheetProps {
 }
 
 export function TablePickerSheet({ open, onOpenChange, venue, imageUrl, initialStartAt }: TablePickerSheetProps) {
+  const reservableLabel = getReservableLabel(venue.type);
   const queryClient = useQueryClient();
   const [date, setDate] = useState(() => initialStartAt ? isoToLocalDate(initialStartAt) : todayStr());
   const [startTime, setStartTime] = useState(() => initialStartAt ? isoToLocalTime(initialStartAt) : '19:00');
@@ -78,7 +80,7 @@ export function TablePickerSheet({ open, onOpenChange, venue, imageUrl, initialS
 
           <SheetHeader className="px-5 pt-3 pb-0">
             <SheetTitle className="text-zinc-100 text-lg font-bold flex items-center gap-2">
-              Choisir une table
+              Choisir une {reservableLabel}
               <span className="text-sm font-normal text-zinc-500">— {venue.name}</span>
             </SheetTitle>
             <SheetDescription className="sr-only">

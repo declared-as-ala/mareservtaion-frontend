@@ -61,16 +61,16 @@ export default function ReservationsPage() {
   });
 
   const now = new Date();
-  const pending = useMemo(() => reservations.filter((r) => r.status === 'PENDING'), [reservations]);
+  const pending = useMemo(() => reservations.filter((r) => ['PENDING', 'pending'].includes(r.status)), [reservations]);
   const upcoming = useMemo(
-    () => reservations.filter((r) => new Date(r.startAt) >= now && r.status === 'CONFIRMED'),
+    () => reservations.filter((r) => new Date(r.startAt) >= now && ['CONFIRMED', 'confirmed', 'checked_in'].includes(r.status)),
     [reservations, now]
   );
   const past = useMemo(
-    () => reservations.filter((r) => new Date(r.startAt) < now && r.status !== 'CANCELLED'),
+    () => reservations.filter((r) => new Date(r.startAt) < now && !['CANCELLED', 'cancelled'].includes(r.status)),
     [reservations, now]
   );
-  const cancelled = useMemo(() => reservations.filter((r) => r.status === 'CANCELLED'), [reservations]);
+  const cancelled = useMemo(() => reservations.filter((r) => ['CANCELLED', 'cancelled'].includes(r.status)), [reservations]);
 
   const filterBySearch = (list: typeof reservations) => {
     if (!search.trim()) return list;

@@ -8,6 +8,8 @@ import { fetchVenueByIdOrSlug } from '@/lib/api/venues';
 import { fetchScenes } from '@/lib/api/scenes';
 import {
   updateAdminVenue,
+  fetchAdminOwners,
+  assignVenueOwner,
   fetchAdminVenueTables,
   createAdminTable,
   deleteAdminTable,
@@ -203,6 +205,11 @@ export default function AdminVenueDetailPage() {
     queryFn: () => fetchAdminVenueMenu(id),
     enabled: !!id,
   });
+  const { data: owners = [] } = useQuery({
+    queryKey: ['admin-owners'],
+    queryFn: fetchAdminOwners,
+  });
+  const [ownerAssigning, setOwnerAssigning] = useState(false);
 
   const effectiveSceneId = activeSceneId ?? (scenes[0]?._id ?? null);
 
@@ -730,6 +737,42 @@ export default function AdminVenueDetailPage() {
                     </div>
                   </CardContent>
                 </Card>
+                <Card className="rounded-2xl border-border/40 shadow-sm">
+                  <CardHeader className="pb-3">
+                    <CardTitle className="text-base">Proprietaire du lieu</CardTitle>
+                    <CardDescription className="text-xs">Assigner ou changer le proprietaire.</CardDescription>
+                  </CardHeader>
+                  <CardContent className="space-y-3">
+                    <Select
+                      value={typeof (venue as any).ownerId === 'object' ? ((venue as any).ownerId?._id || 'none') : ((venue as any).ownerId || 'none')}
+                      onValueChange={async (value) => {
+                        setOwnerAssigning(true);
+                        try {
+                          await assignVenueOwner(id, value === 'none' ? null : value);
+                          await refetch();
+                          toast.success('Proprietaire mis a jour.');
+                        } catch {
+                          toast.error('Erreur attribution proprietaire.');
+                        } finally {
+                          setOwnerAssigning(false);
+                        }
+                      }}
+                    >
+                      <SelectTrigger className="rounded-xl">
+                        <SelectValue placeholder="Selectionner un proprietaire" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="none">Aucun proprietaire</SelectItem>
+                        {owners.map((owner) => (
+                          <SelectItem key={owner._id} value={owner._id}>
+                            {owner.fullName || owner.email}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                    {ownerAssigning ? <p className="text-xs text-zinc-500">Mise a jour...</p> : null}
+                  </CardContent>
+                </Card>
               </div>
             </div>
           </TabsContent>
@@ -755,10 +798,9 @@ export default function AdminVenueDetailPage() {
                     <div className="relative group rounded-xl overflow-hidden border bg-muted aspect-video">
                       <Image src={form.coverImage} alt="Couverture" fill className="object-cover" sizes="(max-width: 768px) 100vw, 50vw" />
                       <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2">
-                        <Button type="button" size="sm" variant="secondary" className="rounded-xl gap-1.5"
-                          onClick={() => handleCoverUpload}>
-                          <Upload className="size-3.5" /> Remplacer
-                        </Button>
+                        <span className="rounded-xl bg-secondary px-3 py-1.5 text-xs font-medium text-secondary-foreground">
+                          Utilisez la zone d'upload ci-dessous pour remplacer
+                        </span>
                         <Button type="button" size="sm" variant="destructive" className="rounded-xl gap-1.5"
                           onClick={() => setForm({ ...form, coverImage: '' })}>
                           <Trash2 className="size-3.5" /> Retirer

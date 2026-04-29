@@ -149,7 +149,7 @@ export function CartDrawer({ open, onOpenChange }: CartDrawerProps) {
                 <ShoppingBag className="size-7 text-zinc-600" />
               </div>
               <p className="text-zinc-200 font-medium mb-1">Votre panier est vide</p>
-              <p className="text-zinc-500 text-sm">Ajoutez des tables ou chambres pour commencer.</p>
+              <p className="text-zinc-500 text-sm">Ajoutez des reservations pour commencer.</p>
             </div>
           ) : (
             <div>

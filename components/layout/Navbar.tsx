@@ -24,7 +24,7 @@ const categories = [
 export function Navbar() {
   const { user, isLoading: authLoading, isAuthenticated } = useAuth();
   const isAdmin = user?.role === 'ADMIN';
-  const isOwner = user?.role === 'VENUE_OWNER' || user?.role === 'ORGANIZER';
+  const isOwner = user?.role === 'VENUE_OWNER' || user?.role === 'ORGANIZER' || user?.role === 'ESTABLISHMENT_OWNER';
   const totalQuantity = useCartStore((s) => s.totalQuantity());
   const pathname = usePathname();
   const cartOpen = useCartStore((s) => s.drawerOpen);

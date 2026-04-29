@@ -35,13 +35,15 @@ export async function fetchAdminReservations(params?: { status?: string; page?: 
   }
 }
 
-export async function fetchAdminVenues(params?: { page?: number; type?: string; city?: string; q?: string }) {
+export async function fetchAdminVenues(params?: { page?: number; type?: string; city?: string; q?: string; ownerId?: string; withoutOwner?: boolean }) {
   try {
     const sp = new URLSearchParams();
     if (params?.page) sp.set('page', String(params.page));
     if (params?.type) sp.set('type', params.type);
     if (params?.city) sp.set('city', params.city);
     if (params?.q) sp.set('q', params.q);
+    if (params?.ownerId) sp.set('ownerId', params.ownerId);
+    if (params?.withoutOwner) sp.set('withoutOwner', '1');
     const qs = sp.toString();
     const res = await apiGetRaw<{ venues?: unknown[] }>(`/admin/venues${qs ? `?${qs}` : ''}`);
     const list = (res as { venues?: unknown[] })?.venues;
@@ -49,6 +51,22 @@ export async function fetchAdminVenues(params?: { page?: number; type?: string; 
   } catch {
     return [];
   }
+}
+
+export type AdminOwner = { _id: string; fullName: string; email: string; role: string };
+
+export async function fetchAdminOwners(): Promise<AdminOwner[]> {
+  try {
+    const res = await apiGetRaw<{ success?: boolean; data?: AdminOwner[] }>('/admin/owners');
+    const data = (res as { data?: AdminOwner[] })?.data;
+    return Array.isArray(data) ? data : [];
+  } catch {
+    return [];
+  }
+}
+
+export async function assignVenueOwner(venueId: string, ownerId: string | null) {
+  return apiPatchRaw(`/admin/venues/${venueId}/owner`, { ownerId });
 }
 
 export type AdminVenuePayload = {

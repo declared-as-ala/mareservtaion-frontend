@@ -11,13 +11,15 @@ interface VenueGalleryProps {
 
 export function VenueGallery({ images, venueName }: VenueGalleryProps) {
   const [lightboxIndex, setLightboxIndex] = useState<number | null>(null);
+  const [failedUrls, setFailedUrls] = useState<string[]>([]);
 
-  if (images.length === 0) return null;
+  const safeImages = images.filter((u) => Boolean(u) && !failedUrls.includes(u));
+  if (safeImages.length === 0) return null;
 
   const prev = () =>
-    setLightboxIndex((i) => (i !== null ? (i - 1 + images.length) % images.length : 0));
+    setLightboxIndex((i) => (i !== null ? (i - 1 + safeImages.length) % safeImages.length : 0));
   const next = () =>
-    setLightboxIndex((i) => (i !== null ? (i + 1) % images.length : 0));
+    setLightboxIndex((i) => (i !== null ? (i + 1) % safeImages.length : 0));
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === 'ArrowLeft') prev();
@@ -31,20 +33,27 @@ export function VenueGallery({ images, venueName }: VenueGalleryProps) {
         <div className="flex items-center gap-2 text-sm font-semibold">
           <Images className="size-4" />
           Galerie photos
-          <span className="text-muted-foreground font-normal">({images.length})</span>
+          <span className="text-muted-foreground font-normal">({safeImages.length})</span>
         </div>
         <div className="grid grid-cols-2 gap-2 sm:grid-cols-3">
-          {images.slice(0, 6).map((url, i) => (
+          {safeImages.slice(0, 6).map((url, i) => (
             <button
               key={i}
               type="button"
               onClick={() => setLightboxIndex(i)}
               className="relative aspect-video overflow-hidden rounded-xl bg-muted group focus:outline-none focus:ring-2 focus:ring-primary"
             >
-              <Image src={url} alt={`${venueName} — photo ${i + 1}`} fill className="object-cover transition-transform duration-300 group-hover:scale-105" sizes="(max-width: 640px) 50vw, 33vw" />
-              {i === 5 && images.length > 6 && (
+              <Image
+                src={url}
+                alt={`${venueName} — photo ${i + 1}`}
+                fill
+                onError={() => setFailedUrls((prev) => (prev.includes(url) ? prev : [...prev, url]))}
+                className="object-cover transition-transform duration-300 group-hover:scale-105"
+                sizes="(max-width: 640px) 50vw, 33vw"
+              />
+              {i === 5 && safeImages.length > 6 && (
                 <div className="absolute inset-0 bg-black/60 flex items-center justify-center text-white font-bold text-xl">
-                  +{images.length - 6}
+                  +{safeImages.length - 6}
                 </div>
               )}
             </button>
@@ -79,7 +88,7 @@ export function VenueGallery({ images, venueName }: VenueGalleryProps) {
           </button>
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
-            src={images[lightboxIndex]}
+            src={safeImages[lightboxIndex]}
             alt={`${venueName} — photo ${lightboxIndex + 1}`}
             className="max-h-[85vh] max-w-[85vw] object-contain rounded-xl shadow-2xl"
             onClick={(e) => e.stopPropagation()}
@@ -93,7 +102,7 @@ export function VenueGallery({ images, venueName }: VenueGalleryProps) {
             <ChevronRight className="size-8" />
           </button>
           <span className="absolute bottom-5 text-white/50 text-sm tabular-nums">
-            {lightboxIndex + 1} / {images.length}
+            {lightboxIndex + 1} / {safeImages.length}
           </span>
         </div>
       )}

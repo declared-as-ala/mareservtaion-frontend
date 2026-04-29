@@ -41,7 +41,7 @@ export function UserMenuDropdown() {
   const [showConfirm, setShowConfirm] = useState(false);
   if (!user) return null;
   const isAdmin = user.role === 'ADMIN';
-  const isOwner = user.role === 'VENUE_OWNER' || user.role === 'ORGANIZER';
+  const isOwner = user.role === 'VENUE_OWNER' || user.role === 'ORGANIZER' || user.role === 'ESTABLISHMENT_OWNER';
 
   const initials = user.fullName
     .split(/\s+/)

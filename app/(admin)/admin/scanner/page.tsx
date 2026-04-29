@@ -31,6 +31,17 @@ interface ScanResult {
 /* Scanner component                                                     */
 /* ------------------------------------------------------------------ */
 export default function AdminScannerPage() {
+  const adminScannerEnabled = false;
+  if (!adminScannerEnabled) {
+    return (
+      <div className="mx-auto max-w-2xl rounded-xl border border-zinc-800 bg-zinc-900/60 p-6 text-zinc-100">
+        <h1 className="text-xl font-semibold">Scanner admin desactive</h1>
+        <p className="mt-2 text-sm text-zinc-400">
+          Le check-in QR est maintenant reserve aux proprietaires via <code>/owner/scanner</code>.
+        </p>
+      </div>
+    );
+  }
   const videoRef = useRef<HTMLVideoElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [scanning, setScanning] = useState(false);

@@ -39,6 +39,7 @@ import type { TablePlacement } from '@/lib/api/types';
 import type { Venue } from '@/lib/api/types';
 import { StepReservationModal } from '@/components/reservation/StepReservationModal';
 import { TablePickerSheet } from '@/components/reservation/TablePickerSheet';
+import { getReservationCTA } from '@/lib/reservation-labels';
 
 const RESERVATION_DURATION_MS = 2 * 60 * 60 * 1000;
 
@@ -178,6 +179,9 @@ export default function VenueDetailPage() {
       (venue.immersiveSourceType === 'upload' && !!venue.immersiveFile));
   const tabsDefaultValue = hasNewImmersive ? 'visite' : 'apercu';
   const hasTablePlacements = allPlacements.length > 0;
+  const hasReservableTables =
+    hasTablePlacements ||
+    ((venue.tables as Array<unknown> | undefined)?.length ?? 0) > 0;
 
   const handleTablePlacementAddToCart = (placement: TablePlacement) => {
     const table = (
@@ -222,16 +226,6 @@ export default function VenueDetailPage() {
           badges={
             <>
               <TypeBadge type={venue.type} />
-              {venue.isVedette && (
-                <span className="rounded-full bg-amber-500/90 px-2 py-0.5 text-xs font-bold text-black">
-                  ⭐ Vedette
-                </span>
-              )}
-              {venue.isFeatured && (
-                <span className="rounded-full bg-amber-500/90 px-2 py-0.5 text-xs font-bold text-black">
-                  ⭐ Vedette
-                </span>
-              )}
               {venue.immersiveType === 'virtual-tour' && (
                 <span className="inline-flex items-center gap-1 rounded-full border border-white/40 bg-black/30 px-2 py-0.5 text-xs font-medium text-white">
                   <Video className="size-3" /> Visite virtuelle
@@ -780,26 +774,30 @@ export default function VenueDetailPage() {
       </div>
 
       {/* ── Floating reservation button ── */}
-      <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-40">
-        <button
-          type="button"
-          onClick={() => setPickerOpen(true)}
-          className="flex items-center gap-2.5 rounded-full bg-amber-400 hover:bg-amber-300 text-black font-bold px-6 py-3.5 text-sm shadow-2xl shadow-amber-400/40 transition-all hover:scale-105 active:scale-95"
-        >
-          <ShoppingCart className="size-4" />
-          Réserver une table
-        </button>
-      </div>
+      {hasReservableTables && (
+        <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-40">
+          <button
+            type="button"
+            onClick={() => setPickerOpen(true)}
+            className="flex items-center gap-2.5 rounded-full bg-amber-400 hover:bg-amber-300 text-black font-bold px-6 py-3.5 text-sm shadow-2xl shadow-amber-400/40 transition-all hover:scale-105 active:scale-95"
+          >
+            <ShoppingCart className="size-4" />
+            {getReservationCTA(venue.type)}
+          </button>
+        </div>
+      )}
 
       {/* ── Table picker sheet ── */}
-      <TablePickerSheet
-        open={pickerOpen}
-        onOpenChange={setPickerOpen}
-        venue={venue as Venue}
-        imageUrl={img ?? undefined}
-        initialStartAt={selectedSlotStartAt}
-        initialEndAt={selectedSlotEndAt}
-      />
+      {hasReservableTables && (
+        <TablePickerSheet
+          open={pickerOpen}
+          onOpenChange={setPickerOpen}
+          venue={venue as Venue}
+          imageUrl={img ?? undefined}
+          initialStartAt={selectedSlotStartAt}
+          initialEndAt={selectedSlotEndAt}
+        />
+      )}
     </div>
   );
 }

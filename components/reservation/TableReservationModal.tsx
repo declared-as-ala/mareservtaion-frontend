@@ -11,6 +11,7 @@ import { useCartStore } from '@/stores/cart';
 import { createReservation } from '@/lib/api/reservations';
 import { toast } from 'sonner';
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@/components/ui/sheet';
+import { getReservableLabel, getReservationCTA } from '@/lib/reservation-labels';
 import {
   Users, ShoppingCart, CreditCard, Crown,
   Calendar, Clock, Minus, Plus, Phone, Loader2, UtensilsCrossed,
@@ -51,6 +52,7 @@ export function TableReservationModal({
   const { addItem, openDrawer } = useCartStore();
 
   const isAvailable = placement.table.status === 'available';
+  const reservableLabel = getReservableLabel(venue.type);
   const tableLabel  = placement.table.name || `Table ${placement.table.tableNumber}`;
   const tablePrice  = placement.table.price ?? venue.startingPrice ?? 0;
   const minimumSpend = (placement.table as { minimumSpend?: number }).minimumSpend ?? tablePrice;
@@ -176,7 +178,7 @@ export function TableReservationModal({
         </div>
 
         <SheetHeader className="px-5 pt-2 pb-0">
-          <SheetTitle className="text-zinc-100 text-base font-semibold">Réserver une table</SheetTitle>
+          <SheetTitle className="text-zinc-100 text-base font-semibold">{getReservationCTA(venue.type)}</SheetTitle>
         </SheetHeader>
 
         <div className="px-5 py-4 space-y-5 pb-8">
@@ -206,7 +208,7 @@ export function TableReservationModal({
           {!isAvailable && (
             <div className="rounded-xl border border-red-500/30 bg-red-500/10 px-4 py-3 text-sm text-red-400 flex items-center gap-2">
               <span className="size-2 rounded-full bg-red-500 flex-shrink-0" />
-              Cette table n&apos;est pas disponible pour le moment.
+              Cette {reservableLabel} n&apos;est pas disponible pour le moment.
             </div>
           )}
 

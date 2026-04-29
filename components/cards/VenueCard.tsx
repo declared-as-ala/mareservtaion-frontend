@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import Image from 'next/image';
-import { MapPin, Video, Star, ArrowUpRight } from 'lucide-react';
+import { MapPin, Video, ArrowUpRight } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import type { Venue } from '@/lib/api/types';
 import { TypeBadge } from '@/components/shared/TypeBadge';
@@ -49,21 +49,6 @@ export function VenueCard({ venue, className }: VenueCardProps) {
 
           {/* Gradient overlay */}
           <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
-
-          {/* Top badges */}
-          <div className="absolute top-3 left-3 flex flex-wrap gap-1.5">
-            {venue.isFeatured && (
-              <span className="inline-flex items-center gap-1 rounded-full bg-amber-400 px-2.5 py-0.5 text-[10px] font-bold text-black shadow-lg shadow-amber-500/30">
-                <Star className="size-2.5 fill-black" />
-                Vedette
-              </span>
-            )}
-            {venue.isVedette && (
-              <span className="inline-flex items-center rounded-full bg-amber-400/90 px-2.5 py-0.5 text-[10px] font-bold text-black backdrop-blur-sm">
-                ⭐ Vedette
-              </span>
-            )}
-          </div>
 
           {/* Top-right: 360 badge */}
           {venue.hasVirtualTour && (

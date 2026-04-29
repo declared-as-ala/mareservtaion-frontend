@@ -1,9 +1,15 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { Sparkles, Eye, Trash2, RefreshCcw, ChevronLeft, ChevronRight, X, CalendarDays, Users, MapPin, Phone, Mail } from 'lucide-react';
-import { listSOSConseil, updateSOSConseilStatus, deleteSOSConseil, type SOSConseilRecord } from '@/lib/api/sos-conseil';
+import { Sparkles, Eye, Trash2, RefreshCcw, ChevronLeft, ChevronRight, CalendarDays, Users, MapPin, Phone, Mail } from 'lucide-react';
+import {
+  listSOSConseil,
+  updateSOSConseilStatus,
+  updateSOSConseilRecommendedVenues,
+  deleteSOSConseil,
+  type SOSConseilRecord,
+} from '@/lib/api/sos-conseil';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
@@ -23,6 +29,30 @@ import {
   DialogDescription,
 } from '@/components/ui/dialog';
 import { toast } from 'sonner';
+import { Textarea } from '@/components/ui/textarea';
+
+function formatBudgetFr(code?: string): string | undefined {
+  if (!code?.trim()) return undefined;
+  const map: Record<string, string> = {
+    moins_100: 'Moins de 100 TND',
+    '100_300': '100–300 TND',
+    '300_600': '300–600 TND',
+    '600_1000': '600–1 000 TND',
+    plus_1000: 'Plus de 1 000 TND',
+  };
+  return map[code] ?? code.replace(/_/g, ' ');
+}
+
+function formatContactPreferenceFr(v?: string): string | undefined {
+  if (!v) return undefined;
+  return (
+    ({
+      whatsapp: 'WhatsApp',
+      phone: 'Téléphone',
+      email: 'Email',
+    }) as Record<string, string>
+  )[v] ?? v;
+}
 
 function formatAgeRanges(r: SOSConseilRecord): string {
   if (r.averageAgeRanges?.length) return r.averageAgeRanges.map((x) => `${x} ans`).join(', ');
@@ -32,9 +62,9 @@ function formatAgeRanges(r: SOSConseilRecord): string {
 
 const STATUS_LABEL: Record<string, string> = {
   new: 'Nouveau',
-  in_review: 'En revue',
-  contacted: 'Contacté',
-  closed: 'Clôturé',
+  in_review: 'En cours',
+  contacted: 'Répondu',
+  closed: 'Converti',
 };
 
 function StatusBadge({ status }: { status: string }) {
@@ -59,15 +89,32 @@ function StatusBadge({ status }: { status: string }) {
 function DetailModal({ req, onClose }: { req: SOSConseilRecord; onClose: () => void }) {
   const queryClient = useQueryClient();
   const [current, setCurrent] = useState<SOSConseilRecord>(req);
+  const [recoDraft, setRecoDraft] = useState(req.adminRecommendedVenues ?? '');
+
+  useEffect(() => {
+    setCurrent(req);
+    setRecoDraft(req.adminRecommendedVenues ?? '');
+  }, [req]);
 
   const { mutate: changeStatus, isPending } = useMutation({
     mutationFn: (s: SOSConseilRecord['status']) => updateSOSConseilStatus(current._id, s),
     onSuccess: (updated) => {
-      setCurrent((prev) => ({ ...prev, status: updated.status ?? updated as any }));
+      setCurrent((prev) => ({ ...prev, ...updated }));
       queryClient.invalidateQueries({ queryKey: ['admin', 'sos-conseil'] });
       toast.success('Statut mis à jour');
     },
     onError: () => toast.error('Erreur lors de la mise à jour'),
+  });
+
+  const { mutate: saveReco, isPending: savingReco } = useMutation({
+    mutationFn: () =>
+      updateSOSConseilRecommendedVenues(current._id, recoDraft.trim()),
+    onSuccess: (updated) => {
+      setCurrent((prev) => ({ ...prev, ...updated }));
+      queryClient.invalidateQueries({ queryKey: ['admin', 'sos-conseil'] });
+      toast.success('Recommandations enregistrées');
+    },
+    onError: () => toast.error('Erreur lors de la sauvegarde'),
   });
 
   return (
@@ -157,8 +204,37 @@ function DetailModal({ req, onClose }: { req: SOSConseilRecord; onClose: () => v
             </div>
             {current.budgetRange ? (
               <div className="space-y-2">
-                <p className="text-xs text-zinc-500">Budget (ancien formulaire)</p>
-                <p className="text-sm font-medium text-zinc-100">{current.budgetRange.replace(/_/g, ' ')}</p>
+                <p className="text-xs text-zinc-500">Budget</p>
+                <p className="text-sm font-medium text-amber-300/95">
+                  {formatBudgetFr(current.budgetRange) ?? current.budgetRange}
+                </p>
+              </div>
+            ) : null}
+            {(current.contactPreference || current.ambianceTags?.length) ? (
+              <div className="sm:col-span-2 grid sm:grid-cols-2 gap-4 pt-2">
+                {current.contactPreference ? (
+                  <div className="space-y-2">
+                    <p className="text-xs text-zinc-500">Contact préféré</p>
+                    <p className="text-sm font-medium text-zinc-100">
+                      {formatContactPreferenceFr(current.contactPreference) ?? '—'}
+                    </p>
+                  </div>
+                ) : null}
+                {current.ambianceTags && current.ambianceTags.length > 0 ? (
+                  <div className="space-y-2 sm:col-span-2">
+                    <p className="text-xs text-zinc-500">Ambiance / critères</p>
+                    <div className="flex flex-wrap gap-1.5">
+                      {current.ambianceTags.map((tag) => (
+                        <span
+                          key={tag}
+                          className="inline-flex items-center px-2.5 py-1 rounded-full bg-amber-400/12 border border-amber-400/25 text-[11px] text-amber-200"
+                        >
+                          {tag}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+                ) : null}
               </div>
             ) : null}
             {current.preferredTime && (
@@ -169,15 +245,48 @@ function DetailModal({ req, onClose }: { req: SOSConseilRecord; onClose: () => v
             )}
           </div>
 
+          {/* Synthèse assistant */}
+          {current.aiAssistSummary && (
+            <div className="space-y-2">
+              <p className="text-xs text-zinc-500 flex items-center gap-2">
+                <Sparkles className="size-3.5 text-amber-400" />
+                Résumé assistant
+              </p>
+              <div className="bg-amber-500/5 rounded-lg p-4 text-sm text-zinc-200 leading-relaxed whitespace-pre-wrap border border-amber-500/20">
+                {current.aiAssistSummary}
+              </div>
+            </div>
+          )}
+
           {/* Details */}
-          {current.details && (
+          {current.details ? (
             <div className="space-y-2">
               <p className="text-xs text-zinc-500">Détails</p>
               <div className="bg-zinc-800/50 rounded-lg p-4 text-sm text-zinc-300 leading-relaxed whitespace-pre-wrap border border-zinc-700/50">
                 {current.details}
               </div>
             </div>
-          )}
+          ) : null}
+
+          {/* Recommandations venues (manuel) */}
+          <div className="space-y-3 pt-2 border-t border-zinc-800">
+            <p className="text-xs font-medium text-zinc-400">Recommandations (lieux, notes pour l&apos;équipe)</p>
+            <Textarea
+              value={recoDraft}
+              onChange={(e) => setRecoDraft(e.target.value)}
+              placeholder="Liste manuelle ou liens venues…"
+              className="min-h-[140px] bg-zinc-950 border-zinc-700 text-zinc-100 placeholder:text-zinc-600 text-sm"
+            />
+            <Button
+              type="button"
+              size="sm"
+              disabled={savingReco || recoDraft === (current.adminRecommendedVenues ?? '')}
+              onClick={() => saveReco()}
+              className="bg-amber-500 text-black hover:bg-amber-400"
+            >
+              {savingReco ? '…' : 'Enregistrer les recommandations'}
+            </Button>
+          </div>
 
           {/* Status */}
           <div className="space-y-3 pt-4 border-t border-zinc-800">
@@ -260,9 +369,9 @@ export default function AdminSOSConseilPage() {
                 <SelectContent className="bg-zinc-900 border-zinc-800">
                   <SelectItem value="all">Tous les statuts</SelectItem>
                   <SelectItem value="new">Nouveau</SelectItem>
-                  <SelectItem value="in_review">En revue</SelectItem>
-                  <SelectItem value="contacted">Contacté</SelectItem>
-                  <SelectItem value="closed">Clôturé</SelectItem>
+                  <SelectItem value="in_review">En cours</SelectItem>
+                  <SelectItem value="contacted">Répondu</SelectItem>
+                  <SelectItem value="closed">Converti</SelectItem>
                 </SelectContent>
               </Select>
               <Button

@@ -4,7 +4,7 @@ import { useState } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { useQuery } from '@tanstack/react-query';
-import { fetchAdminVenues } from '@/lib/api/admin';
+import { fetchAdminVenues, fetchAdminOwners } from '@/lib/api/admin';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
@@ -28,6 +28,8 @@ import {
 } from '@/components/ui/dropdown-menu';
 
 type VenueRow = { _id: string; name: string; type: string; city: string; coverImage?: string };
+type OwnerRef = { _id: string; fullName?: string; email?: string };
+type VenueRowWithOwner = VenueRow & { ownerId?: OwnerRef | string };
 
 // Type-specific icons and colors
 const TYPE_CONFIG: Record<string, { icon: React.ComponentType<{ className?: string }>; color: string; bgColor: string; borderColor: string }> = {
@@ -74,12 +76,24 @@ export default function AdminVenuesPage() {
   const [typeFilter, setTypeFilter] = useState('');
   const [q, setQ] = useState('');
   const [viewMode, setViewMode] = useState<'table' | 'grid'>('table');
+  const [ownerFilter, setOwnerFilter] = useState('');
+  const [withoutOwner, setWithoutOwner] = useState(false);
 
   const { data: venuesData = [], isLoading } = useQuery({
-    queryKey: ['admin', 'venues', typeFilter, q],
-    queryFn: () => fetchAdminVenues({ type: typeFilter || undefined, q: q || undefined }),
+    queryKey: ['admin', 'venues', typeFilter, q, ownerFilter, withoutOwner],
+    queryFn: () =>
+      fetchAdminVenues({
+        type: typeFilter || undefined,
+        q: q || undefined,
+        ownerId: ownerFilter || undefined,
+        withoutOwner,
+      }),
   });
-  const venues = venuesData as VenueRow[];
+  const venues = venuesData as VenueRowWithOwner[];
+  const { data: owners = [] } = useQuery({
+    queryKey: ['admin', 'owners'],
+    queryFn: fetchAdminOwners,
+  });
 
   // Count by type
   const typeCounts = venues.reduce((acc, v) => {
@@ -170,6 +184,27 @@ export default function AdminVenuesPage() {
                 className="pl-9 h-9 border-zinc-700 bg-zinc-800/50 text-zinc-100 placeholder:text-zinc-500 focus:border-amber-500 focus:ring-amber-500/20"
               />
             </div>
+            <Select value={ownerFilter || 'all'} onValueChange={(v) => setOwnerFilter(v === 'all' ? '' : v)}>
+              <SelectTrigger className="w-[220px] h-9 border-zinc-700 bg-zinc-800/50 text-zinc-100">
+                <SelectValue placeholder="Proprietaire" />
+              </SelectTrigger>
+              <SelectContent className="bg-zinc-900 border-zinc-800">
+                <SelectItem value="all">Tous proprietaires</SelectItem>
+                {owners.map((owner) => (
+                  <SelectItem key={owner._id} value={owner._id}>
+                    {owner.fullName || owner.email}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+            <Button
+              type="button"
+              variant={withoutOwner ? 'default' : 'outline'}
+              onClick={() => setWithoutOwner((v) => !v)}
+              className="h-9"
+            >
+              Sans proprietaire
+            </Button>
           </div>
         </CardContent>
       </Card>
@@ -221,6 +256,7 @@ export default function AdminVenuesPage() {
                   <TableHead className="text-zinc-400 pl-4">Lieu</TableHead>
                   <TableHead className="text-zinc-400">Type</TableHead>
                   <TableHead className="text-zinc-400">Ville</TableHead>
+                  <TableHead className="text-zinc-400">Proprietaire</TableHead>
                   <TableHead className="text-right pr-4 text-zinc-400">Actions</TableHead>
                 </TableRow>
               </TableHeader>
@@ -246,6 +282,9 @@ export default function AdminVenuesPage() {
                         <MapPin className="size-3.5 text-zinc-500" />
                         {v.city}
                       </div>
+                    </TableCell>
+                    <TableCell className="text-sm text-zinc-400">
+                      {typeof v.ownerId === 'object' ? (v.ownerId.fullName || v.ownerId.email || '—') : '—'}
                     </TableCell>
                     <TableCell className="text-right pr-4">
                       <div className="flex items-center justify-end gap-1">

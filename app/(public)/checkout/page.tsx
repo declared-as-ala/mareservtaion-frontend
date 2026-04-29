@@ -247,8 +247,8 @@ export default function CheckoutPage() {
           >
             <Clock className="mr-2 size-4" />
             {hasExpiredHold
-              ? 'Le maintien de votre table a expire.'
-              : `Table maintenue pendant ${Math.floor(holdSecondsLeft / 60).toString().padStart(2, '0')}:${String(holdSecondsLeft % 60).padStart(2, '0')}`}
+              ? 'Le maintien de votre reservation a expire.'
+              : `Reservation maintenue pendant ${Math.floor(holdSecondsLeft / 60).toString().padStart(2, '0')}:${String(holdSecondsLeft % 60).padStart(2, '0')}`}
           </div>
         )}
 

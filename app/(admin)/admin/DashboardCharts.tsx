@@ -10,6 +10,7 @@ import {
   MapPin,
   Users,
   FileText,
+  Ticket,
   ArrowUpRight,
   ArrowDownRight,
   Minus,
@@ -29,6 +30,7 @@ import {
   Area,
 } from 'recharts';
 import { VENUE_TYPE_LABELS } from '@/app/constants/venueTypes';
+import { getDashboardResourceName } from '@/lib/reservation-labels';
 
 // ── Chart Colors ───────────────────────────────────────────────
 
@@ -119,6 +121,39 @@ export function DashboardCharts() {
   });
 
   const isLoading = loadingReservations || loadingVenues || loadingUsers || loadingEvents;
+  const reservationsList = reservations as any[];
+  const venuesList = venues as any[];
+
+  const bookingSplit = reservationsList.reduce(
+    (acc, r) => {
+      const t = String(r.bookingType || 'TABLE').toUpperCase();
+      if (t === 'ROOM') acc.ROOM += 1;
+      else if (t === 'SEAT') acc.SEAT += 1;
+      else acc.TABLE += 1;
+      return acc;
+    },
+    { TABLE: 0, ROOM: 0, SEAT: 0 }
+  );
+
+  const revenueByBooking = reservationsList
+    .filter((r) => ['confirmed', 'completed', 'CONFIRMED', 'COMPLETED', 'checked_in'].includes(String(r.status)))
+    .reduce(
+      (acc, r) => {
+        const t = String(r.bookingType || 'TABLE').toUpperCase();
+        const amount = Number(r.totalPrice || 0);
+        if (t === 'ROOM') acc.ROOM += amount;
+        else if (t === 'SEAT') acc.SEAT += amount;
+        else acc.TABLE += amount;
+        return acc;
+      },
+      { TABLE: 0, ROOM: 0, SEAT: 0 }
+    );
+
+  const categoryRevenueChartData = [
+    { name: getDashboardResourceName('CAFE'), revenue: revenueByBooking.TABLE },
+    { name: getDashboardResourceName('HOTEL'), revenue: revenueByBooking.ROOM },
+    { name: getDashboardResourceName('CINEMA'), revenue: revenueByBooking.SEAT },
+  ];
 
   // Prepare venue type distribution data
   const venueTypeData = (venues as any[]).reduce((acc: Record<string, number>, v: any) => {
@@ -185,6 +220,12 @@ export function DashboardCharts() {
 
   return (
     <div className="space-y-4">
+      <div className="grid gap-4 md:grid-cols-3">
+        <StatWithTrend title="Reservations tables" value={bookingSplit.TABLE} icon={Calendar} iconColor="text-amber-400" iconBg="bg-amber-500/10" />
+        <StatWithTrend title="Reservations chambres" value={bookingSplit.ROOM} icon={MapPin} iconColor="text-blue-400" iconBg="bg-blue-500/10" />
+        <StatWithTrend title="Reservations places" value={bookingSplit.SEAT} icon={Ticket} iconColor="text-purple-400" iconBg="bg-purple-500/10" />
+      </div>
+
       {/* Venue Type Distribution */}
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-7">
         <Card className="col-span-4 border-zinc-800 bg-zinc-900/50">
@@ -274,6 +315,51 @@ export function DashboardCharts() {
                 </PieChart>
               </ResponsiveContainer>
             )}
+          </CardContent>
+        </Card>
+      </div>
+
+      <div className="grid gap-4 md:grid-cols-2">
+        <Card className="border-zinc-800 bg-zinc-900/50">
+          <CardHeader>
+            <CardTitle className="text-base text-zinc-100">Revenus par categorie de reservation</CardTitle>
+            <CardDescription className="text-zinc-400">Tables, chambres, places</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <ResponsiveContainer width="100%" height={280}>
+              <BarChart data={categoryRevenueChartData}>
+                <CartesianGrid strokeDasharray="3 3" stroke="#27272a" />
+                <XAxis dataKey="name" stroke="#71717a" fontSize={12} tickLine={false} axisLine={false} />
+                <YAxis stroke="#71717a" fontSize={12} tickLine={false} axisLine={false} />
+                <Tooltip content={<ChartTooltip />} />
+                <Bar dataKey="revenue" fill="#10b981" radius={[6, 6, 0, 0]} />
+              </BarChart>
+            </ResponsiveContainer>
+          </CardContent>
+        </Card>
+        <Card className="border-zinc-800 bg-zinc-900/50">
+          <CardHeader>
+            <CardTitle className="text-base text-zinc-100">Top etablissements (activite)</CardTitle>
+            <CardDescription className="text-zinc-400">Basé sur les reservations</CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-2">
+            {Object.entries(
+              reservationsList.reduce((acc: Record<string, number>, r: any) => {
+                const venueName = typeof r.venueId === 'object' ? r.venueId?.name : undefined;
+                const key = venueName || 'Lieu';
+                acc[key] = (acc[key] || 0) + 1;
+                return acc;
+              }, {})
+            )
+              .sort((a, b) => b[1] - a[1])
+              .slice(0, 5)
+              .map(([name, count]) => (
+                <div key={name} className="flex items-center justify-between rounded-lg border border-zinc-800 bg-zinc-950/50 px-3 py-2 text-sm">
+                  <span className="text-zinc-300">{name}</span>
+                  <span className="font-semibold text-amber-300">{count}</span>
+                </div>
+              ))}
+            {!reservationsList.length && <p className="text-sm text-zinc-500">Aucune donnee.</p>}
           </CardContent>
         </Card>
       </div>
