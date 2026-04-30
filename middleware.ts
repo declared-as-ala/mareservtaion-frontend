@@ -47,6 +47,22 @@ function isTokenValid(cookieValue: string | undefined): boolean {
   return true;
 }
 
+/**
+ * In production on Vercel, frontend and backend can live on different domains.
+ * In that setup, backend auth cookies are NOT readable by frontend middleware,
+ * so route protection must be handled client-side (/auth/me + API 401 handling).
+ */
+function canUseEdgeCookieAuth(request: NextRequest): boolean {
+  const apiUrl = process.env.NEXT_PUBLIC_API_URL;
+  if (!apiUrl) return true;
+  try {
+    const apiHost = new URL(apiUrl).hostname;
+    return apiHost === request.nextUrl.hostname;
+  } catch {
+    return true;
+  }
+}
+
 // ── Route matching ──────────────────────────────────────────────
 
 const DASHBOARD_PATTERN = /^\/dashboard($|\/)/;
@@ -68,6 +84,7 @@ const PUBLIC_PATTERNS = [
 
 export function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
+  const edgeCookieAuthEnabled = canUseEdgeCookieAuth(request);
 
   // Skip middleware for public/static assets
   if (PUBLIC_PATTERNS.some((p) => p.test(pathname))) {
@@ -76,6 +93,12 @@ export function middleware(request: NextRequest) {
 
   const accessTokenCookie = request.cookies.get('accessToken')?.value;
   const hasValidToken = isTokenValid(accessTokenCookie);
+
+  // Cross-origin API deployment (frontend domain != backend domain):
+  // don't enforce cookie-based redirects at the edge.
+  if (!edgeCookieAuthEnabled) {
+    return NextResponse.next();
+  }
 
   // ── Dashboard routes — redirect to appropriate home ─────────
   if (DASHBOARD_PATTERN.test(pathname)) {

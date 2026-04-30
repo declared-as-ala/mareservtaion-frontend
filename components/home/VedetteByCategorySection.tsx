@@ -136,19 +136,19 @@ function CategoryCarousel({ type, label, href }: { type: string; label: string; 
 
 export function VedetteByCategorySection() {
   return (
-    <section className="relative overflow-hidden bg-[#111113] py-24 text-white">
+    <section className="relative overflow-hidden bg-[#111113] py-16 text-white md:py-24">
       {/* Top border + subtle glow */}
       <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-white/[0.06] to-transparent" />
       <div className="absolute -top-20 right-0 h-[400px] w-[400px] rounded-full bg-amber-500/[0.015] blur-[100px]" />
 
-      <div className="mx-auto max-w-7xl px-6">
+      <div className="mx-auto max-w-7xl px-4 sm:px-6">
         {/* Section header */}
-        <div className="text-center mb-16">
+        <div className="mb-12 text-center md:mb-16">
           <div className="mx-auto mb-4 h-px w-12 bg-gradient-to-r from-amber-400/60 via-amber-400 to-amber-500/40" />
           <h2 className="font-serif text-2xl font-semibold tracking-tight text-white/95 md:text-3xl">
             Nos coups de cœur
           </h2>
-          <p className="text-sm text-white/35 mt-2">
+          <p className="mt-2 text-sm text-white/45">
             Les lieux incontournables sélectionnés pour vous
           </p>
         </div>

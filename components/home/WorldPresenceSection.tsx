@@ -4,7 +4,7 @@ import { Globe2 } from 'lucide-react';
 
 export function WorldPresenceSection() {
   return (
-    <section className="relative min-h-[520px] overflow-hidden bg-[#111113] text-white md:min-h-[600px]">
+    <section className="relative min-h-[500px] overflow-hidden bg-[#111113] text-white md:min-h-[600px]">
       {/* Background image */}
       <div className="absolute inset-0">
         <Image
@@ -25,7 +25,7 @@ export function WorldPresenceSection() {
       <div className="absolute -bottom-20 right-1/4 h-72 w-72 rounded-full bg-amber-600/[0.02] blur-[100px]" />
 
       <AppContainer>
-        <div className="relative z-10 flex min-h-[440px] flex-col items-center justify-center text-center md:min-h-[520px]">
+        <div className="relative z-10 flex min-h-[430px] flex-col items-center justify-center text-center md:min-h-[520px]">
           {/* Globe icon */}
           <div className="mb-6 flex size-14 items-center justify-center rounded-full border border-amber-400/15 bg-amber-400/[0.04]">
             <Globe2 className="size-6 text-amber-400/80" strokeWidth={1.5} />
@@ -39,13 +39,13 @@ export function WorldPresenceSection() {
           </div>
 
           {/* Headline */}
-          <h2 className="mx-auto max-w-3xl font-serif text-2xl leading-relaxed text-white/90 md:text-3xl lg:text-4xl">
+          <h2 className="mx-auto max-w-3xl font-serif text-xl leading-relaxed text-white/90 sm:text-2xl md:text-3xl lg:text-4xl">
             La plateforme de réservation immersive,{' '}
             <strong className="font-bold text-amber-400/90">bientôt</strong>{' '}
             dans le monde entier
           </h2>
 
-          <p className="mx-auto mt-4 max-w-lg text-sm text-white/35">
+          <p className="mx-auto mt-4 max-w-lg text-sm leading-relaxed text-white/45">
             De Tunis à Paris, de Dubaï à Montréal — nous construisons le futur de la réservation d&apos;expériences.
           </p>
 
@@ -53,7 +53,7 @@ export function WorldPresenceSection() {
           <div className="mx-auto mt-6 h-px w-16 bg-gradient-to-r from-amber-400/60 via-amber-400 to-amber-500/40" />
 
           {/* Stats */}
-          <div className="mt-12 grid grid-cols-3 gap-8 md:gap-16">
+          <div className="mt-10 grid grid-cols-3 gap-5 sm:gap-8 md:mt-12 md:gap-16">
             <div className="text-center">
               <div className="text-2xl font-bold text-amber-400/90 md:text-3xl">10+</div>
               <div className="mt-1.5 text-xs text-white/30">Villes cibles</div>

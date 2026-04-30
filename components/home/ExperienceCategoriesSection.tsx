@@ -15,7 +15,7 @@ const items = [
 
 export function ExperienceCategoriesSection() {
   return (
-    <section className="relative overflow-hidden bg-[#111113] py-24 text-white">
+    <section className="relative overflow-hidden bg-[#111113] py-16 text-white md:py-24">
       {/* Subtle top border */}
       <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-white/[0.06] to-transparent" />
 
@@ -24,12 +24,12 @@ export function ExperienceCategoriesSection() {
 
       <AppContainer>
         {/* Header */}
-        <div className="mx-auto max-w-2xl text-center mb-16">
+        <div className="mx-auto mb-12 max-w-2xl text-center md:mb-16">
           <div className="mx-auto mb-4 h-px w-12 bg-gradient-to-r from-amber-400/60 via-amber-400 to-amber-500/40" />
           <h2 className="font-serif text-2xl font-semibold tracking-tight text-white/95 md:text-3xl">
             Tous les lieux où l&apos;expérience compte
           </h2>
-          <p className="mt-3 text-sm text-white/40">
+          <p className="mt-3 text-sm leading-relaxed text-white/45">
             Explorez par catégorie et trouvez exactement ce que vous cherchez
           </p>
         </div>
@@ -40,12 +40,12 @@ export function ExperienceCategoriesSection() {
             <Link
               key={label}
               href={href}
-              className="group relative flex flex-col items-center gap-3 rounded-xl border border-white/[0.05] bg-[#161618]/60 p-5 text-center backdrop-blur-sm transition-all duration-300 hover:border-amber-400/20 hover:bg-[#161618] hover:-translate-y-0.5 hover:shadow-lg hover:shadow-amber-500/[0.03] md:p-6"
+              className="group relative flex min-h-36 flex-col items-center gap-3 rounded-xl border border-white/[0.05] bg-[#161618]/60 p-4 text-center backdrop-blur-sm transition-all duration-300 hover:border-amber-400/20 hover:bg-[#161618] hover:-translate-y-0.5 hover:shadow-lg hover:shadow-amber-500/[0.03] md:min-h-40 md:p-6"
             >
               <div className="flex size-12 items-center justify-center rounded-lg border border-amber-400/10 bg-amber-400/[0.03] transition-all duration-300 group-hover:scale-110 group-hover:border-amber-400/25 group-hover:bg-amber-400/[0.06] md:size-14">
                 <Icon className="size-5 text-amber-400/80 transition-colors group-hover:text-amber-400 md:size-6" strokeWidth={1.5} />
               </div>
-              <p className="text-xs font-medium leading-snug text-white/55 transition-colors group-hover:text-white/85 md:text-sm">
+              <p className="text-xs font-medium leading-snug text-white/65 transition-colors group-hover:text-white/90 md:text-sm">
                 {label}
               </p>
             </Link>
@@ -53,7 +53,7 @@ export function ExperienceCategoriesSection() {
         </div>
 
         {/* See all */}
-        <div className="mt-12 text-center">
+        <div className="mt-10 text-center md:mt-12">
           <Link
             href="/explorer"
             className="group inline-flex items-center gap-2 text-sm font-medium text-amber-400/70 transition-colors hover:text-amber-400"

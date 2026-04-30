@@ -29,7 +29,7 @@ const steps = [
 
 export function HowItWorksSection() {
   return (
-    <section className="relative overflow-hidden bg-[#0B0B0C] py-28 text-white">
+    <section className="relative overflow-hidden bg-[#0B0B0C] py-16 text-white md:py-24 lg:py-28">
       {/* Top border */}
       <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-white/[0.06] to-transparent" />
 
@@ -39,18 +39,18 @@ export function HowItWorksSection() {
 
       <AppContainer>
         {/* Header */}
-        <div className="mx-auto max-w-2xl text-center mb-20">
+        <div className="mx-auto mb-12 max-w-2xl text-center md:mb-16 lg:mb-20">
           <div className="mx-auto mb-4 h-px w-12 bg-gradient-to-r from-amber-400/60 via-amber-400 to-amber-500/40" />
           <h2 className="font-serif text-2xl font-semibold tracking-tight text-white/95 md:text-3xl">
             Comment ça marche
           </h2>
-          <p className="mt-3 text-sm text-white/35">
+          <p className="mt-3 text-sm leading-relaxed text-white/45">
             Trois étapes simples pour vivre une expérience exceptionnelle
           </p>
         </div>
 
         {/* Steps */}
-        <div className="grid gap-6 md:grid-cols-3">
+        <div className="grid gap-4 sm:gap-5 md:grid-cols-3 md:gap-6">
           {steps.map((step) => {
             const Icon = step.icon;
             return (
@@ -64,7 +64,7 @@ export function HowItWorksSection() {
                 </div>
 
                 {/* Image */}
-                <div className="relative h-44 overflow-hidden">
+                <div className="relative h-40 overflow-hidden sm:h-44">
                   <Image
                     src={step.image}
                     alt=""
@@ -81,11 +81,11 @@ export function HowItWorksSection() {
                 </div>
 
                 {/* Content */}
-                <div className="px-5 pb-6 pt-4">
+                <div className="px-4 pb-5 pt-4 sm:px-5 sm:pb-6">
                   <h3 className="text-sm font-semibold uppercase tracking-wider text-amber-300/80">
                     {step.title}
                   </h3>
-                  <p className="mt-2 text-[13px] leading-relaxed text-white/40">
+                  <p className="mt-2 text-[13px] leading-relaxed text-white/50">
                     {step.text}
                   </p>
                 </div>
@@ -95,7 +95,7 @@ export function HowItWorksSection() {
         </div>
 
         {/* CTA */}
-        <div className="mt-14 text-center">
+        <div className="mt-10 text-center md:mt-14">
           <Link
             href="/explorer"
             className="group inline-flex items-center gap-2 rounded-full bg-gradient-to-r from-amber-400 via-amber-500 to-amber-400 px-8 py-3.5 text-sm font-semibold text-black shadow-lg shadow-amber-500/15 transition-all duration-300 hover:shadow-amber-500/30 hover:-translate-y-0.5 active:translate-y-0"

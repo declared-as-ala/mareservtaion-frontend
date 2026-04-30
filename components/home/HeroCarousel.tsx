@@ -86,7 +86,7 @@ function SlideContent({
   const ctaUrl = slide.ctaUrl ?? '/explorer';
 
   return (
-    <div className="relative flex min-h-[440px] w-full flex-col justify-center overflow-hidden bg-[#0B0B0C] md:min-h-[560px] lg:min-h-[700px] xl:min-h-[740px]">
+    <div className="relative flex min-h-[540px] w-full flex-col justify-center overflow-hidden bg-[#0B0B0C] md:min-h-[620px] lg:min-h-[700px] xl:min-h-[740px]">
       {img ? (
         <SlideImage src={img} alt={title || 'Banner'} priority={isActive} />
       ) : (
@@ -99,35 +99,35 @@ function SlideContent({
       <div className="absolute -top-40 -left-40 h-[500px] w-[500px] rounded-full bg-amber-500/[0.03] blur-[140px]" />
       <div className="absolute -bottom-40 -right-40 h-[500px] w-[500px] rounded-full bg-amber-600/[0.02] blur-[140px]" />
 
-      <div className="relative z-10 mx-auto max-w-7xl w-full px-6 md:px-10">
+      <div className="relative z-10 mx-auto w-full max-w-7xl px-4 pt-24 pb-14 sm:px-6 sm:pt-28 sm:pb-16 md:px-10 md:pt-32 md:pb-20">
         <div className="max-w-xl">
           <div className="mb-6 h-px w-16 bg-gradient-to-r from-amber-400/80 via-amber-400 to-amber-500/60" />
 
           {subtitle && (
-            <p className="mb-3 text-xs font-semibold uppercase tracking-[0.2em] text-amber-400/80">
+            <p className="mb-3 text-[11px] font-semibold uppercase tracking-[0.18em] text-amber-400/80 sm:text-xs sm:tracking-[0.2em]">
               {subtitle}
             </p>
           )}
 
-          <h2 className="font-serif text-4xl font-bold leading-tight tracking-tight text-white md:text-5xl lg:text-6xl">
+          <h2 className="font-serif text-[30px] font-bold leading-[1.12] tracking-tight text-white sm:text-4xl md:text-5xl lg:text-6xl">
             {title || 'Réservez votre expérience'}
           </h2>
 
-          <p className="mt-5 max-w-md text-[15px] leading-relaxed text-white/55">
+          <p className="mt-4 max-w-md text-sm leading-relaxed text-white/65 sm:mt-5 sm:text-[15px]">
             Découvrez et réservez les meilleurs lieux, restaurants, hôtels et événements — en quelques clics.
           </p>
 
-          <div className="mt-9 flex flex-wrap items-center gap-4">
+          <div className="mt-7 flex flex-wrap items-center gap-3 sm:mt-9 sm:gap-4">
             <Link
               href={ctaUrl}
-              className="group inline-flex items-center gap-2 rounded-full bg-gradient-to-r from-amber-400 via-amber-500 to-amber-400 px-8 py-3.5 text-sm font-semibold text-black shadow-lg shadow-amber-500/15 transition-all duration-300 hover:shadow-amber-500/30 hover:-translate-y-0.5 active:translate-y-0"
+              className="group inline-flex min-h-11 items-center gap-2 rounded-full bg-gradient-to-r from-amber-400 via-amber-500 to-amber-400 px-6 py-3 text-sm font-semibold text-black shadow-lg shadow-amber-500/15 transition-all duration-300 hover:shadow-amber-500/30 hover:-translate-y-0.5 active:translate-y-0 sm:px-8 sm:py-3.5"
             >
               {ctaLabel}
               <ArrowRight className="size-4 transition-transform group-hover:translate-x-0.5" />
             </Link>
             <Link
               href="/explorer"
-              className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/[0.03] px-8 py-3.5 text-sm font-semibold text-white/90 backdrop-blur-sm transition-all duration-200 hover:border-amber-400/30 hover:bg-amber-400/[0.04]"
+              className="inline-flex min-h-11 items-center gap-2 rounded-full border border-white/10 bg-white/[0.03] px-6 py-3 text-sm font-semibold text-white/90 backdrop-blur-sm transition-all duration-200 hover:border-amber-400/30 hover:bg-amber-400/[0.04] sm:px-8 sm:py-3.5"
             >
               Explorer les lieux
             </Link>
@@ -140,35 +140,35 @@ function SlideContent({
 
 function FallbackHero() {
   return (
-    <div className="relative flex min-h-[440px] w-full flex-col justify-center overflow-hidden bg-[#0B0B0C] md:min-h-[560px] lg:min-h-[700px] xl:min-h-[740px]">
+    <div className="relative flex min-h-[540px] w-full flex-col justify-center overflow-hidden bg-[#0B0B0C] md:min-h-[620px] lg:min-h-[700px] xl:min-h-[740px]">
       <SlideImage src={FALLBACK_IMAGE} alt="" priority />
       <SlideOverlay />
       <div className="absolute -top-40 -left-40 h-[500px] w-[500px] rounded-full bg-amber-500/[0.03] blur-[140px]" />
       <div className="absolute -bottom-40 -right-40 h-[500px] w-[500px] rounded-full bg-amber-600/[0.02] blur-[140px]" />
 
-      <div className="relative z-10 mx-auto max-w-7xl w-full px-6 md:px-10">
+      <div className="relative z-10 mx-auto w-full max-w-7xl px-4 pt-24 pb-14 sm:px-6 sm:pt-28 sm:pb-16 md:px-10 md:pt-32 md:pb-20">
         <div className="max-w-xl">
           <div className="mb-6 h-px w-16 bg-gradient-to-r from-amber-400/80 via-amber-400 to-amber-500/60" />
           <p className="mb-3 text-xs font-semibold uppercase tracking-[0.2em] text-amber-400/80">
             Ma Reservation
           </p>
-          <h2 className="font-serif text-4xl font-bold leading-tight tracking-tight text-white md:text-5xl lg:text-6xl">
+          <h2 className="font-serif text-[30px] font-bold leading-[1.12] tracking-tight text-white sm:text-4xl md:text-5xl lg:text-6xl">
             Réservez votre table et votre expérience avant d&apos;y aller
           </h2>
-          <p className="mt-5 max-w-md text-[15px] leading-relaxed text-white/55">
+          <p className="mt-4 max-w-md text-sm leading-relaxed text-white/65 sm:mt-5 sm:text-[15px]">
             Découvrez, explorez et réservez les meilleurs lieux et expériences.
           </p>
-          <div className="mt-9 flex flex-wrap items-center gap-4">
+          <div className="mt-7 flex flex-wrap items-center gap-3 sm:mt-9 sm:gap-4">
             <Link
               href="/explorer"
-              className="group inline-flex items-center gap-2 rounded-full bg-gradient-to-r from-amber-400 via-amber-500 to-amber-400 px-8 py-3.5 text-sm font-semibold text-black shadow-lg shadow-amber-500/15 transition-all duration-300 hover:shadow-amber-500/30 hover:-translate-y-0.5 active:translate-y-0"
+              className="group inline-flex min-h-11 items-center gap-2 rounded-full bg-gradient-to-r from-amber-400 via-amber-500 to-amber-400 px-6 py-3 text-sm font-semibold text-black shadow-lg shadow-amber-500/15 transition-all duration-300 hover:shadow-amber-500/30 hover:-translate-y-0.5 active:translate-y-0 sm:px-8 sm:py-3.5"
             >
               Explorer les lieux
               <ArrowRight className="size-4 transition-transform group-hover:translate-x-0.5" />
             </Link>
             <Link
               href="/login"
-              className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/[0.03] px-8 py-3.5 text-sm font-semibold text-white/90 backdrop-blur-sm transition-all duration-200 hover:border-amber-400/30 hover:bg-amber-400/[0.04]"
+              className="inline-flex min-h-11 items-center gap-2 rounded-full border border-white/10 bg-white/[0.03] px-6 py-3 text-sm font-semibold text-white/90 backdrop-blur-sm transition-all duration-200 hover:border-amber-400/30 hover:bg-amber-400/[0.04] sm:px-8 sm:py-3.5"
             >
               Connexion
             </Link>
@@ -242,7 +242,7 @@ export function HeroCarousel() {
       </div>
 
       {/* Dots */}
-      <div className="absolute bottom-8 left-1/2 z-20 flex -translate-x-1/2 gap-2">
+      <div className="absolute bottom-5 left-1/2 z-20 flex -translate-x-1/2 gap-2 sm:bottom-8">
         {slides.map((_, i) => (
           <button
             key={i}
@@ -264,7 +264,7 @@ export function HeroCarousel() {
         <>
           <button
             type="button"
-            className="absolute left-4 top-1/2 z-20 flex size-11 -translate-y-1/2 items-center justify-center rounded-full bg-[#0B0B0C]/60 text-amber-400/70 backdrop-blur-md ring-1 ring-white/[0.06] transition-all duration-200 hover:bg-[#0B0B0C]/80 hover:text-amber-400 hover:scale-105"
+            className="absolute left-3 top-1/2 z-20 hidden size-11 -translate-y-1/2 items-center justify-center rounded-full bg-[#0B0B0C]/60 text-amber-400/70 backdrop-blur-md ring-1 ring-white/[0.06] transition-all duration-200 hover:bg-[#0B0B0C]/80 hover:text-amber-400 hover:scale-105 md:flex"
             onClick={() => emblaApi?.scrollPrev()}
             aria-label="Précédent"
           >
@@ -272,7 +272,7 @@ export function HeroCarousel() {
           </button>
           <button
             type="button"
-            className="absolute right-4 top-1/2 z-20 flex size-11 -translate-y-1/2 items-center justify-center rounded-full bg-[#0B0B0C]/60 text-amber-400/70 backdrop-blur-md ring-1 ring-white/[0.06] transition-all duration-200 hover:bg-[#0B0B0C]/80 hover:text-amber-400 hover:scale-105"
+            className="absolute right-3 top-1/2 z-20 hidden size-11 -translate-y-1/2 items-center justify-center rounded-full bg-[#0B0B0C]/60 text-amber-400/70 backdrop-blur-md ring-1 ring-white/[0.06] transition-all duration-200 hover:bg-[#0B0B0C]/80 hover:text-amber-400 hover:scale-105 md:flex"
             onClick={() => emblaApi?.scrollNext()}
             aria-label="Suivant"
           >
